@@ -22,8 +22,9 @@ int pos = 0;
 
 void cinit_banner (void) {
 	// Banner
-	cinit_print ("\n  Remove the serial cable from the board \n");	
-	cinit_print ("    Remember to RESET the board after USE \n");
+	//cinit_print ("\n  Remove the serial cable from the board \n");	
+	//cinit_print ("    Remember to RESET the board after USE \n");
+	segment_init();
 }
 
 /* Initializes the LED's on the Evaluator7T board to be 
@@ -49,7 +50,7 @@ int C_Entry ( void ) {
 	__asm {
 		MRS r1, CPSR
 		BIC r1, r1, #0x80
-		ORR	r1,	r1,	#0x13
+		ORR	r1,	r1,	#0x10
 		MSR CPSR_c, r1
 	}
 	task1();  // Start with process 1
