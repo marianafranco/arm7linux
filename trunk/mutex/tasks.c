@@ -58,7 +58,6 @@ void task1 (void) {
 	int delay;
 	while (1) {
 		// Dummy time delay
-		//cinit_print ("Process 1\n");
 		segment_set(1);
 		for (delay=0; delay<0x40ffff; delay++) {}
 		  
@@ -69,7 +68,6 @@ void task2 (void) {
 int delay;
 	while (1) {
 		// Dummy time delay
-		//cinit_print ("Process 2\n"); 
 		segment_set(2);
 		for (delay=0; delay<0x40ffff; delay++) {}
 		 
@@ -79,7 +77,6 @@ int delay;
 void task3 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 3\n");  
 		// Dummy time delay
 		segment_set(3);
 		for (delay=0; delay<0x40ffff; delay++) {}
@@ -89,7 +86,6 @@ int delay;
 void task4 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 4\n");  
 		// Dummy time delay
 		segment_set(4);
 		for (delay=0; delay<0x40ffff; delay++) {}
@@ -99,7 +95,6 @@ int delay;
 void task5 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 5\n");
 		// Dummy time delay
 		segment_set(5);
 		for (delay=0; delay<0x40ffff; delay++) {}  
@@ -109,7 +104,6 @@ int delay;
 void task6 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 6\n");
 		// Dummy time delay
 		segment_set(6);
 		for (delay=0; delay<0x40ffff; delay++) {}  
@@ -119,7 +113,6 @@ int delay;
 void task7 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 7\n"); 
 		// Dummy time delay
 		segment_set(7);
 		for (delay=0; delay<0x40ffff; delay++) {}
@@ -129,7 +122,6 @@ int delay;
 void task8 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 8\n");  
 		// Dummy time delay
 		segment_set(8);
 		for (delay=0; delay<0x40ffff; delay++) {}
@@ -139,7 +131,6 @@ int delay;
 void task9 (void) {
 int delay;
 	while (1) {
-		//cinit_print ("Process 9\n");  
 		// Dummy time delay
 		segment_set(9);
 		for (delay=0; delay<0x40ffff; delay++) {}
