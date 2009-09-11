@@ -1,1 +1,0 @@
-void cinit_print (const char *string);
