@@ -30,7 +30,7 @@ handler_swaptofirst
 	CMP 	r1,#9
 	BNE		handler_swaptonext
 ;Setup context switch to TASK 1
-	ADD		r1, r1, #1
+	MOV		r1, #1
 	STR		r1, [r0]	
 ; Set current_task_addr to TASK 9
 	LDR		r0, =handler_currenttaskaddr_str
