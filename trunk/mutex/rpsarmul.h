@@ -1,11 +1,9 @@
-#ifndef RPSDEF_H
-#define RPSDEF_H
+#define IRQVector (unsigned *) 0x18
 
 /*******************************************************************************/
 /* RPS interrupt Controller IRQ register                                       */
 /*******************************************************************************/
 #define IntBase         0x0A000000
-#define IRQEnable      ((volatile unsigned *)(IntBase + 0x08))
 #define IRQEnableSet   ((volatile unsigned *)(IntBase + 0x08))
 #define IRQEnableClear ((volatile unsigned *)(IntBase + 0x0c))
 
@@ -26,7 +24,7 @@
 /* Counter/Timer control register bits                                         */
 /*******************************************************************************/
 #define TimerEnable      0x80
+#define TimerPeriodic    0x40
 #define TimerPrescale8   0x08
 
-#endif
 

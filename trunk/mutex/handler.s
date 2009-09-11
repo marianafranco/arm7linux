@@ -1,6 +1,5 @@
 ;  Provides an IRQ handler that both services the interrupt for
-;  both the timer and button interrupt. For the timer interrupt
-;  a context change occurs between two tasks A and B. 	   
+;  the timer interrupt.
 ;  The AREA must have 
 ;  - the attribute READONLY, otherwise the linker will not
 ;    place it in ROM.
@@ -9,31 +8,18 @@
 
 	IMPORT timer_irq
 	EXPORT handler_timer
-	EXPORT Angel_IRQ_Address
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	
 	AREA	irq, CODE, READONLY
 
-; -- address of the IRQ controller 
-INTPND		DCD		0x03ff4004
-
 ; Services the timer interrupt and complete a context change.
 handler_timer
 	; Save current context for APCS
 	STMFD	sp!, {r0 - r3, LR}
-	; Go back to the system mode
-	;MRS			r0,CPSR
-	;ORR			r0,r0,#0x1F
-	;MSR 			CPSR_c,r0
 	; Reset the timer	
 	STMFD		sp!, {r4 - r12}
 	BL		timer_irq
-	LDMFD		sp!, {r4 - r12}
-	; Clear the interrupt
-	;MOV      r0,#0
-    ;MOV      r1,#0xa800000
-	;STR      r0,[r1,#0xc]
 	LDMFD		sp!, {r4 - r12}
 	
 	;-----------------------------------------------------
@@ -122,10 +108,7 @@ handler_contextswitch
 
 	AREA	var, DATA, READWRITE
 
-; Scratch location for Angel IRQ Handler address .
-Angel_IRQ_Address	
-	DCD 0x00000000	
-; Context ID 1=TASK B 0=TASK A 
+; Context task ID 
 handler_currenttaskid_str
 	DCD 0x0
 ; Address of the PCB for the next Task
