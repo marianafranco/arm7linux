@@ -1,3 +1,5 @@
+#define emulator 0
+
 #define IRQVector (unsigned *) 0x18
 
 /*******************************************************************************/
@@ -27,4 +29,10 @@
 #define TimerPeriodic    0x40
 #define TimerPrescale8   0x08
 
-
+// Board variables
+#define SYSCFG	0x03ff0000
+#define TMOD	((volatile unsigned *)(SYSCFG+0x6000))
+#define INTPND	((volatile unsigned *)(SYSCFG+0x4004))
+#define TDATA0	((volatile unsigned *)(SYSCFG+0x6004))
+#define INTMSK	((volatile unsigned *)(SYSCFG+0x4008))
+#define INT_GLOBAL	(21)
