@@ -58,8 +58,7 @@ void task1 (void) {
 	while (1) {
 		// Dummy time delay
 		segment_set(1);
-		for (delay=0; delay<0x40ffff; delay++) {}
-		  
+		//for (delay=0; delay<0x40ffff; delay++) {}
 	}
 }
 
@@ -68,7 +67,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(2);
-		for (delay=0; delay<0x40ffff; delay++) {}
+		//for (delay=0; delay<0x40ffff; delay++) {}
 		 
 	}
 }
@@ -78,7 +77,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(3);
-		for (delay=0; delay<0x40ffff; delay++) {}
+		//for (delay=0; delay<0x40ffff; delay++) {}
 	}
 }
 
@@ -87,7 +86,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(4);
-		for (delay=0; delay<0x40ffff; delay++) {}
+		//for (delay=0; delay<0x40ffff; delay++) {}
 	}
 }
 
@@ -96,7 +95,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(5);
-		for (delay=0; delay<0x40ffff; delay++) {}  
+		//for (delay=0; delay<0x40ffff; delay++) {}  
 	}
 }
 
@@ -105,7 +104,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(6);
-		for (delay=0; delay<0x40ffff; delay++) {}  
+		//for (delay=0; delay<0x40ffff; delay++) {}  
 	}
 }
 
@@ -114,7 +113,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(7);
-		for (delay=0; delay<0x40ffff; delay++) {}
+		//for (delay=0; delay<0x40ffff; delay++) {}
 	}
 }
 
@@ -123,7 +122,7 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(8);
-		for (delay=0; delay<0x40ffff; delay++) {}
+		//for (delay=0; delay<0x40ffff; delay++) {}
 	}
 }
 
@@ -132,6 +131,6 @@ int delay;
 	while (1) {
 		// Dummy time delay
 		segment_set(9);
-		for (delay=0; delay<0x40ffff; delay++) {}
+		//for (delay=0; delay<0x40ffff; delay++) {}
 	}
 }

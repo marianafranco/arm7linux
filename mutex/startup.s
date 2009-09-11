@@ -55,6 +55,7 @@ startup_pcb
 	; Pondo o endereço de task2 em handler_task2pcb_str - 4
 
 	LDR		r0, =task2
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#136
 	SUB		r1,r1,#4
@@ -70,6 +71,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task2
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -81,6 +83,7 @@ startup_pcb
 	; Pondo o endereço de task3 em handler_task3pcb_str - 4
 
 	LDR		r0, =task3
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#204
 	SUB		r1,r1,#4
@@ -97,6 +100,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task3
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -108,6 +112,7 @@ startup_pcb
 	; Pondo o endereço de task4 em handler_task4pcb_str - 4
 
 	LDR		r0, =task4
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#272
 	SUB		r1,r1,#4
@@ -125,6 +130,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task4
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -136,6 +142,7 @@ startup_pcb
 	; Pondo o endereço de task5 em handler_task5pcb_str - 4
 
 	LDR		r0, =task5
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#340
 	SUB		r1,r1,#4
@@ -154,6 +161,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task5
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -165,6 +173,7 @@ startup_pcb
 	; Pondo o endereço de task6 em handler_task6pcb_str - 4
 
 	LDR		r0, =task6
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#408
 	SUB		r1,r1,#4
@@ -184,6 +193,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task6
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -195,6 +205,7 @@ startup_pcb
 	; Pondo o endereço de task7 em handler_task7pcb_str - 4
 
 	LDR		r0, =task7
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#476
 	SUB		r1,r1,#4
@@ -215,6 +226,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task7
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -226,6 +238,7 @@ startup_pcb
 	; Pondo o endereço de task8 em handler_task8pcb_str - 4
 
 	LDR		r0, =task8
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#544
 	SUB		r1,r1,#4
@@ -247,6 +260,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task8
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
@@ -258,6 +272,7 @@ startup_pcb
 	; Pondo o endereço de task9 em handler_task9pcb_str - 4
 
 	LDR		r0, =task9
+	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#612
 	SUB		r1,r1,#4
@@ -280,6 +295,7 @@ startup_pcb
 
 	SUB		r1,r1,#56
 	LDR		r0,=task9
+	ADD		r0,r0,#4
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
