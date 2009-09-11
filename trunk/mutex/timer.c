@@ -1,8 +1,6 @@
-/* Setups IRQ registers and serives the IRQ's (timer) */
 #include "rpsarmul.h"
 
-#define COUNTDOWN	0x00cffff0 // Time for the timer 0x00effff0
-
+// Initiate timer
 void timer_init (void) {
 	if (emulator == 1) {
 	  *IRQEnableClear = ~0; // Clear/disable all interrupts
@@ -30,15 +28,15 @@ void timer_irq(void) {
 void timer_start (void) {
 	if (emulator == 1) {
   		*Timer1Load = COUNTDOWN; // Load counter values
-		*Timer1Control = (TimerEnable | // Enable the Timer  )
+		*Timer1Control = (TimerEnable | // Enable the Timer
 						  TimerPeriodic | // Periodic Timer producing interrupt               
 						  TimerPrescale8 ); // Set Maximum Prescale - 8 bits 
-    	*IRQEnableSet = IRQTimer1; // Enable the counter timer interrupts
+    	*IRQEnableSet = IRQTimer1; // Enable interrupt
     }
     else {
-    	*TDATA0		 = COUNTDOWN;	// load Counter Timer 
-    	*TMOD 		|= 0x1;			// enable interval interrupt 	
-    	*(volatile int*)INTMSK &= ~((1 << INT_GLOBAL) | (1<<10) | (1<<0)); //unmask the interrupt source
+    	*TDATA0		 = COUNTDOWN;	// Load counter values
+    	*TMOD 		|= 0x1;			// Enable interrupt
+    	*(volatile int*)INTMSK &= ~((1 << INT_GLOBAL) | (1<<10) | (1<<0)); // Unmask the interrupt source
 	}
 }
 	

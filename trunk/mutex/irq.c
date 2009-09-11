@@ -1,8 +1,5 @@
 /* Installs an IRQ handler and initializes the timer interrupt */
 #include "timer.h"
-#include "rpsarmul.h"
-
-extern void handler_timer(void);
 
 // Installs a handler to the interruption vector
 void irq_installhandler (unsigned routine, unsigned *vector) { 
@@ -24,12 +21,4 @@ void irq_installhandler (unsigned routine, unsigned *vector) {
    //vector	     	= (unsigned *) (0x18 + old_vector_value+0x8);
    //Angel_IRQ_Address 	= *vector; 	// chain Angel Interrupt Handler	  
   // *vector		= routine; 	// IRQ handler
-}
-
-// Initializes all the IRQ interrupt and installs an IRQ handler.
-void irq_init (void) {
-	// Initializes timer
-	timer_init 	();
-	// Install handler
-	irq_installhandler ((unsigned)handler_timer, (unsigned *)IRQVector);
 }
