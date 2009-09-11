@@ -1,6 +1,5 @@
 #include "segment.h"
 
-
 // LED STUFF
 
 // -- Samsung KS32C50100 settings ....
