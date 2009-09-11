@@ -1,41 +1,6 @@
-/****************************************************************
- *
- * ARM Strategic Support Group
- * 
- ****************************************************************/
-
-/****************************************************************
- *
- *	Module		: segment.h
- *	Description	: Segment Display header File 
- *
- *  Tool Chain	: ARM Developer Suite 1.0
- *	Platform	: Evaluator7T
- * 	Status		: Complete
- * 	History		: 
- *
- *				2000-04-04 Andrew N. Sloss
- *				- implemented
- *				
- *	Notes		:
- *
- *				This program never ends. To terminate the user 
- *				has to break in with the debugger or reset the
- *				board.
- *
- ****************************************************************/
-
-/****************************************************************
- * IMPORT
- ****************************************************************/
-
-// none....
-
-/****************************************************************
- * MACROS
- ****************************************************************/
+ void segment_init (void);
  
-/* The bits taken up by the display in IODATA register */
+ /* The bits taken up by the display in IODATA register */
 
 #define	SEG_MASK	(0x1fc00)
 
@@ -66,18 +31,3 @@
 #define	DISP_D		(SEG_B|SEG_C|SEG_D|SEG_E|SEG_G)
 #define	DISP_E		(SEG_A|SEG_D|SEG_E|SEG_F|SEG_G)
 #define	DISP_F		(SEG_A|SEG_E|SEG_F|SEG_G)
-
-/****************************************************************
- * DATATYPES
- ****************************************************************/
- 
-// none... 
-
-/****************************************************************
- * ROUTINES
- ****************************************************************/
- 
-// none... 
-/****************************************************************
- * END OF SEGMENT.H
- ****************************************************************/

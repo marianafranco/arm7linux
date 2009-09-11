@@ -1,11 +1,3 @@
-;  Provides an IRQ handler that both services the interrupt for
-;  the timer interrupt.
-;  The AREA must have 
-;  - the attribute READONLY, otherwise the linker will not
-;    place it in ROM.
-;  - the attribute CODE, otherwise the assembler will not
-;    let us put any code in this AREA
-
 	IMPORT timer_irq
 	EXPORT handler_timer
 	EXPORT handler_currenttaskid_str
@@ -21,34 +13,36 @@ handler_timer
 	STMFD		sp!, {r4 - r12}
 	BL		timer_irq
 	LDMFD		sp!, {r4 - r12}
-	
-	;-----------------------------------------------------
-	; If it is any task but the last
-handler_swaptofirst
+	; If it is not the last task, go to handler_swaptonext
 	LDR		r0, =handler_currenttaskid_str
 	LDR		r1,[r0]
 	CMP 	r1,#9
 	BNE		handler_swaptonext
-;Setup context switch to TASK 1
+	B		handler_swaptofirst
+	
+; If it is any task but the last
+handler_swaptofirst
+	;Setup context switch to TASK 1
 	MOV		r1, #1
 	STR		r1, [r0]	
-; Set current_task_addr to TASK 9
+	; Set current_task_addr to TASK 9
 	LDR		r0, =handler_currenttaskaddr_str
 	LDR		r1, =handler_task_bottom
 	ADD		r1,r1,#612
 	STR		r1, [r0]
-; Set next_task to point to TASK 1
+	; Set next_task to point to TASK 1
 	LDR		r0, =handler_task_bottom
 	ADD		r0,r0,#68
 	LDR		r1, =handler_nexttask_str
 	STR		r0, [r1]
 	B		handler_contextswitch
 
+; Switch to the next task
 handler_swaptonext
-;Setup context switch to task n + 1
+	;Setup context switch to task n + 1
 	ADD		r1, r1, #1
 	STR		r1, [r0]
-; Set current_task_addr to task n
+	; Set current_task_addr to task n
 	LDR		r2, =handler_currenttaskid_str
 	LDR		r2, [r2]
 	SUB		r2, r2, #1
@@ -58,7 +52,7 @@ handler_swaptonext
 	ADD		r1, r1, r0
 	LDR		r0, =handler_currenttaskaddr_str
 	STR		r1, [r0]
-; Set next_task to point to task n + 1
+	; Set next_task to point to task n + 1
 	LDR		r2, =handler_currenttaskid_str
 	LDR		r2, [r2]
 	MOV		r0, #68
@@ -69,9 +63,7 @@ handler_swaptonext
 	STR		r1, [r0]
 	B		handler_contextswitch
 
-	;-----------------------------------------------------
-
-; Carry out context switch
+; Carry out process switch
 handler_contextswitch 
 	; Reset and save IRQ stack
 	LDR		r0, =handler_irqstack_str
@@ -103,8 +95,9 @@ handler_contextswitch
 	LDR		r13,[r13]
 	; Return the next task
 	SUBS 		pc, r14, #4
-	;-----------------------------------------------------
-; DATA AREA
+
+
+	; DATA AREA
 
 	AREA	var, DATA, READWRITE
 
@@ -120,31 +113,7 @@ handler_nexttask_str
 ; Store a copy of the IRQ stack
 handler_irqstack_str
 	DCD 0x0
-
-; +-----------------+
-; | PCB Structure	|
-; +-----------------+
-; |	-4	| 	r14		|
-; |	-8	|	r13		|
-; |	-12	|	r12		|
-; |	-16	|	r11		|
-; |	-20	|	r10		|
-; |	-24	|	r9		|
-; |	-28	|	r8		|
-; |	-32	|	r7		|
-; |	-36	|	r6		|
-; |	-40	| 	r5		|
-; |	-44	|	r4		|
-; |	-48	|	r3		|
-; |	-52	| 	r2		|
-; |	-56	| 	r1		|
-; |	-60 |	r0		|
-; |	-64	|	LR		|
-; |	-68	|	SPSR	|
-; +-----------------+
-; The offsets are from (bottom + 68 * process#)
-
-; Context PCB for all the tasks (each size = 68)
+; Context PCB for all the tasks (each size = 68) Offsets are from (bottom + 68 * process#)
 handler_task_bottom
 	% 680
 
