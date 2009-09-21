@@ -1,4 +1,5 @@
  void segment_init (void);
+ void segment_set (int seg);
  
  /* The bits taken up by the display in IODATA register */
 
