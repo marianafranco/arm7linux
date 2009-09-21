@@ -1,6 +1,10 @@
  void segment_init (void);
  void segment_set (int seg);
  
+#define SYSCFG			0x03ff0000
+#define IOPMOD          ((volatile unsigned *)(SYSCFG+0x5000))
+#define IOPDATA         ((volatile unsigned *)(SYSCFG+0x5008))
+ 
  /* The bits taken up by the display in IODATA register */
 
 #define	SEG_MASK	(0x1fc00)

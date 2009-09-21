@@ -1,6 +1,6 @@
-#include "rpsarmul.h"
+#include "timer.h"
 
-// Initiate timer
+// Initiate timer settings
 void timer_init (void) {
 	if (emulator == 1) {
 	  *IRQEnableClear = ~0; // Clear/disable all interrupts
@@ -9,11 +9,12 @@ void timer_init (void) {
 
 	}
 	else {
-	  *TMOD		= 0;
+	  *TMOD		= 0;	// Disable interrupt
 	  *INTPND 	= 0x00000000; 	// Clear pending interrupts 
 	}
 }
 
+// Restart timer interrupt
 void timer_irq(void) {
 	if (emulator == 1) {
 		*Timer1Clear = 0;/* clear the interrupt */
@@ -25,6 +26,7 @@ void timer_irq(void) {
 	}
 }	
 
+// Start timer
 void timer_start (void) {
 	if (emulator == 1) {
   		*Timer1Load = COUNTDOWN; // Load counter values
