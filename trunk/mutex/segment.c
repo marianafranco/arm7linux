@@ -1,11 +1,6 @@
 #include "segment.h"
 
-#define SYSCFG			0x03ff0000
-#define IOPMOD          ((volatile unsigned *)(SYSCFG+0x5000))
-#define IOPDATA         ((volatile unsigned *)(SYSCFG+0x5008))
-
-static unsigned int numeric_display [16] = 
-{
+static unsigned int numeric_display [16] =  {
 	DISP_0,
 	DISP_1,
 	DISP_2,
@@ -25,22 +20,19 @@ static unsigned int numeric_display [16] =
 };
 
 
-void segment_setdisplay (unsigned d)
-{
+void segment_setdisplay (unsigned d) {
 		*IOPDATA 	&= ~SEG_MASK;
 		*IOPDATA 	|= d;	
 }
 
-void segment_set (int seg)
-{
+void segment_set (int seg) {
 	if ( seg >= 0 & seg <= 0xf ) 
 		segment_setdisplay(numeric_display[seg]);
 
 }
 
 // Initialize 7-segment display
-void segment_init (void)
-{
+void segment_init (void) {
 	*IOPMOD 	|= SEG_MASK;
 	*IOPDATA 	|= SEG_MASK;
 }
