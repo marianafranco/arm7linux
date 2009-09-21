@@ -4,7 +4,7 @@
 #include "segment.h"
 #include "rpsarmul.h"
 
-extern void handler_timer(void);
+extern void handler(void);
 
 // Entry point for the program 
 int C_Entry ( void ) {	
@@ -13,7 +13,7 @@ int C_Entry ( void ) {
 	// Initialize timer
 	timer_init 	();
 	// Install handler
-	irq_installhandler ((unsigned)handler_timer, (unsigned *)IRQVector);
+	irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
 	// Start timer
 	timer_start ();
 	// Enabling IRQ interruption, changing to user mode

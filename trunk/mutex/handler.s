@@ -1,14 +1,26 @@
 	IMPORT timer_irq
-	EXPORT handler_timer
+	EXPORT handler
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	
 	AREA	irq, CODE, READONLY
 
+INTPND		DCD		0x03ff4004
+
 ; Services the timer interrupt and complete a context change.
-handler_timer
+handler
 	; Save current context for APCS
 	STMFD	sp!, {r0 - r3, LR}
+	; If it is a timer interrupt, branch
+	LDR 	r0, INTPND	 
+	LDR 	r0, [r0]		
+	TST 	r0, #0x0400
+	BNE		handler_timer 
+	; Otherwise, go to the angel
+	LDMFD	sp!, {r0 - r3, lr}	
+	LDR 	pc, Angel_IRQ_Address
+	
+handler_timer
 	; Reset the timer	
 	STMFD		sp!, {r4 - r12}
 	BL		timer_irq
@@ -101,6 +113,8 @@ handler_contextswitch
 
 	AREA	var, DATA, READWRITE
 
+Angel_IRQ_Address	
+	DCD 0x00000000
 ; Context task ID 
 handler_currenttaskid_str
 	DCD 0x0
