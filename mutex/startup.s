@@ -40,8 +40,22 @@ THUMB SETL {FALSE}
 ; Set up the stack pointer to point to the 512K (Evaluator7T top of 
 ; memory.
 
-; Start Up TASK1 User Mode stack
-	MOV 	sp, #0x80000
+	; Setting up IRQ stack
+	MOV		r2,	#0xc0|0x12
+	MSR		CPSR_c, r2
+	MOV		sp, #0x8000
+	
+	; Setting up user stack
+	MOV		r2, #0xc0|0x1f
+	MSR		CPSR_c, r2
+	MOV		sp, #0x20000
+	
+	;Setting up SVC stack
+	MOV		r2,	#0xc0|0x13
+	MSR		CPSR_c, r2
+	MOV		r1, #0x8000
+	SUB		r1, r1, #128
+	MOV		sp, r1
 
 ; Description: Sets up TASK B Processor Control Block
 ; task2[-4]  = "PCB R14" = &task2

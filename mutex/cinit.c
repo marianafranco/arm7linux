@@ -16,11 +16,9 @@ int C_Entry ( void ) {
 	irq_installhandler ((unsigned)handler_timer, (unsigned *)IRQVector);
 	// Start timer
 	timer_start ();
-	// Enabling IRQ interruption and changing to user mode
+	// Enabling IRQ interruption, changing to user mode
 	__asm {
-		MRS r1, CPSR
-		BIC r1, r1, #0x80
-		ORR	r1,	r1,	#0x10
+		MOV		r1,	#0x40|0x10
 		MSR CPSR_c, r1
 	}
 	// Start with process 1
