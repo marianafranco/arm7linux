@@ -3,6 +3,24 @@
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	EXPORT Angel_IRQ_Address
+	EXPORT handler_timer
+	
+	
+;*********** MARI ******************
+	EXPORT	Process_Table
+	
+;	EXPORT	PtrStateTask1
+;	EXPORT	PtrStateTask2
+;	EXPORT	PtrStateTask3
+;	EXPORT	PtrStateTask4
+;	EXPORT	PtrStateTask5
+;	EXPORT	PtrStateTask6
+;	EXPORT	PtrStateTask7
+;	EXPORT	PtrStateTask8
+;	EXPORT	PtrStateTask9
+;	
+;*********** END MARI **************
+	
 	
 	AREA	irq, CODE, READONLY
 
@@ -29,6 +47,73 @@ handler_timer
 	; If it is not the last task, go to handler_swaptonext
 	LDR		r0, =handler_currenttaskid_str
 	LDR		r1,[r0]
+
+;*********** MARI ******************
+	B		get_next_taskid_1
+	
+get_next_taskid_1
+	CMP 	r1, #9
+	BNE		get_next_taskid_2
+	B		get_next_taskid_3
+	
+get_next_taskid_2
+	ADD		r3, r1, #1			;r3 guarda o id do proximo processo
+	B		get_next_taskid_4	
+
+get_next_taskid_3
+	MOV		r3, #1
+	
+get_next_taskid_4
+	SUB		r4, r3, #1
+	MOV		r5, #4
+	MUL		r6, r4, r5
+	LDR		r5, =Process_Table
+	ADD		r5, r5, r6
+	LDR		r4, [r5]
+	CMP		r4, #1
+	BNE		get_next_taskid_5
+	B		end_get_nexttaskid
+
+get_next_taskid_5
+	MOV		r1, r3
+	B		get_next_taskid_1
+	
+end_get_nexttaskid
+
+handler_next_process
+	;Setup context switch to TASK 1
+	;STR		r3, [r0]
+	
+	; Set current_task_addr to task n
+	LDR		r2, =handler_currenttaskid_str
+	LDR		r2, [r2]
+	SUB		r2, r2, #1
+	MOV		r0, #68
+	MUL		r1,	r2, r0
+	LDR		r0, =handler_task_bottom
+	ADD		r1, r1, r0
+	LDR		r0, =handler_currenttaskaddr_str
+	STR		r1, [r0]
+
+	; Set next_task to point to task n + 1
+	MOV		r2, r3
+	;LDR		r2, [r2]
+	SUB		r2, r2, #1
+	MOV		r0, #68
+	MUL		r1,	r2, r0
+	LDR		r0, =handler_task_bottom
+	ADD		r1, r1, r0
+	LDR		r0, =handler_nexttask_str
+	STR		r1, [r0]
+	
+	STR		r3, [r0]		; id currrent = r3
+	B		handler_contextswitch
+	
+	
+
+
+;*********** END MARI **************
+	
 	CMP 	r1,#9
 	BNE		handler_swaptonext
 	B		handler_swaptofirst
@@ -76,6 +161,8 @@ handler_swaptonext
 	STR		r1, [r0]
 	B		handler_contextswitch
 
+
+
 ; Carry out process switch
 handler_contextswitch 
 	; Reset and save IRQ stack
@@ -110,6 +197,13 @@ handler_contextswitch
 	SUBS 		pc, r14, #4
 
 
+
+
+
+
+
+
+
 	; DATA AREA
 
 	AREA	var, DATA, READWRITE
@@ -131,5 +225,55 @@ handler_irqstack_str
 ; Context PCB for all the tasks (each size = 68) Offsets are from (bottom + 68 * process#)
 handler_task_bottom
 	% 680
+	
+;********** MARI ******************	
+	
+;--- Process Table ----;
+	AREA	ProcessTable, DATA, READWRITE
+Process_Table
+	% 40
+	
+
+;	DCD		PtrStateTask1
+;	DCD		PtrStateTask2
+;	DCD		PtrStateTask3
+;	DCD		PtrStateTask4
+;	DCD		PtrStateTask5
+;	DCD		PtrStateTask6
+;	DCD		PtrStateTask7
+;	DCD		PtrStateTask8
+;	DCD		PtrStateTask9
+;
+;PtrStateTask1
+;	DCD     0x1
+;
+;PtrStateTask2
+;	DCD     0x0
+;
+;PtrStateTask3
+;	DCD     0x0
+;
+;PtrStateTask4
+;	DCD     0x0
+;
+;PtrStateTask5
+;	DCD     0x0
+;
+;PtrStateTask6
+;	DCD     0x0
+;
+;PtrStateTask7
+;	DCD     0x0
+;
+;PtrStateTask8
+;	DCD     0x0
+;
+;PtrStateTask9
+;	DCD     0x0
+
+
+
+;********** END MARI ***************
+
 
 	END

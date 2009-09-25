@@ -1,10 +1,12 @@
 #include "tasks.h"
 #include "timer.h"
 #include "irq.h"
+//#include "button.h"
 #include "segment.h"
 #include "rpsarmul.h"
 
 extern void handler(void);
+extern void handler_timer(void);
 
 // Entry point for the program 
 int C_Entry ( void ) {	
@@ -12,8 +14,15 @@ int C_Entry ( void ) {
 	segment_init();
 	// Initialize timer
 	timer_init 	();
+	// Initialize button
+	//button_init ();
 	// Install handler
-	irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
+	if (emulator == 1) {
+		irq_installhandler ((unsigned)handler_timer, (unsigned *)IRQVector);
+	}
+	else {
+		irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
+	}
 	// Start timer
 	timer_start ();
 	// Enabling IRQ interruption, changing to user mode
