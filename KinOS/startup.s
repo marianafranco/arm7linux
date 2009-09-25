@@ -334,7 +334,7 @@ init_process_table_1
 	MOV		r1, #1
 	STR		r1, [r0]
 	
-	MOV		r1, #1
+	MOV		r1, #0
 	MOV		r2, #0
 init_process_table_2
 	ADD		r2, r2, #4
@@ -349,6 +349,14 @@ init_process_table_3
 	
 	
 end_init_process_table
+
+	;-- Teste
+	LDR		r0, =Process_Table
+	MOV		r1, #0
+	MOV		r2, #12
+	ADD		r3, r0, r2
+	STR		r1, [r3]
+	
 	
 	;******* END MARI ********
 

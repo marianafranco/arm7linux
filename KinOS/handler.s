@@ -86,13 +86,18 @@ get_next_taskid_5
 end_get_nexttaskid
 
 handler_next_process
-	;Setup context switch to TASK 1
-	;STR		r3, [r0]
+	; Verifica se o atual eh igual ao proximo
+	LDR		r2, =handler_currenttaskid_str
+	LDR		r2, [r2]
+	CMP		r2, r3
+	BNE		handler_next_process_1
+	B		handler_contextNOTswitch
 	
+handler_next_process_1	
 	; Set current_task_addr to task n
 	LDR		r2, =handler_currenttaskid_str
 	LDR		r2, [r2]
-	SUB		r2, r2, #1
+	;SUB		r2, r2, #1
 	MOV		r0, #68
 	MUL		r1,	r2, r0
 	LDR		r0, =handler_task_bottom
@@ -103,7 +108,7 @@ handler_next_process
 	; Set next_task to point to task n + 1
 	MOV		r2, r3
 	;LDR		r2, [r2]
-	SUB		r2, r2, #1
+	;SUB		r2, r2, #1
 	MOV		r0, #68
 	MUL		r1,	r2, r0
 	LDR		r0, =handler_task_bottom
@@ -111,6 +116,7 @@ handler_next_process
 	LDR		r0, =handler_nexttask_str
 	STR		r1, [r0]
 	
+	LDR		r0, =handler_currenttaskid_str
 	STR		r3, [r0]		; id currrent = r3
 	B		handler_contextswitch
 	
@@ -189,24 +195,44 @@ handler_contextswitch
 	LDR 		r13, =handler_nexttask_str		
 	LDR		r13, [r13]
 	SUB		r13, r13,#60
+	
 	; Load the next task and setup PSR
 	cmp		r13, #0
 	LDMNEDB		r13, {r0,r14}
 	MSRNE 		spsr_cxsf, r0
 	LDMNEIA		r13, {r0-r14}^
 	AND		r0,r0,r0 		; nop
+
 	; Load the IRQ stack into r13_irq 
 	LDR		r13, =handler_irqstack_str
 	LDR		r13,[r13]
 	; Return the next task
+	;SUBS 		pc, r14, #4
+
+
+;********** MARI ******************	
+	B		end_handler
+
+handler_contextNOTswitch
+
+	; Reset and save IRQ stack
+	LDR		r0, =handler_irqstack_str
+	MOV		r1, sp
+	ADD		r1, r1, #5*4
+	STR		r1, [r0]
+	; Restore the remaining registers
+	LDMFD		sp!,{r0-r3,lr}
+	; Load the IRQ stack into r13_irq 
+	LDR		r13, =handler_irqstack_str
+	LDR		r13,[r13]
+	; Return the next task
+	;SUBS 		pc, r14, #4
+
+end_handler
+	; Return the next task
 	SUBS 		pc, r14, #4
-
-
-
-
-
-
-
+	
+;********** END MARI ******************	
 
 
 	; DATA AREA
