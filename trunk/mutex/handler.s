@@ -1,6 +1,7 @@
 	IMPORT timer_irq
 	IMPORT button_irq
 	EXPORT handler
+	EXPORT handler_timer
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	EXPORT Angel_IRQ_Address
