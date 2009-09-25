@@ -1,1 +1,0 @@
-void irq_installhandler (unsigned routine, unsigned *vector);
