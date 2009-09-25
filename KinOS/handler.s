@@ -3,7 +3,7 @@
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	EXPORT Angel_IRQ_Address
-	EXPORT handler_timer
+	EXPORT handler_emulator
 	
 	
 ;*********** MARI ******************
@@ -25,6 +25,11 @@
 	AREA	irq, CODE, READONLY
 
 INTPND		DCD		0x03ff4004
+
+handler_emulator
+	; Save current context for APCS
+	STMFD	sp!, {r0 - r3, LR}
+	B		handler_timer
 
 ; Services the timer interrupt and complete a context change.
 handler
