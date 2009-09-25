@@ -27,3 +27,14 @@
 #define TDATA0	((volatile unsigned *)(SYSCFG+0x6004))
 #define INTMSK	((volatile unsigned *)(SYSCFG+0x4008))
 #define INT_GLOBAL	(21)
+
+// Button variables
+#define IOPCON ((volatile unsigned *)(SYSCFG+0x5004))
+#define INT_SW3_MASK (1)
+#define IO_ENABLE_INT0 (1<<4)
+#define IO_ACTIVE_HIGH_INT0 (1<<3)
+#define IO_RISING_EDGE_INT0 (1)
+
+// Dips variables
+#define IOPDATA ((volatile unsigned *)(SYSCFG+0x5008))
+#define SWITCH_MASK	(0xf)
