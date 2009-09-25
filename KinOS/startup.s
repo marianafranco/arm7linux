@@ -11,6 +11,11 @@
 	IMPORT	task9
 	IMPORT	handler_currenttaskid_str
 	IMPORT handler_task_bottom
+	
+;************ MARI *************
+	IMPORT	Process_Table
+
+;************ END MARI *********
 
 	AREA asm_code, CODE
 
@@ -318,6 +323,35 @@ startup_pcb
 	MOV		r0,#0x10 
 	STR		r0,[r1]
 	;-----------------------------------------------------
+
+	;******* MARI ************
+	
+	; -- Init the Process Table
+	
+init_process_table_1
+	
+	LDR		r0, =Process_Table
+	MOV		r1, #1
+	STR		r1, [r0]
+	
+	MOV		r1, #1
+	MOV		r2, #0
+init_process_table_2
+	ADD		r2, r2, #4
+	CMP		r2, #40
+	BNE		init_process_table_3
+	B		end_init_process_table
+	
+init_process_table_3
+	ADD		r3, r0, r2
+	STR		r1, [r3]
+	B		init_process_table_2
+	
+	
+end_init_process_table
+	
+	;******* END MARI ********
+
 
 	; -- set the current ID to TASK1
 
