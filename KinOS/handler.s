@@ -3,7 +3,32 @@
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	
+	EXPORT Angel_IRQ_Address
+	
+	
 	AREA	irq, CODE, READONLY
+	
+
+handler_irq
+	; save current context for APCS
+	STMFD	sp!, {r0 - r3, LR}	
+
+	; identify source of interrupt
+	LDR 	r0, INTPND	 
+	LDR 	r0, [r0]		
+
+	; check if source is a timer interrupt
+	TST 	r0, #0x0400
+	BNE		handler_timer 
+
+	; check if source is a button interrupt
+	TST		r0, #0x0001		
+	BNE		handler_button	
+
+	; check if source is an Angel interrupt
+	LDMFD	sp!, {r0 - r3, lr}	
+	LDR 	pc, Angel_IRQ_Address	
+
 
 ; Services the timer interrupt and complete a context change.
 handler_timer
@@ -100,6 +125,10 @@ handler_contextswitch
 	; DATA AREA
 
 	AREA	var, DATA, READWRITE
+	
+; Scratch location for Angel IRQ Handler address
+Angel_IRQ_Address	
+	DCD 0x00000000	
 
 ; Context task ID 
 handler_currenttaskid_str
