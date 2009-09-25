@@ -1,6 +1,10 @@
 /* Installs an IRQ handler and initializes the timer interrupt */
 #include "timer.h"
 
+
+extern int  Angel_IRQ_Address;
+
+
 // Installs a handler to the interruption vector
 void irq_installhandler (unsigned routine, unsigned *vector) { 
 	unsigned vec;

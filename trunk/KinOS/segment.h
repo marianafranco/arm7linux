@@ -1,5 +1,9 @@
  void segment_init (void);
  
+ //@START_MARI
+ void segment_set (int);
+ //@END_MARI
+ 
  /* The bits taken up by the display in IODATA register */
 
 #define	SEG_MASK	(0x1fc00)
