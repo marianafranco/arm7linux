@@ -1,6 +1,7 @@
 #include "tasks.h"
 #include "timer.h"
 #include "irq.h"
+#include "button.h"
 #include "segment.h"
 #include "rpsarmul.h"
 
@@ -12,6 +13,8 @@ int C_Entry ( void ) {
 	segment_init();
 	// Initialize timer
 	timer_init 	();
+	// Initialize button
+	button_init ();
 	// Install handler
 	irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
 	// Start timer

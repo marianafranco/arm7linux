@@ -1,4 +1,5 @@
 	IMPORT timer_irq
+	IMPORT button_irq
 	EXPORT handler
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
@@ -17,6 +18,9 @@ handler
 	LDR 	r0, [r0]		
 	TST 	r0, #0x0400
 	BNE		handler_timer 
+	; If it is a button interrupt, branch
+	TST		r0, #0x0001		
+	BNE		handler_button	
 	; Otherwise, go to the angel
 	LDMFD	sp!, {r0 - r3, lr}	
 	LDR 	pc, Angel_IRQ_Address
@@ -109,6 +113,14 @@ handler_contextswitch
 	; Return the next task
 	SUBS 		pc, r14, #4
 
+handler_button
+
+	; C routine	
+	BL	button_irq
+	; Change process
+	B handler_timer
+	;LDMFD   sp!, {r0 - r3,lr}	 
+	;SUBS    pc, lr, #4 	
 
 	; DATA AREA
 
