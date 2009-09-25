@@ -6,7 +6,7 @@
 #include "rpsarmul.h"
 
 extern void handler(void);
-extern void handler_timer(void);
+extern void handler_emulator(void);
 
 // Entry point for the program 
 int C_Entry ( void ) {	
@@ -18,7 +18,7 @@ int C_Entry ( void ) {
 	button_init ();
 	// Install handler
 	if (emulator == 1) {
-		irq_installhandler ((unsigned)handler_timer, (unsigned *)IRQVector);
+		irq_installhandler ((unsigned)handler_emulator, (unsigned *)IRQVector);
 	}
 	else {
 		irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
