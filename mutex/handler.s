@@ -2,6 +2,7 @@
 	EXPORT handler
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
+	EXPORT Angel_IRQ_Address
 	
 	AREA	irq, CODE, READONLY
 
