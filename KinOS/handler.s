@@ -265,45 +265,6 @@ Process_Table
 	% 40
 	
 
-;	DCD		PtrStateTask1
-;	DCD		PtrStateTask2
-;	DCD		PtrStateTask3
-;	DCD		PtrStateTask4
-;	DCD		PtrStateTask5
-;	DCD		PtrStateTask6
-;	DCD		PtrStateTask7
-;	DCD		PtrStateTask8
-;	DCD		PtrStateTask9
-;
-;PtrStateTask1
-;	DCD     0x1
-;
-;PtrStateTask2
-;	DCD     0x0
-;
-;PtrStateTask3
-;	DCD     0x0
-;
-;PtrStateTask4
-;	DCD     0x0
-;
-;PtrStateTask5
-;	DCD     0x0
-;
-;PtrStateTask6
-;	DCD     0x0
-;
-;PtrStateTask7
-;	DCD     0x0
-;
-;PtrStateTask8
-;	DCD     0x0
-;
-;PtrStateTask9
-;	DCD     0x0
-
-
-
 ;********** END MARI ***************
 
 
