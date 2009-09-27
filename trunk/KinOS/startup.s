@@ -324,18 +324,19 @@ startup_pcb
 	STR		r0,[r1]
 	;-----------------------------------------------------
 
+
+
 	;******* MARI ************
 	
 	; -- Init the Process Table
-	
-init_process_table_1
-	
+init_process_table
 	LDR		r0, =Process_Table
 	MOV		r1, #1
 	STR		r1, [r0]
 	
 	MOV		r1, #0
 	MOV		r2, #0
+
 init_process_table_2
 	ADD		r2, r2, #4
 	CMP		r2, #40
@@ -346,7 +347,6 @@ init_process_table_3
 	ADD		r3, r0, r2
 	STR		r1, [r3]
 	B		init_process_table_2
-	
 	
 end_init_process_table
 
@@ -360,6 +360,7 @@ end_init_process_table
 	
 	;******* END MARI ********
 
+;-----------------------------------------------------
 
 	; -- set the current ID to TASK1
 
