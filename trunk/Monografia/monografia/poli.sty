@@ -1,0 +1,511 @@
+% Personalização do estilo LaTeX ABNT
+% para a EP da USP
+%
+% by Jomi
+%
+% (testado com o abnTex 0.6 com teTeX)
+%
+%
+% comandos que este pacote provê ou personaliza (além dos da classe
+% ABNT e Report):
+% . \departamento{...} o nome do departamento
+% . \teseDr{...}       indica que o texto é uma tese de doutorado
+% . \teseLD{...}       indica livre docência
+% . \memorialLD        indica memorial de livre docência % JSS
+% . \dissertacao{...}  indica dissertação
+%
+% . \autorPoli{...}{...}{...} indica o nome, sobrenome e url do autor
+%
+% . \capa         monta a capa
+% . \folhaderosto monta a folha de rosto
+%     . \areaConcentracao{...} muda a área de concentração
+% . \fichacatalografica monta a ficha catalográfica (o comando
+%     \PolyAssFichaCatalografica precisa ser redefinido para a
+%     apresentação ficar ok (ver o exemplo).
+%
+% . \meupageref{} para resolver o erro do pagaref
+% . \citep{...}   cita na forma "(FULANO 2000)"
+% . \citet{...}   cita na forma "Fulano (2000)"
+%
+% . \mymarginpar{...} faz uma nota na margem
+% . \pendencia{...} marca uma pendência no texto
+% . \versaofinal faz com que as margens laterais e as pendências não
+%     aparecam
+%
+% . \inputfig[Comentada]{...} padroniza e simplifica a inclusão de
+%     figuras (ver como usar no final deste arquivo).
+%
+%
+%
+%
+% bugs conhecidos:
+% . o pacote hyperref (que coloca links no PDF) junto com o da ABNT
+%   produzem um erro no \pageref. Fiz um novo comando \meupageref{..}
+%   que funciona bem.
+% . no pdf, os links feitos pelo meupageref não vão para o lugar certo
+% . as referências de inproceedings não ficam na norma ABNT (ver a
+%   documentação do estilo ABNT para detalhes)
+%
+% Mais informações na documentação da classe abnt em
+%   http://abntex.codigolivre.org.br
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{poli}[2003/01/19]
+
+% Opções
+% --------
+\newboolean{PoliUsarHyperRef}
+\DeclareOption{usarHyperref}    {\setboolean{PoliUsarHyperRef}{true}}
+\DeclareOption{naousarHyperref} {\setboolean{PoliUsarHyperRef}{false}}
+\ExecuteOptions{usarHyperref}
+
+\newboolean{PoliUsarRefABNT}
+\DeclareOption{usarRefABNT}    {\setboolean{PoliUsarRefABNT}{true}}
+\DeclareOption{naousarRefABNT} {\setboolean{PoliUsarRefABNT}{false}}
+\ExecuteOptions{usarRefABNT}
+
+
+% Process options (without star -> in the order of definition!).
+\ProcessOptions
+
+% Pacotes
+% ---------
+\RequirePackage[english,brazil]{babel}    % suporte ao português
+\RequirePackage[latin1]{inputenc} % suporte a caracteres acentuados
+
+
+% Formatação da página e aspectos gerais
+%\RequirePackage[a4paper,top=2.2cm,left=4cm,right=2.5cm,bottom=1.5cm]{geometry}
+% de top tem que tirar 1.3cm (dos 3.5 do formato da pelo) do header
+% de bottom tem que tirar 1 cm sei lá por que
+
+
+% tabelas
+\RequirePackage{longtable}
+\RequirePackage{booktabs} % melhora o desenho das tabelas com \toprule \midrule e \bottomrule
+
+% index
+\RequirePackage{makeidx}  % índice
+\makeindex
+
+% referências
+\usepackage{prettyref} % facilita a construção de referências, deve-se usar \prettyref{...} no lugar de \ref{...}
+\newrefformat{fig}{fi\-gu\-ra~\ref{#1}}
+\newrefformat{alg}{al\-go\-ritmo~\ref{#1}}
+\newrefformat{tab}{ta\-be\-la~\ref{#1}}
+\newrefformat{sec}{se\-ção~\ref{#1}}
+\newrefformat{eq} {e\-qua\-ção~(\ref{#1})}
+\newrefformat{chp}{ca\-pí\-tu\-lo~\ref{#1}}
+\newrefformat{ex} {e\-xem\-plo~\ref{#1}}
+\newrefformat{anx}{a\-ne\-xo~\ref{#1}}
+\newrefformat{apd}{a\-pên\-di\-ce~\ref{#1}}
+\newrefformat{parte}{par\-te~\ref{#1}}
+\newrefformat{thm}{teo\-re\-ma~\ref{#1}}
+\newrefformat{def}{de\-fi\-ni\-ção~\ref{#1}}
+\newrefformat{lem}{le\-ma~\ref{#1}}
+\newrefformat{cor}{co\-ro\-lá\-rio~\ref{#1}}
+
+% acronimos
+\usepackage{acronym}  % uso de siglas
+
+% gráficos
+\usepackage{graphicx}                 % figuras
+%\usepackage{floatflt}                % figuras como ``frames'' a direita
+%\usepackage{wrapfig}                 % idem a floatflt, mas parece funcionar melhor
+\usepackage{subfigure}
+
+
+% PDF
+\usepackage{url}
+
+\ifthenelse{\boolean{PoliUsarHyperRef}}%
+ {%
+   \usepackage[pdftex,a4paper]{hyperref} % PDF com links (pode-se usar como opção: dvipdfm, dvips, pdftex...)
+   %
+   % novo pageref para corrigir o erro da dupla hyperref x abnt
+   \renewcommand{\pageref}[1]{%
+     \meupageref{#1}
+   }
+   \newcommand{\meupageref}[1]{%
+     \hyperlink{page.\hypergetpageref{#1}}{\hypergetpageref{#1}}%
+   }
+ }%
+ {%
+   \newcommand{\href}[2]{#2}
+   \newcommand{\hypersetup}[1]{}
+   \newcommand{\meupageref}[1]{\pageref{#1}}
+ }
+
+
+%\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue} % colorido
+\hypersetup{colorlinks=false} % p&b
+\hypersetup{pdfborder=0 0 0} % links sem bordas
+
+
+% sumário
+\setcounter{tocdepth}{2}
+
+% Formatação de paragrafos
+% ------------------------
+
+% para fontes em small caps em chapter
+%\renewcommand{\ABNTchapterfont}{\scshape}
+%\renewcommand{\ABNTtocchapterfont}{\bfseries}
+
+% para fontes como o report
+\renewcommand{\ABNTchapterfont}{\bfseries}
+\renewcommand{\ABNTchaptersize}{\Large}
+
+
+%\sloppy % alinhamento das margens + preciso, mas diminui a separação de sílabas
+
+
+
+% captions
+% --------
+
+\RequirePackage[bf,center]{caption}
+%\setlength{\captionmargin}{0.8cm}
+%\renewcommand{\captionfont}{\sffamily\footnotesize\bfseries}
+
+%\usepackage[nobottomtitles]{titlesec} % personalizaçao de títulos
+
+
+% referências
+% -----------
+
+\ifthenelse{\boolean{PoliUsarRefABNT}}%
+{ \usepackage[alf]{abntcite} % para as ref. no formato ABNT
+  \newcommand{\citep}[2][]{\cite[#1]{#2}} % cita na forma "(FULANO 2000)"
+  \newcommand{\citet}[2][]{\citeonline[#1]{#2}} % cita na forma "Fulano (2000)"
+}%
+{ \newcommand{\citep}[2][]{\cite[#1]{#2}}
+  \newcommand{\citet}[2][]{\cite[#1]{#2}}
+}
+
+%\usepackage{natbib} % melhora as referencias (citep, citet,
+%citeauthor, ...) % não funciona com o estilo da ABNT
+
+
+% comandos para o tipo de documento
+% ----------------------------------
+
+\newcommand{\autorPoli}[3]{%
+  \autor{\href{#3}{#1 #2}}%
+  %\renewcommand{\PolyAutorFichaCatalografica}{\href{#3}{#2, #1}}%
+}
+
+
+\newcommand{\autoresPoli}[5]{
+ \autor{{}{#1 \\ #2 \\ #3 \\ #4 \\ #5}} 
+}
+
+
+\newcommand{\PoliDepartamentoData}{}
+\newcommand{\departamento}[1]{\renewcommand{\PoliDepartamentoData}{#1}}
+
+\newcommand{\PoliAreaConcetracaoData}{}
+\newcommand{\areaConcentracao}[1]{
+  \renewcommand{\PoliAreaConcetracaoData}{#1\\}
+}
+
+
+\newcommand{\PoliTipoDocData}{}
+
+
+\newcommand{\teseDr}[1]{%
+  \renewcommand{\PoliTipoDocData}{Tese (Doutorado)}
+  \comentario{Tese apresentada à Escola Politécnica da Universidade de São Paulo para obtenção do título
+    de Doutor em #1.}%
+}
+
+\newcommand{\qualiDr}[1]{%
+  \renewcommand{\PoliTipoDocData}{Tese (Doutorado)}
+  \comentario{Texto apresentado à Escola
+    Politécnica da Universidade de
+    São Paulo para o Exame de Qualificação
+    de Doutorado em #1.}%
+}
+
+\newcommand{\memorialLD}{%
+  \renewcommand{\PoliTipoDocData}{Memorial (Livre Docência)}
+  \comentario{\vspace{1.5cm}
+    Texto apresentado à Escola
+    Politécnica da Universidade
+    de São Paulo como requisito
+    para obtenção do Título de
+    Professor Livre Docente, junto ao
+    \PoliDepartamentoData.}%
+  \orientador[~]{}%
+}
+
+\newcommand{\teseLD}[1]{%
+  \renewcommand{\PoliTipoDocData}{Tese (Livre Docência)}
+  \comentario{%
+    #1 à Escola
+    Politécnica da Universidade
+    de São Paulo como requisito
+    para obtenção do Título de
+    Professor Livre Docente, junto ao
+    \PoliDepartamentoData.}%
+  \orientador[~]{}%
+}
+
+
+\newcommand{\dissertacao}[1]{%
+  \renewcommand{\PoliTipoDocData}{Dissertação (Mestrado)}
+  \comentario{Dissertação apresentada à Escola
+    Politécnica da Universidade de
+    São Paulo para obtenção do
+    Título de Mestre em #1.}%
+}
+
+\newcommand{\monografia}[1]{%
+  \renewcommand{\PoliTipoDocData}{Trabalho de Formatura}
+  \comentario{Monografia apresentada à Escola
+  	\\ Politécnica da Universidade de São 
+    \\ Paulo para a Conclusão do Curso de
+    \\ #1.}%
+}
+
+
+
+% Capa
+% ------------------------
+
+\renewcommand{\capa}{%
+  \hypersetup{pdftitle=\ABNTtitulodata,pdfauthor=\ABNTautordata}
+  \begin{center}
+    \espaco{1}
+    {\autorformat \ABNTautordata} \\[8.5cm]
+    {\tituloformat \ABNTtitulodata}
+
+    % comentário
+%    \vspace{2cm}
+%    \hspace{.45\textwidth} % posicionando a minipage
+%    \begin{minipage}{.5\textwidth}
+%      \begin{espacoumemeio}
+%        \begin{sloppypar}
+%          {\comentarioformat
+%           \ABNTcomentariodata}\\[0.3cm]
+%        \end{sloppypar}
+%      \end{espacoumemeio}
+%    \end{minipage}
+
+    % local e data
+    \vspace*{\stretch{1}}
+    \begin{espacosimples}
+      {\localformat\ABNTlocaldata}\\
+      {\dataformat\ABNTdatadata}
+    \end{espacosimples}
+    \if@openright\cleardoublepage\else\clearpage\fi%
+  \end{center}
+}
+
+
+% Falsa Folha de rosto
+% ------------------------
+
+\newcommand{\falsafolhaderosto}{%
+  \begin{center}
+    \espaco{1}
+    {\autorformat \ABNTautordata} \\[8.5cm]
+    {\tituloformat \ABNTtitulodata}
+
+    % comentário
+    \vspace{2cm}
+    \hspace{.45\textwidth} % posicionando a minipage
+    \begin{minipage}{.5\textwidth}
+      \begin{espacoumemeio}
+        \begin{sloppypar}
+          { \comentarioformat
+            \ABNTcomentariodata\\[0.3cm]
+          }
+        \end{sloppypar}
+      \end{espacoumemeio}
+    \end{minipage}
+
+    % local e data
+    \vspace*{\stretch{1}}
+    \begin{espacosimples}
+      {\localformat\ABNTlocaldata}\\
+      {\dataformat\ABNTdatadata}
+    \end{espacosimples}
+    \clearpage
+  \end{center}
+}
+
+% Folha de rosto
+% ------------------------
+
+\renewcommand{\folhaderosto}{%
+  \begin{center}
+    \espaco{1}
+    {\autorformat \ABNTautordata} \\[8.5cm]
+    {\tituloformat \ABNTtitulodata}
+
+    % comentário
+    \vspace{2cm}
+    \hspace{.45\textwidth} % posicionando a minipage
+    \begin{minipage}{.5\textwidth}
+      \begin{espacoumemeio}
+        \begin{sloppypar}
+          { \comentarioformat
+            \ABNTcomentariodata\\[0.3cm]
+          }
+        \end{sloppypar}
+      \end{espacoumemeio}
+      \begin{espacosimples}
+        \PoliAreaConcetracaoData
+
+        {\orientadornameformat\ABNTorientadorname}
+        {\orientadorformat\ABNTorientadordata} \\
+
+        {\coorientadornameformat\ABNTcoorientadorname}
+        {\coorientadorformat\ABNTcoorientadordata}
+      \end{espacosimples}
+    \end{minipage}
+
+    % local e data
+    \vspace*{\stretch{1}}
+    \begin{espacosimples}
+      {\localformat\ABNTlocaldata}\\
+      {\dataformat\ABNTdatadata}
+    \end{espacosimples}
+    \clearpage
+  \end{center}
+}
+
+
+
+% Ficha catalográfica
+% ------------------------
+\usepackage{lastpage}
+
+\newcommand{\PolyAutorFichaCatalografica}{}
+\newcommand{\PolyAutorFichaCatalograficaI}{}
+\newcommand{\PolyTituloFichaCatalografica}{}
+
+\newcommand{\PolyRefFichaCatalografica}{%
+  \PoliTipoDocData~ --- Escola Politécnica da Universidade de São Paulo.
+  \PoliDepartamentoData.}
+
+\newcommand{\PolyAssFichaCatalografica}{}
+
+\newcommand{\fichacatalografica}{%
+\newpage
+\vspace*{\stretch{1}}
+
+\begin{espacosimples}
+
+\begin{center}
+  \textbf{FICHA CATALOGRÁFICA}
+\end{center}
+
+\begin{tabular}{| @{\hspace{.5cm}} p{\textwidth-2cm} @{\hspace{.5cm}}|}
+  \hline
+
+  \vspace{.1cm}
+  \noindent \PolyAutorFichaCatalografica \\
+
+  \hspace{.5cm}%
+  \PolyTituloFichaCatalografica\ /\ \PolyAutorFichaCatalograficaI. --
+  \ABNTlocaldata,
+  \ABNTdatadata. \pageref{LastPage}~p. \\
+
+  \vspace{.1cm}\hspace{.5cm}%
+  \PolyRefFichaCatalografica \\
+
+  \vspace{.1cm}\hspace{.5cm}%
+  \PolyAssFichaCatalografica
+  \vspace{.3cm}
+  \\
+
+  \hline
+\end{tabular}
+
+\end{espacosimples}
+
+}
+
+
+
+% outros comandos úteis
+% ----------------------
+
+
+\newcommand{\mymarginpar}[1]{%
+  \marginpar[%
+    \begin{flushright}
+      \scriptsize{\textsf{#1}}
+    \end{flushright}%
+    ]%
+    {%
+    \begin{flushleft}
+      \scriptsize{\textsf{#1}}
+    \end{flushleft}%
+    }%
+}
+
+\reversemarginpar
+
+\newcommand{\toindex}[1]{\index{#1}}%\marginpar{\scriptsize{\textsf{i:#1}}}}
+\newcommand{\indexdef}[1]{\index{#1|textsl}}%\marginpar{\scriptsize{\textsf{id:#1}}}}
+\newcommand{\indexfun}[1]{\index{#1@{\textit{#1}}}}%\marginpar{\scriptsize{\textsf{id:#1}}}}
+
+\newcommand{\pendencia}[1]{~[\textsc{Pendência}\footnote{\textbf{#1}}]~}
+
+\newcommand{\versaofinal}{
+  \renewcommand{\pendencia}[1]{}
+  \renewcommand{\mymarginpar}[1]{}
+}
+
+% Comandos
+% ========
+%
+% inclusão de figuras
+%
+% args: 1. file
+%       2. label
+%       3. caption text
+%       4. witdh (%): 0.8, 1, ....
+%       5. explicação
+
+\newcommand{\extFig}[0]{eps} % extensão das figuras (mudar para pdf, se necessário)
+
+\newcommand{\inputfig}[5][tbp]{%
+\begin{figure}[#1]
+  \begin{center}
+    \includegraphics[width=#5\textwidth]{#2.\extFig}
+  \end{center}
+  \caption{#4.} \label{fig:#3}
+\end{figure}%
+}
+
+\newcommand{\inputfigJPG}[6][tbp]{%
+\begin{figure}[#1]
+  \begin{center}
+    \includegraphics[bb=#6,width=#5\textwidth]{#2.jpg}
+  \end{center}
+  \caption{#4.} \label{fig:#3}
+\end{figure}%
+}
+
+\newcommand{\inputfigComentada}[6][tbp]{%
+\begin{figure}[#1]
+  \begin{center}
+    \includegraphics[width=#5\textwidth]{#2.\extFig}
+  \end{center}
+  \begin{quote}
+    {\footnotesize #6}
+  \end{quote}
+  \caption{#4.} \label{fig:#3}
+\end{figure}%
+}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "tese"
+%%% End:
