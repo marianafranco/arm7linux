@@ -1,14 +1,35 @@
 	IMPORT timer_irq
 	IMPORT button_irq
+	IMPORT swi_chandler
+	
 	EXPORT handler
 	EXPORT handler_emulator
 	EXPORT handler_currenttaskid_str
 	EXPORT handler_task_bottom
 	EXPORT Angel_IRQ_Address
+	EXPORT handler_swi
+	EXPORT Angel_SWI_Address
 	
 	AREA	irq, CODE, READONLY
 
 INTPND		DCD		0x03ff4004
+
+handler_swi
+	STMFD 	sp!,{r0-r12,lr}			;Store registers
+	STMFD	sp!, {r0 - r11}
+	LDR		r0,[lr,#-4]				;Calculate address of SWI instruction
+	BIC		r0,r0,#0xff000000		;Mask off top 8 bits of instruction to give SWI 
+									;number
+	LDR		r1, Angel_SWI_Number	;Get Angel SWI Number
+	CMP		r0, r1					;Intercept Angel SWI Early 
+	BNE		user_swis
+	LDMFD	sp!, {r0 - r11}	
+	LDMFD	sp!,{r0-r12,lr}			;Restore registers for Angel...
+	LDR		pc, Angel_SWI_Address	;if eq then branch to the Angel SWI
+user_swis							;Non Angel SWI
+	LDMFD	sp!, {r1 - r12}
+	BL		swi_chandler			;call C routine to handle SWI	
+	LDMFD	sp!,{r0-r12,pc}^		;restore registers and return.
 
 handler_emulator
 	; Save current context for APCS
@@ -146,6 +167,12 @@ handler_nexttask_str
 ; Store a copy of the IRQ stack
 handler_irqstack_str
 	DCD 0x0
+; Stores the number of the Angel SWI
+Angel_SWI_Number
+	DCD	0x00123456
+; Chained Angel SWI Interrupt address
+Angel_SWI_Address
+	DCD 	0x00000000  
 ; Context PCB for all the tasks (each size = 68) Offsets are from (bottom + 68 * process#)
 handler_task_bottom
 	% 680
