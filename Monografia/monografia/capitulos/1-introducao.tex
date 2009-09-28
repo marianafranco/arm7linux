@@ -7,19 +7,42 @@
 \chapter{Introdução} \label{chap:introducao}
 \index{introducao}
 
+
 % Objetivo
 \section{Objetivo} \label{sec:intro_objetivo}
 \index{introducao!objetivo} 
+
+O objetivo deste projeto de formatura é desenvolver um microkernel para a placa experimental Evalutator-7T, contituída de um processador ARM7 e alguns periféricos simples.
+
+O microkernel implementa os mecanismos básicos de um sistema operacional, como o chaveamento de processos, as chamadas de sistema e utiliza alguns drivers para a comunicação com os periféricos da placa.
+
+Além disso, foram criados alguns programas para testar e exemplificar o funcionamento do microkernel. Entre esses programas, um simples terminal foi desenvolvido para a interação do usuário com o sistema.
+
 
 
 % Motivação
 \section{Motivação} \label{sec:intro_motivacao}
 \index{introducao!motivacao}
 
+As disciplinas de Laboratório de Processadores e de Sistemas Operacionais do curso de Engenharia da Computação na Escola Politécnica da USP, atualmente, estão muito distantes entre si, no entanto o conteúdo das mesmas é muito próximo.
+
+Foi pensando nessa realidade, que chegamos na idéia de desenvolver um sistema operacional didático, para um hardware simples de manipular, porém com maior poder de processamento que os kits experimentais presentes hoje no Laboratório de Processadores, a placa ARM Evaluator-7T.
+
+Outra motivação do projeto foi aprofundar os conhecimentos sobre sistemas operacionais e sobre os processadores ARM.
+
+
 
 % Justificativa
 \section{Justificativa}  \label{sec:intro_justificativa}
 \index{introducao!justificativa}
+
+O objetivo inicial do projeto era portar um sistema operacional Unix já existente para a placa didática Evaluator-7T. 
+
+Inicialmente pensamos em utilizar os sistemas Android e Minix 3, mas ao estudar o kernel dos dois sistemas, vimos que os recursos de memória necessários para executá-los era muito maior que os 512KB disponíveis na placa. Além disso, no caso do Minix 3, teríamos que reescrever o assembly do kernel que atualmente só tem versão para i386, para assembly ARM, o que seria impossível com o tempo disponível para o projeto.
+
+Assim surgiu a idéia de desenvolver um microkernel próprio, com as funcionalidades básicas de um sistema operacional, e que fosse de fácil entendimento; pois como mencionado anteriormente, espera-se que o material desenvolvido seja destinado a melhorar e aproximar o ensino de Sistemas Operacionais com as experiências do Laboratório de Processadores.
+
+ 
 
 
 % Metodologia de Trabalho
@@ -28,5 +51,8 @@
 
 
 % Estrutura do Trabalho
-\section{Estrutura do Trabalho} \label{sec:intro_estrutura}
-\index{introducao!estrutura}
+\section{Organização do Documento} \label{sec:intro_organizacao}
+\index{introducao!organizacao}
+
+
+Apresentar a organização do documento: o que cada capítulo, anexo e apêndice aborda.
