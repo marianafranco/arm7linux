@@ -38,3 +38,10 @@
 // Dips variables
 #define IOPDATA ((volatile unsigned *)(SYSCFG+0x5008))
 #define SWITCH_MASK	(0xf)
+
+// Software interruption
+#define SWIVector (unsigned *) 0x08
+
+#define		fork_SWI	0
+#define		exec_SWI	1
+#define		exit_SWI	2

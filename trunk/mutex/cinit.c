@@ -3,9 +3,11 @@
 #include "irq.h"
 #include "button.h"
 #include "segment.h"
+#include "swi.h"
 #include "rpsarmul.h"
 
 extern void handler(void);
+extern void handler_swi(void);
 extern void handler_emulator(void);
 
 // Entry point for the program 
@@ -23,6 +25,7 @@ int C_Entry ( void ) {
 	else {
 		irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
 	}
+	irq_installSWIhandler ((unsigned)handler_swi, (unsigned *)SWIVector);
 	// Start timer
 	timer_start ();
 	// Enabling IRQ interruption, changing to user mode
