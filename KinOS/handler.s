@@ -8,17 +8,7 @@
 	
 ;*********** MARI ******************
 	EXPORT	Process_Table
-	
-;	EXPORT	PtrStateTask1
-;	EXPORT	PtrStateTask2
-;	EXPORT	PtrStateTask3
-;	EXPORT	PtrStateTask4
-;	EXPORT	PtrStateTask5
-;	EXPORT	PtrStateTask6
-;	EXPORT	PtrStateTask7
-;	EXPORT	PtrStateTask8
-;	EXPORT	PtrStateTask9
-;	
+
 ;*********** END MARI **************
 	
 	
@@ -54,21 +44,18 @@ handler_timer
 	LDR		r1,[r0]
 
 ;*********** MARI ******************
-	B		get_next_taskid_1
-	
-get_next_taskid_1
-	CMP 	r1, #9
-	BNE		get_next_taskid_2
-	B		get_next_taskid_3
-	
-get_next_taskid_2
-	ADD		r3, r1, #1			;r3 guarda o id do proximo processo
-	B		get_next_taskid_4	
 
-get_next_taskid_3
+	
+get_next_taskid
+	CMP 	r1, #9
+	BEQ		get_next_taskid_1
+	ADD		r3, r1, #1			;r3 guarda o id do proximo processo
+	B		get_next_taskid_2	
+
+get_next_taskid_1
 	MOV		r3, #1
 	
-get_next_taskid_4
+get_next_taskid_2
 	SUB		r4, r3, #1
 	MOV		r5, #4
 	MUL		r6, r4, r5
@@ -76,28 +63,22 @@ get_next_taskid_4
 	ADD		r5, r5, r6
 	LDR		r4, [r5]
 	CMP		r4, #1
-	BNE		get_next_taskid_5
-	B		end_get_nexttaskid
-
-get_next_taskid_5
+	BEQ		end_get_nexttaskid
 	MOV		r1, r3
-	B		get_next_taskid_1
-	
+	B		get_next_taskid
 end_get_nexttaskid
+
 
 handler_next_process
 	; Verifica se o atual eh igual ao proximo
 	LDR		r2, =handler_currenttaskid_str
 	LDR		r2, [r2]
 	CMP		r2, r3
-	BNE		handler_next_process_1
-	B		handler_contextNOTswitch
-	
-handler_next_process_1	
-	; Set current_task_addr to task n
+	BEQ		handler_contextNOTswitch
+		
+	; Set current_task_addr to current task n
 	LDR		r2, =handler_currenttaskid_str
 	LDR		r2, [r2]
-	;SUB		r2, r2, #1
 	MOV		r0, #68
 	MUL		r1,	r2, r0
 	LDR		r0, =handler_task_bottom
@@ -105,74 +86,20 @@ handler_next_process_1
 	LDR		r0, =handler_currenttaskaddr_str
 	STR		r1, [r0]
 
-	; Set next_task to point to task n + 1
+	; Set next_task to point to next task
 	MOV		r2, r3
-	;LDR		r2, [r2]
-	;SUB		r2, r2, #1
 	MOV		r0, #68
 	MUL		r1,	r2, r0
 	LDR		r0, =handler_task_bottom
 	ADD		r1, r1, r0
 	LDR		r0, =handler_nexttask_str
 	STR		r1, [r0]
-	
 	LDR		r0, =handler_currenttaskid_str
-	STR		r3, [r0]		; id currrent = r3
+	STR		r3, [r0]				; currrent task id = r3
 	B		handler_contextswitch
 	
 	
-
-
 ;*********** END MARI **************
-	
-	CMP 	r1,#9
-	BNE		handler_swaptonext
-	B		handler_swaptofirst
-	
-; If it is any task but the last
-handler_swaptofirst
-	;Setup context switch to TASK 1
-	MOV		r1, #1
-	STR		r1, [r0]	
-	; Set current_task_addr to TASK 9
-	LDR		r0, =handler_currenttaskaddr_str
-	LDR		r1, =handler_task_bottom
-	ADD		r1,r1,#612
-	STR		r1, [r0]
-	; Set next_task to point to TASK 1
-	LDR		r0, =handler_task_bottom
-	ADD		r0,r0,#68
-	LDR		r1, =handler_nexttask_str
-	STR		r0, [r1]
-	B		handler_contextswitch
-
-; Switch to the next task
-handler_swaptonext
-	;Setup context switch to task n + 1
-	ADD		r1, r1, #1
-	STR		r1, [r0]
-	; Set current_task_addr to task n
-	LDR		r2, =handler_currenttaskid_str
-	LDR		r2, [r2]
-	SUB		r2, r2, #1
-	MOV		r0, #68
-	MUL		r1,	r2, r0
-	LDR		r0, =handler_task_bottom
-	ADD		r1, r1, r0
-	LDR		r0, =handler_currenttaskaddr_str
-	STR		r1, [r0]
-	; Set next_task to point to task n + 1
-	LDR		r2, =handler_currenttaskid_str
-	LDR		r2, [r2]
-	MOV		r0, #68
-	MUL		r1,	r2, r0
-	LDR		r0, =handler_task_bottom
-	ADD		r1, r1, r0
-	LDR		r0, =handler_nexttask_str
-	STR		r1, [r0]
-	B		handler_contextswitch
-
-
 
 ; Carry out process switch
 handler_contextswitch 
@@ -211,7 +138,7 @@ handler_contextswitch
 
 
 ;********** MARI ******************	
-	B		end_handler
+	B		end_handler_next_process
 
 handler_contextNOTswitch
 
@@ -228,9 +155,10 @@ handler_contextNOTswitch
 	; Return the next task
 	;SUBS 		pc, r14, #4
 
-end_handler
+end_handler_next_process
 	; Return the next task
 	SUBS 		pc, r14, #4
+	
 	
 ;********** END MARI ******************	
 
@@ -260,12 +188,12 @@ handler_task_bottom
 ;********** MARI ******************	
 	
 ;--- Process Table ----;
+	
 	AREA	ProcessTable, DATA, READWRITE
+	
 Process_Table
 	% 40
 	
-
 ;********** END MARI ***************
-
 
 	END

@@ -325,37 +325,30 @@ startup_pcb
 	;-----------------------------------------------------
 
 
-
 	;******* MARI ************
 	
-	; -- Init the Process Table
+	; -- Init the Process Table with the state for each process
 init_process_table
 	LDR		r0, =Process_Table
-	MOV		r1, #1
-	STR		r1, [r0]
-	
-	MOV		r1, #0
-	MOV		r2, #0
-
+	MOV		r1, #1					; r1 contains the state value 0 or 1 (active)
+	STR		r1, [r0]				; make the first process active
+	MOV		r1, #0					; r1 = 0 (inactive)
+	MOV		r2, #0					; r2 is used to pointer to the correct value in the process table
 init_process_table_2
-	ADD		r2, r2, #4
-	CMP		r2, #40
-	BNE		init_process_table_3
-	B		end_init_process_table
-	
-init_process_table_3
-	ADD		r3, r0, r2
-	STR		r1, [r3]
-	B		init_process_table_2
-	
+	ADD		r2, r2, #4				; r2 = 4 
+	CMP		r2, #40					; r2 = 40?
+	BEQ		end_init_process_table	; if r2 = 40, goto end
+	ADD		r3, r0, r2				; else, r3 = r0 + r2
+	STR		r1, [r3]				; Mem[r3] = r1 (active or inactive)
+	B		init_process_table_2	; return to init_process_table_2
 end_init_process_table
 
-	;-- Teste
+	;-- Teste area used to change the start state value of one process
 	LDR		r0, =Process_Table
-	MOV		r1, #0
-	MOV		r2, #12
-	ADD		r3, r0, r2
-	STR		r1, [r3]
+	MOV		r1, #1					; r1 is the state value, inactive or active
+	MOV		r2, #12					; r2 = task number * 4
+	ADD		r3, r0, r2				; r3 = r0 + r2
+	STR		r1, [r3]				; Mem[r3] = r1 (active or inactive)
 	
 	
 	;******* END MARI ********
