@@ -6,3 +6,10 @@
 
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
+
+
+Quando um sistema operacional é projetado, geralmente é adotada uma arquitetura em módulos, a fim de se dividir esta tarefa complexa em várias partes com funções bem definidas, como o gerenciamento de E/S, drivers e aplicações. Nesta arquitetura, o módulo que é utilizado por todos os outros e que interage diretamente com o hardware é chamado de kernel. Por seu contato direto com o hardware, este código é escrito em assembly, e por  ser utilizado por todos os outros módulos do sistema operacional, deve ser rápido para não comprometer a performance do sistema.  Ele roda quando o hardware é ligado, a fim de se inicializar o sistema, e após isso apenas quando há algum tipo de interrupção.
+
+\section{Tipos de kernel}
+
+Há basicamente dois tipos de kernel: monolíticos e microkernels.
