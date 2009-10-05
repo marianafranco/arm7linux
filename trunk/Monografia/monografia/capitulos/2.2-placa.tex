@@ -2,3 +2,37 @@
 % A Placa Experimental Evaluator-7T
 \section{A Placa Experimental Evaluator-7T} \label{sec:conceitos_placa}
 \index{conceitos!placa}
+
+O principal elemento de hardware deste projeto é a placa experimental ARM Evaluator-7T, baseada no processador ARM7TDMI, um processador RISC de 32 bits capaz de executar o conjunto de instruções denominado Thumb.
+
+Os elementos presentes na arquitetura da placa Evaluator-7T são os seguintes:
+
+\begin{arquitetura_eval7t}
+
+\item Microcontrolador Samsung KS32C50100
+
+\item 512kB EPROM flash
+
+\item 512kB RAM estática (SRAM)
+
+\item Dois conectores RS232 de 9 pinos tipo D
+
+\item Botões de reset e de interrupção
+
+\item Quatro LEDs programáveis pelo usuário e um display de 7 segmentos
+
+\item Entrada de usuário por um interruptor DIP com 4 elementos
+
+\item Conector Multi-ICE
+
+\item Clock de 10MHz (o processador usa-o para gerar um clock de 50MHz)
+
+\item Regulador de tensão de 3.3V
+
+\end{arquitetura_eval_7t}
+
+%inserir diagrama da arquitetura da placa aqui
+
+Com relação à memória flash da placa, ela vem de fábrica com o bootstrap loader da placa e programa monitor de debug. O restante dela pode ser usado para os programas de usuário.
+
+Já em relação às duas portas seriais presentes na placa, cada uma tem usos específicos. A primeira, chamada DEBUG, é usada pelo monitor de debug ou pelo programa bootstrap presente na placa. Ela está conectada ao UART1 do microcontrolador. A segunda, chamada USER, é de uso genérico e está disponível para uso em programas. Ela está conectada ao UART0 do microcontrolador.
