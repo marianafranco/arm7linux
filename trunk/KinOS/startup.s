@@ -336,7 +336,7 @@ init_process_table
 	MOV		r2, #0					; r2 is used to pointer to the correct value in the process table
 init_process_table_2
 	ADD		r2, r2, #4				; r2 = 4 
-	CMP		r2, #40					; r2 = 40?
+	CMP		r2, #40					; r2 = 40 ?
 	BEQ		end_init_process_table	; if r2 = 40, goto end
 	ADD		r3, r0, r2				; else, r3 = r0 + r2
 	STR		r1, [r3]				; Mem[r3] = r1 (active or inactive)
@@ -346,7 +346,7 @@ end_init_process_table
 	;-- Teste area used to change the start state value of one process
 	LDR		r0, =Process_Table
 	MOV		r1, #1					; r1 is the state value, inactive or active
-	MOV		r2, #12					; r2 = task number * 4
+	MOV		r2, #4					; r2 = (task number-1) * 4
 	ADD		r3, r0, r2				; r3 = r0 + r2
 	STR		r1, [r3]				; Mem[r3] = r1 (active or inactive)
 	

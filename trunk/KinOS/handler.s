@@ -34,7 +34,7 @@ handler_swi
 	LDMFD	sp!,{r0-r12,lr}			;Restore registers for Angel...
 	LDR		pc, Angel_SWI_Address	;if eq then branch to the Angel SWI
 user_swis							;Non Angel SWI
-	LDMFD	sp!, {r1 - r12}
+	LDMFD	sp!, {r1-r12}			;
 	BL		swi_chandler			;call C routine to handle SWI	
 	LDMFD	sp!,{r0-r12,pc}^		;restore registers and return.
 
