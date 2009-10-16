@@ -15,8 +15,6 @@
 
 ;*********** END MARI **************
 	
-	
-	
 	AREA	irq, CODE, READONLY
 
 INTPND		DCD		0x03ff4004
@@ -70,7 +68,6 @@ handler_timer
 	
 ;*********** MARI ******************
 
-	
 get_next_taskid
 	CMP 	r1, #9
 	BEQ		get_next_taskid_1
@@ -92,7 +89,6 @@ get_next_taskid_2
 	MOV		r1, r3
 	B		get_next_taskid
 end_get_nexttaskid
-
 
 handler_next_process
 	; Verifica se o atual eh igual ao proximo
@@ -123,9 +119,7 @@ handler_next_process
 	STR		r3, [r0]				; currrent task id = r3
 	B		handler_contextswitch
 	
-	
 ;*********** END MARI **************
-
 
 ; Carry out process switch
 handler_contextswitch 
