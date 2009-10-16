@@ -1,16 +1,12 @@
 #include "tasks.h"
-
 #include "swi.h"
-
 #include <string.h>
 
 
-typedef void (*pt2Task)(void);
-
 
 struct { char* name; void (*task_ptr)(void); } tasks_name[] = {
-{"task1", &task1},
-{"task2", &task2}
+	{"task1", &task1},
+	{"task2", &task2}
 };
 
 
@@ -22,30 +18,23 @@ pt2Task  get_task_addr(char* name){
 		}
 	
 	}
-	return &task1;
+	return NULL;
 }
-
-
 
 
 void task1 (void) {
 	
 	char* newTask = "task2";
-	
 	exec(2, get_task_addr(newTask));
-	//exec(2, task2_address);
 	
 	while (1) {
 		segment_set(1);
 	}
 }
 
-
-
-
 void task2 (void) {
 	while (1) {
-		segment_set(2);		 
+		segment_set(2);
 	}
 }
 

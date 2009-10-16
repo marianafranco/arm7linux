@@ -5,18 +5,16 @@
 	AREA	exec, CODE, READONLY
 
 ; Description: Sets up TASK B Processor Control Block
-; task2[-4]  = "PCB R14" = &task2
-; task2[-8]  = "PCB SP"  = TASK1 SP - 4048;
-; task2[-60] = "LR"      = &task2 
+; task2[-4]  = "PCB R14" = &task
+; task2[-8]  = "PCB SP"  = SP_USER_BOTTOM - 4048;
+; task2[-60] = "LR"      = &task 
 ; task2[-64] = "SPSR"	 = %nzcvift_User32 = 0x10
 	
 rotina_exec
-	;MOV	pc, r1
-
 	MOV		r3, r1		; r3 = task pointer
 	MOV		r4, r0		; r4 = task id
 	
-	; Pondo o endereço de task2 em handler_task2pcb_str - 4
+	; -- Put the task address in handler_task2pcb_str - 4
 	MOV		r0, r3
 	ADD		r0,r0,#4
 	LDR		r1, =handler_task_bottom
@@ -28,13 +26,14 @@ rotina_exec
 	SUB		r1,r1,#4
 	STR		r0,[r1]	
 
-	; -- set up USER stack for TASK2 .................
+	; -- set up USER stack for the TASK .................
 	SUB		r1,r1,#4
 loop
 	SUB		r4,r4,#1
 	CMP		r4,#0
 	BEQ		end_loop
-	SUB		r0,sp,#4048
+	MOV		r6, #0x20000	; SP_USER_BOTTOM
+	SUB		r0,r6,#4048
 	B		loop
 end_loop
 	STR		r0,[r1]
