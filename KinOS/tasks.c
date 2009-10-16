@@ -24,11 +24,18 @@ pt2Task  get_task_addr(char* name){
 
 void task1 (void) {
 	
+	int j;
+	
 	char* newTask = "task2";
 	exec(2, get_task_addr(newTask));
 	
+	j=0;
 	while (1) {
 		segment_set(1);
+		j++;
+		if(j==100000000){
+			exit(2);
+		}
 	}
 }
 

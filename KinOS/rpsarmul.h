@@ -1,4 +1,4 @@
-#define emulator 0
+#define emulator 1
 
 #define IRQVector (unsigned *) 0x18
 #define COUNTDOWN	0x00effff0
