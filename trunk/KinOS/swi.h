@@ -9,6 +9,7 @@ extern int  Angel_SWI_Address;
 typedef void (*pt2Task)(void);
 
 extern void rotina_exec(int, pt2Task);
+extern void rotina_exit(int);
 
 
 __swi(fork_SWI) void _fork(int);

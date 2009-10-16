@@ -1,7 +1,6 @@
 #include "swi.h"
 
 
-	
 void irq_installSWIhandler (unsigned routine, unsigned *vector) {
 
 	if (emulator == 1) {
@@ -30,19 +29,6 @@ void rotina_fork (int processo) {
 	}
 }
 
-//void rotina_exec (int processo) {
-	
-		//LED_2_ON;
-	
-//}
-
-void rotina_exit (int processo) {
-	if (processo == 1) {
-		//LED_3_ON;
-	}
-}
-
-
 
 void swi_chandler (unsigned swi_number, int processo, pt2Task process_addr ) {
 
@@ -56,5 +42,5 @@ void swi_chandler (unsigned swi_number, int processo, pt2Task process_addr ) {
 		default:
 			rotina_exit(processo);
 			break;	
-	}	
+	}
 }	
