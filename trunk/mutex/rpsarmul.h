@@ -42,6 +42,4 @@
 // Software interruption
 #define SWIVector (unsigned *) 0x08
 
-#define		fork_SWI	0
-#define		exec_SWI	1
-#define		exit_SWI	2
+#define		OS_SWI	0

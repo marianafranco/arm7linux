@@ -1,6 +1,6 @@
 	IMPORT timer_irq
 	IMPORT button_irq
-	IMPORT swi_chandler
+	IMPORT	routine_fork
 	
 	EXPORT handler
 	EXPORT handler_emulator
@@ -23,20 +23,31 @@ INTPND		DCD		0x03ff4004
 
 handler_swi
 	STMFD 	sp!,{r0-r12,lr}			;Store registers
-	STMFD	sp!, {r0 - r11}
 	LDR		r0,[lr,#-4]				;Calculate address of SWI instruction
 	BIC		r0,r0,#0xff000000		;Mask off top 8 bits of instruction to give SWI 
 									;number
 	LDR		r1, Angel_SWI_Number	;Get Angel SWI Number
 	CMP		r0, r1					;Intercept Angel SWI Early 
-	BNE		user_swis
-	LDMFD	sp!, {r0 - r11}	
+	BEQ		goto_angel
+	MOV		r1, #0
+	CMP		r0, r1
+	BEQ		user_swis
+	LDMFD	sp!,{r0-r12,pc}^
+
+goto_angel
 	LDMFD	sp!,{r0-r12,lr}			;Restore registers for Angel...
 	LDR		pc, Angel_SWI_Address	;if eq then branch to the Angel SWI
 user_swis							;Non Angel SWI
-	LDMFD	sp!, {r1 - r12}
-	BL		swi_chandler			;call C routine to handle SWI	
+	LDMFD	sp!,{r0-r12,lr}
+	STMFD 	sp!,{r0-r12,lr}
+	MOV		r1,	#0
+	CMP		r0, r1
+	BEQ		pre_routine_fork	
 	LDMFD	sp!,{r0-r12,pc}^		;restore registers and return.
+
+pre_routine_fork
+	LDMFD	sp!,{r0-r12,lr}
+	B	routine_fork
 
 handler_emulator
 	; Save current context for APCS
@@ -149,7 +160,7 @@ handler_contextswitch
 	LDR		r13, [r13]
 	SUB		r13, r13,#60
 	; Load the next task and setup PSR
-	cmp		r13, #0
+	CMP		r13, #0
 	LDMNEDB		r13, {r0,r14}
 	MSRNE 		spsr_cxsf, r0
 	LDMNEIA		r13, {r0-r14}^
