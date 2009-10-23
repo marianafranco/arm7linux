@@ -1,14 +1,8 @@
 #include "swi.h"
 
 extern int  Angel_SWI_Address;
+extern void routine_fork(void);
 
-__swi(fork_SWI) void _fork(int process);
-__swi(exec_SWI) void _exec(int);
-__swi(exit_SWI) void _exit(int);
-#define fork(process) _fork (process)
-#define exec(process) _exec (process)
-#define exit(process) _exit (process)
-	
 void irq_installSWIhandler (unsigned routine, unsigned *vector) {
 
 	if (emulator == 1) {
@@ -31,35 +25,9 @@ void irq_installSWIhandler (unsigned routine, unsigned *vector) {
 	}
 }	
 
-void rotina_fork (int processo) {
-	if (processo == 1) {
-		//LED_1_ON;
-	}
+int fork () {
+	
+	syscall(0);
+	
+	return 0;
 }
-
-void rotina_exec (int processo) {
-	if (processo == 1) {
-		//LED_2_ON;
-	}
-}
-
-void rotina_exit (int processo) {
-	if (processo == 1) {
-		//LED_3_ON;
-	}
-}
-
-void swi_chandler (unsigned swi_number, int processo) {
-
-	switch (swi_number) {
-		case fork_SWI:
-			rotina_fork(processo);
-			break;
-		case exec_SWI:
-			rotina_exec(processo);
-			break;
-		default:
-			rotina_exit(processo);
-			break;	
-	}	
-}	
