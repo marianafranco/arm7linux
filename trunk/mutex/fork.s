@@ -8,7 +8,8 @@
 	
 routine_fork
 	STMFD 	sp!,{r0-r12,lr}
-	STMFD 	sp!,{lr,r0-r12} ; A pilha empilha de r12 p/ LR
+	STMFD 	sp!,{r0-r12}
+	STMFD 	sp!,{lr} 
 	NOP
 	; Finds the first available space in the process table (return id in r0 and its address in r1)
 	LDR		r1, =Process_Table
@@ -29,9 +30,10 @@ pcb_bottom
 ; Duplicate the stack content
 ; Descobre o tamanho da pilha (r5)
 	; Pega conteudo de R13 do modo usuario (r3)
+	SUB		r13,r13,#4
 	STMIA 		r13, {r13}^
 	NOP
-	LDR		r3, [r13]
+	LDMFD	sp!,{r3}
 	; Pega base do modo de usuario (r4)
 	MOV		r4,#0x20000
 	MOV		r5,#4048
@@ -47,17 +49,16 @@ pcb_bottom
 	MUL		r5,	r7,	r5
 	SUB		r6,	r6,	r5
 loop_stack_copy
-	CMP		r4,	r3
-	BEQ		set_stack_pointer
 	LDR		r5,	[r4]
 	STR		r5,[r6]
+	CMP		r4,	r3
+	BEQ		set_stack_pointer
 	SUB		r6,	r6,	#4
 	SUB		r4,	r4,	#4
 	B		loop_stack_copy
 ; Set the stack pointer to the same point 
 ; Descobre a base da pilha nova (r6)
 set_stack_pointer ;
-	SUB		r6,	r6,	#4
 ; Começa a popular o PCB de baixo p/ cima
 ;SPSR
 	SUB		r2,	r2,	#68
@@ -85,7 +86,7 @@ registers_loop
 	B		registers_loop
 final_jump
 	MOV		r11,#1
-	STR		r11,[r1]
+	;STR		r11,[r1]
 	LDMFD	sp!,{r0-r12,pc}^
 	
 		
