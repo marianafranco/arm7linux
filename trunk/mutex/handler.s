@@ -211,9 +211,6 @@ handler_button
 
 Angel_IRQ_Address	
 	DCD 0x00000000
-; Chained Angel SWI Interrupt address
-Angel_SWI_Address
-	DCD 0x00000000  
 ; Context task ID 
 handler_currenttaskid_str
 	DCD 0x0
@@ -229,6 +226,9 @@ handler_irqstack_str
 ; Stores the number of the Angel SWI
 Angel_SWI_Number
 	DCD	0x00123456
+; Chained Angel SWI Interrupt address
+Angel_SWI_Address
+	DCD 0x00000000	
 ; Context PCB for all the tasks (each size = 68) Offsets are from (bottom + 68 * process#)
 handler_task_bottom
 	% 680

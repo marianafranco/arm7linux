@@ -25,7 +25,7 @@ int C_Entry ( void ) {
 	else {
 		irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
 	}
-	irq_installSWIhandler ((unsigned)handler_swi, (unsigned *)SWIVector);
+	irq_installSWIhandler ((unsigned)handler_swi, SWIVector);
 	// Start timer
 	timer_start ();
 	// Enabling IRQ interruption, changing to user mode

@@ -86,7 +86,7 @@ registers_loop
 	B		registers_loop
 final_jump
 	MOV		r11,#1
-	;STR		r11,[r1]
+	STR		r11,[r1]
 	LDMFD	sp!,{r0-r12,pc}^
 	
 		
