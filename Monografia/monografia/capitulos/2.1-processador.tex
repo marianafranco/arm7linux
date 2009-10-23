@@ -42,7 +42,7 @@ A arquitetura de pipeline aumenta a velocidade do fluxo de instruções para o pro
 
 O ARM7 possui uma arquitetura de pipeline de três estágios. Durante operação normal, o processador estará sempre ocupado em executar três instruções em diferentes estágios. Enquanto executa a primeira, decodifica a segunda e busca a terceira.
 
-\begin{figure}[htb]
+\begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.25]{figuras/pipeline.pdf}
 		\caption{Pipeline de 3 estágios\label{fig:pipeline}}
@@ -51,10 +51,13 @@ O ARM7 possui uma arquitetura de pipeline de três estágios. Durante operação nor
 
 O primeiro estágio de pipeline lê a instrução da memória e incrementa o valor do registrador de endereços, que guarda o valor da próxima instrução a ser buscada. O próximo estágio decodifica a instrução e prepara os sinais de controle necessários para executá-la.  O terceiro lê os operandos do banco de registradores, executa as operações através da ALU (Arithmetic Logic Unit), lê ou escreve na memória, se necessário, e guarda o resultado das instruções no banco de registradores.
 
-\begin{figure}[htb]
+\paragraph{} % linha em branco
+\paragraph{}
+
+\begin{figure}[ht]
 	\begin{center}
-		\includegraphics{figuras/pipeline2.jpg}
-		\caption{Pipeline do ARM7TDMI\label{fig:pipeline2}}
+		\includegraphics[scale=0.75]{figuras/pipeline_blockdiagram.jpg}
+		\caption{Pipeline do ARM7TDMI\label{fig:pipeline_blockdiagram}}
 	\end{center}
 \end{figure}
 
@@ -102,6 +105,7 @@ Neste projeto, decidimos pela utilização do processador no modo ARM que facilita
 Os processadores ARM possuem 7 modos de operação:
 
 \begin{center}
+\begin{table}[ht]
 \begin{tabular}{|l|l|p{7.5cm}|}
 \hline
 		\textbf{Modo}	&	\textbf{Identificador}	& \textbf{Descrição}	\\
@@ -121,6 +125,8 @@ Os processadores ARM possuem 7 modos de operação:
 		Indefinido		&	und			&	Modo usado quando uma instrução desconhecida é executada.	\\
 \hline
 \end{tabular}
+\caption{Modos de operação\label{modos}}
+\end{table}
 \end{center}
 
 Mudanças no modo de operação podem ser feitas através de programas, ou podem ser causadas por interrupções externas ou exceções (interrupções de software).
@@ -150,7 +156,36 @@ O processador ARM7TDMI tem um total de 37 registradores:
 
 Esses registradores não são todos acessíveis ao mesmo tempo. O modo de operação do processador determina quais registradores são disponíveis ao programador.
 
+\subsubsection{Modo Usuário e Sistema}
 
+O conjunto de registradores para o modo Usuário (o mesmo usado no modo Sistema) contém 16 registradores diretamente acessíveis, R0 à R15. Um adicional registrador, o CPSR (Current Program Status Register), contem os bits de flag e de modo. 
+
+Os registradores R13 à R15 possuem as seguintes funções especiais: 
+
+\begin{itemize}
+\item R13: usado como ponteiro de pilha, stack pointer (SP)
+\item R14: é chamado de link register (lr) e é onde se coloca o endereço de retorno sempre que uma sub-rotina é chamada.
+\item R15: corresponde ao program counter (pc) e contém o endereço da próxima instrução à ser executada pelo processador.
+\end{itemize}
+
+\subsubsection{Modos privilegiados}
+
+Além dos registradores acessíveis ao programador, o ARM coloca à disposição mais alguns registradores nos modos privilegiados. Esses registradores são mapeados aos registradores acessíveis ao programador no modo Usuário e permitem que estes sejam salvos a cada interrupção.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[scale=0.65]{figuras/registradores.jpg}
+		\caption{Organização dos registradores no modo ARM\label{fig:registradores}}
+	\end{center}
+\end{figure}
+
+Como se pode verificar na figura, cada modo tem o seu próprio R13 e R14. Isso permite que cada modo mantenha seu próprio ponteiro de pilha (SP) e endereço de retorno (LR).
+
+Além desses dois registradores, o modo FIQ possui mais cinco registradores especiais: R8\textunderscore fiq-R12\textunderscore fiq. Isso significa que quando o processador muda para o modo FIQ, o programa não precisa salvar os registradores R8-R12.
+
+Esses registradores especiais mapeiam de um pra um os registradores do modo usuário. Se você mudar o modo do processador, um registrador particular do novo modo irá substituir o registrador existente.
+
+Por exemplo, quando o processador esta no modo IRQ, as instruções executadas continuarão a acessar os registradores R13 e R14. No entanto, esses serão os registradores especiais R13\textunderscore irq e R14\textunderscore irq. Os registradores do modo usuário (R13\textunderscore usr e R14\textunderscore usr) não serão afetados pelas instruções referenciando esses registradores. O programa continua tendo acesso normal aos outros registradores R0 à R12.
 
 
 %-------------------------------------------
@@ -159,8 +194,120 @@ Esses registradores não são todos acessíveis ao mesmo tempo. O modo de operação 
 \subsection{Registradores de Estado} \label{sub:reg_estado}
 \index{conceitos!processador!reg_estado}
 
+O Current Program Status Register (CPRS) é acessível em todos os modos do processador. Ele contém as flags de condição, os bits para desabilitar as interrupções, o modo atual do processador, e outras informações de estado e controle. Cada modo de exceção possui também um Saved Program Register (SPRS), que é usado para preservar o valor do CPSR quando a exceção associada acontece. 
+
+Os registradores de estado do programa:
+
+\begin{itemize}
+\item Guardam informação sobre a operação mais recente executada pela ULA (ALU).
+\item Controlam o ativar e desativar de interrupções.
+\item Determinam o modo de operação do processador.
+\end{itemize}
+
+\paragraph{} % linha em branco
+\paragraph{}
+\paragraph{}
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[scale=0.65]{figuras/status_register.jpg}
+		\caption{Formato dos registradores de estado CPSR e SPSR\label{fig:status_register}}
+	\end{center}
+\end{figure}
+
+\subsubsection{Flags de Condição}
+
+Os bits N, Z, C e V são flags de condição, é possível de alterá-los através do resultado de operações lógicas ou aritméticas. 
+
+Os flags de condição são normalmente modificados por:
+
+\begin{itemize}
+\item Uma instrução de comparação (CMN, CMP, TEQ, TST).
+\item Alguma outra instrução aritmética, lógica ou move, onde o registrador de destino não é o R15 (PC).
+\end{itemize}
+
+Nesses dois casos, as novas flags de condição (depois de a instrução ter sido executada) normalmente significam:
+
+\begin{itemize}
+\item N: Indica se o resultado da instrução é um número positivo (N=0) ou negativo (N=1).
+\item Z: Contém 1 se o resultado da instrução é zero (isso normalmente indica um resultado de igualdade para uma comparação), e 0 se o contrário.
+\item C: Pode possuir significados diferentes:
+	\begin{itemize}
+	\item Para uma adição, C contém 1 se a adição produz "vai-um" (carry), e 0 caso contrário.
+	\item Para uma subtração, C contém 0 se a subtração produz "vem-um" (borrow), e 1 caso contrário.
+	\item Para as instruções que incorporam deslocamento, C contém o último bit deslocado para fora pelo deslocador.
+	\item Para outras instruções, C normalmente não é usado.
+	\end{itemize}
+\item V: Possui dois significados:
+	\begin{itemize}
+	\item Para adição ou subtração, V contém 1 caso tenha ocorrido um overflow considerando os operandos e o resultado em complemento de dois.
+	\item o	Para outras instruções, V normalmente não é usado.
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Bits de Controle}
+
+Os oito primeiros bits de um PSR (Program Status Register) são conhecidos como bits de controle. Eles são:
+
+\begin{itemize}
+\item Bits de desativação de interrupção
+\item Bit T
+\item Bits de modo
+\end{itemize}
+
+Os bits de controle mudam quando uma interrupção acontece. Quando o processador esta operando em um modo privilegiado, programas podem manipular esses bits.
+
+\paragraph{Bits de desativação de interrupção}
+\paragraph{}
+
+Os bits I e F são bits de desativação de interrupção:
+
+\begin{itemize}
+\item Quando o bit I é ativado, as interrupções IRQ são desativadas.
+\item Quando o bit F é ativado, as interrupções FIQ são desativadas.
+\end{itemize}
 
 
+\paragraph{Bit T}
+\paragraph{}
+
+O bit T reflete o modo de operação:
+
+\begin{itemize}
+\item Quando o bit T é ativado, o processador é executado em estado Thumb.
+\item Quando o bit T é limpo, o processador é executado em estado ARM.
+\end{itemize}
+
+
+\paragraph{Bits de modo}
+\paragraph{}
+
+Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits de modo definem um modo válido, portando tome cuidado para usar somente as combinações mostradas a seguir:
+
+\begin{center}
+\begin{table}[ht]
+\begin{tabular}{|l|l|p{7.5cm}|}
+\hline
+		\textbf{Bit de modo}	&	\textbf{Modo de operação}	& \textbf{Registradores acessíveis}	\\
+\hline
+		10000	&	Usuário(usr)	& 	PC,R14-R0,CPSR	\\
+\hline
+		10001	&	FIQ(fiq)		&	PC,R14\textunderscore fiq-R8\textunderscore fiq,R7-R0,CPSR,SPSR\textunderscore fiq		\\
+\hline
+		10010	&	IRQ(irq)		&	PC,R14\textunderscore irq, R13\textunderscore irq,R12-R0,CPSR,SPSR\textunderscore irq	\\
+\hline
+		10011	&	Supervisor(svc)	&	PC,R14\textunderscore svc,	R13\textunderscore irq,R12-R0,CPSR,SPSR\textunderscore svc \\
+\hline
+		10111	&	Abort(abt)		&	PC,R14\textunderscore abt,	R13\textunderscore irq,R12-R0,CPSR,SPSR\textunderscore abt	\\
+\hline
+		11011	&	Indefinido(und)	&	PC,R14\textunderscore und,	R13\textunderscore irq,R12-R0,CPSR,SPSR\textunderscore und \\
+\hline
+		11111	&	Sistema(sys)	&	PC,R14-R0,CPRS	\\
+\hline
+\end{tabular}
+\caption{Valores para o bit de modo \label{bit_tipo}}
+\end {table}
+\end{center}
 
 %-------------------------------------------
 % Interrupções
@@ -168,4 +315,34 @@ Esses registradores não são todos acessíveis ao mesmo tempo. O modo de operação 
 \subsection{Interrupções} \label{sub:interrupcoes}
 \index{conceitos!processador!interrupcoes}
 
+Interrupções surgem sempre que o fluxo normal de um programa deve ser interrompido temporariamente, por exemplo, para servir uma interrupção vinda de um periférico ou a tentativa de executar uma instrução desconhecida. Antes de tentar lidar com uma interrupção, o ARM7TDMI preserva o estado atual de forma que o programa original possa ser retomado quando a rotina de interrupção tiver acabado. 
+
+A arquitetura ARM suporta 7 tipos de interrupções. A figura a baixo lista os tipos de interrupção e o modo do processador usado para lidar com cada tipo. Quando uma interrupção acontece, a execução é forçada para um endereço fixo de memória correspondente ao tipo de interrupção. Esses endereços fixos são chamados de vetores de interrupção.
+
+\begin{center}
+\begin{table}[ht]
+\begin{tabular}{|l|l|p{7.5cm}|}
+\hline
+		\textbf{Tipo de interrupção}	&	\textbf{Modo de operação}	& \textbf{Endereço}	\\
+\hline
+		Reset							&	Supervisor	& 	0x00000000	\\
+\hline
+		Instrução indefinida			&	Indefinido	&	0x00000000 	\\
+\hline
+		Interrupção de Software (swi)	&	Supervisor	&	0x00000000	\\
+\hline
+		10011							&	Abort		&	0x00000000 \\
+\hline
+		10111							&	Abort		&	0x00000000	\\
+\hline
+		Interrupção normal(IRQ)			&	IRQ			&	0x00000000 \\
+\hline
+		Interrupção rápida(FIQ)			&	FIQ			&	0x00000000	\\
+\hline
+\end{tabular}
+\caption{Valores para o bit de modo \label{bit_tipo}}
+\end {table}
+\end{center}
+
+Deve-se notar olhando para a tabela a cima, que existe espaço suficiente para apenas uma instrução entre cada vetor de interrupção (4 bytes). Estes são inicializados com instruções de desvio (branch).
 
