@@ -22,16 +22,41 @@
 INTPND		DCD		0x03ff4004
 
 handler_swi
-	STMFD 	sp!,{r0-r12,lr}			;Store registers
+	STMFD 	sp!,{r0-r12,lr}			;Store registers	
+	
+	;MOV		r0, #0x11000
+	;STR		lr, [r0]
+	
 	LDR		r0,[lr,#-4]				;Calculate address of SWI instruction
 	BIC		r0,r0,#0xff000000		;Mask off top 8 bits of instruction to give SWI 
 									;number
 	LDR		r1, Angel_SWI_Number	;Get Angel SWI Number
 	CMP		r0, r1					;Intercept Angel SWI Early 
 	BEQ		goto_angel
-	MOV		r1, #0
-	CMP		r0, r1
-	BEQ		user_swis
+	
+	MOV		r0, #0x11000
+	MRS		R1, CPSR
+	STR		r1, [r0]
+	
+	;MOV		r2,	#0xc0|0x13
+	;MSR		CPSR_c, r2
+	
+	;MOV		r0, #0x11000
+	;LDR		r1, [r0]
+	
+	MOV		r0, #0x10000
+	STR		lr, [r0]
+	
+	;MOV		r1, #0
+	;CMP		r0, r1
+	;BEQ		user_swis
+	
+	B		user_swis
+	
+	;MOV		r0, #0x11000
+	;LDR		r2,	[r0]
+	;MSR		CPSR_c, r2
+	
 	LDMFD	sp!,{r0-r12,pc}^
 
 goto_angel
@@ -39,6 +64,7 @@ goto_angel
 	LDR		pc, Angel_SWI_Address	;if eq then branch to the Angel SWI
 user_swis							;Non Angel SWI
 	LDMFD	sp!,{r0-r12,lr}
+	NOP
 	STMFD 	sp!,{r0-r12,lr}
 	MOV		r1,	#0
 	CMP		r0, r1
@@ -47,6 +73,8 @@ user_swis							;Non Angel SWI
 
 pre_routine_fork
 	LDMFD	sp!,{r0-r12,lr}
+	NOP
+	STMFD 	sp!,{r0-r12,lr}
 	B	routine_fork
 
 handler_emulator

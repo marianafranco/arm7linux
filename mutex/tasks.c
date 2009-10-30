@@ -3,11 +3,11 @@
 int a = 1;
 
 void task1 (void) {
+	
+	a = fork();
+
 	while (1) {
 		segment_set(1);
-		if (a == 1) {
-			a = fork();
-		}
 	}
 }
 
