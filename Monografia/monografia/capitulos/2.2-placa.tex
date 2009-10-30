@@ -32,6 +32,46 @@ Os elementos presentes na arquitetura da placa Evaluator-7T são os seguintes:
 
 %inserir diagrama da arquitetura da placa aqui
 
-Com relação à memória flash da placa, ela vem de fábrica com o bootstrap loader da placa e programa monitor de debug. O restante dela pode ser usado para os programas de usuário.
+Com relação à memória flash da placa, ela vem de fábrica com o bootstrap loader da placa e programa monitor de debug. O restante dela pode ser usado para os programas de usuário. A tabela abaixo mostra a faixa de endereços de cada região da memória.
+
+% a tabela nao esta aparecendo no lugar certo (logo após o parágrafo acima)
+\begin{table}[h]
+\caption{Mapa da memória flash}
+\centering
+\begin{tabular}{l l}
+\hline\hline
+Faixa de endereço & Descrição\\
+\hline\hline
+0x01800000 a 0x01806FFF & Bootstrap loader \\ %\hline
+0x01807000 a 0x01807FFF & Teste de produção \\ %\hline
+0x01808000 a 0x0180FFFF & Reservado \\ %\hline
+0x01810000 a 0x0181FFFF & Angel \\ %\hline
+0x01820000 a 0x0187FFFF & Disponível para outros programas e dados \\ \hline
+\end{tabular}
+\label{table:mapamemflash}
+\end{table}
 
 Já em relação às duas portas seriais presentes na placa, cada uma tem usos específicos. A primeira, chamada DEBUG, é usada pelo monitor de debug ou pelo programa bootstrap presente na placa. Ela está conectada ao UART1 do microcontrolador. A segunda, chamada USER, é de uso genérico e está disponível para uso em programas. Ela está conectada ao UART0 do microcontrolador.
+
+%BSL
+\subsection{Os programas Bootstrap Loader e Angel}
+
+Como mencionado anteriormente, a memória flash da placa contém uma região reservada para os programas Bootstrap Loader (BSL) e o programa monitor de debug chamado Angel.
+
+O BSL é o primeiro programa a ser executado pelo microcontrolador quando esta é ligada ou reiniciada. Suas principais funções são:
+
+\begin{itemize}
+
+\item Fazer a conexão com o computador através da porta serial e uma aplicação de terminal, como o HyperTerminal do Windows
+
+\item Prover a infraestrutura necessária à configuração da placa
+
+\item Prover ajuda ao usuário
+
+\item Gerenciar imagens de memória como um conjunto de módulos executáveis
+
+\item Carregar aplicações na SRAM e executá-las
+
+\end{itemize}
+
+%Angel
