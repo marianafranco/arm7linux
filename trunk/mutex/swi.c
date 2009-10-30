@@ -2,6 +2,8 @@
 
 extern int  Angel_SWI_Address;
 extern void routine_fork(void);
+extern void routine_exec(void);
+extern void routine_exit(void);
 
 void irq_installSWIhandler (unsigned routine, unsigned *vector) {
 
@@ -25,9 +27,15 @@ void irq_installSWIhandler (unsigned routine, unsigned *vector) {
 	}
 }	
 
-int fork () {
-	
-	syscall(0);
-	
+int fork(){
+	syscall(0, 0, 0);
 	return 0;
+}
+
+void exec(int process_id, pt2Task process_addr){
+	syscall(1, process_id, process_addr);
+}
+
+void exit(){
+	syscall(2, 0, 0);
 }
