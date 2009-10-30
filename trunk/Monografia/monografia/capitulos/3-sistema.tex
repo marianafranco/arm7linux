@@ -7,9 +7,53 @@
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
 
+(Explicar em algum lugar as divisões que existem no assembly.)\\
+(Explicar que temos 10 threads)
 
-Quando um sistema operacional é projetado, geralmente é adotada uma arquitetura em módulos, a fim de se dividir esta tarefa complexa em várias partes com funções bem definidas, como o gerenciamento de E/S, drivers e aplicações. Nesta arquitetura, o módulo que é utilizado por todos os outros e que interage diretamente com o hardware é chamado de kernel. Por seu contato direto com o hardware, este código é escrito em assembly, e por  ser utilizado por todos os outros módulos do sistema operacional, deve ser rápido para não comprometer a performance do sistema.  Ele roda quando o hardware é ligado, a fim de se inicializar o sistema, e após isso apenas quando há algum tipo de interrupção.
+\section{Organização}
 
-\section{Tipos de kernel}
+Nesta etapa descreveremos algumas das estruturas de dados em assembly que utilizamos em nosso projeto, assim como organizamos a memória na placa e utilizamos os modos.
 
-Há basicamente dois tipos de kernel: monolíticos e microkernels.
+\subsection{Process Control Block}
+
+O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das dez threads que estão sendo executadas, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=10cm]{figuras/pcb.pdf}
+\caption{Estrutura de dados do PCB. Fonte: \cite{aaa} \label{pcb}}
+\end{figure}
+
+\subsection{Lista de processos}
+
+\subsection{Memória}
+
+\subsection{Modos}
+
+
+\section{Inicialização}
+
+O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de processos. Após esta etapa, a uma inicialização em C, feita no arquivo cinit.c, que ao fim de sua execução, roda o primeiro processo.
+
+\subsection{Modo}
+
+O primeiro passo do programa é informar qual o tipo de código que será executado no programa. Como descrito anteriormente, podemos ter o assembly ARM ou o assembly thumb. Em nosso programa, utlizaremos apenas código ARM, já que ele fornece mais instruções (favorece a legibilidade) e porque o tamanho do código não é um grande problema.
+
+\subsection{Pilhas}
+
+A fim de podemos utilizar as pilhas, precisamos inicializá-las em cada um dos modos que virão a ser utilizados. Em nosso programa, utilizamos os modos SVC, user e IRQ. Para inicializar as pilhas, devemos primeiro mudar o modo, desabilitar as interrupções temporariamente e só depois mudar o ponteiro de pilha. Podemos fazer os dois primeiros passos de uma vez só, já que estas operações são feitas através do registrador de estado, como descrito anteriormente. Porém, um problema nos surge ao tentarmos inicializar o ponteiro de pilha do modo user: uma vez que entremos neste modo, não podemos ir para nenhum outro estado privilegiado. A solução para este problema é que ao invés de mudarmos para o modo de usuário, vamos ao modo system, que nada mais é do que o modo usuário privilegiado. 
+
+Como podemos ver na figura \ref{organmem}, a pilha do modo user começa no endereço 0x20000, a do modo IRQ em 0x8000 e a do modo SVC em 0x7F80. Como convenção para todas as pilhas que utilizaremos, não podemos nos esquecer que elas crescem sempre para baixo.
+
+\subsection{Tabela de processos}
+
+
+
+\subsection{Periféricos}
+
+\subsection{Installhandler}
+
+\subsection{Interrupção de timer}
+
+\section{Inicialização}
+
