@@ -1,11 +1,36 @@
 #include "tasks.h"
 
+
+struct { char* name; void (*task_ptr)(void); } tasks_name[] = {
+	{"task1", &task1},
+	{"task2", &task2}
+};
+
+
+pt2Task  get_task_addr(char* name){
+	int i;
+	for(i=0; i<sizeof(tasks_name); i++){
+		if(strcmp(tasks_name[i].name, name)==0){
+			return tasks_name[i].task_ptr;
+		}
+	
+	}
+	return NULL;
+}
+
+
+
 int a = 1;
 
 void task1 (void) {
 	
+	char* newTask = "task2";
+	
 	a = fork();
-
+	
+	
+	exec(2,get_task_addr(newTask));
+	
 	while (1) {
 		segment_set(1);
 	}

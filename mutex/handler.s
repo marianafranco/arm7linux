@@ -1,81 +1,69 @@
-	IMPORT timer_irq
-	IMPORT button_irq
+	IMPORT 	timer_irq
+	IMPORT 	button_irq
 	IMPORT	routine_fork
+	IMPORT	routine_exec
+	IMPORT	routine_exit
 	
-	EXPORT handler
-	EXPORT handler_emulator
-	EXPORT handler_currenttaskid_str
-	EXPORT handler_task_bottom
-	EXPORT Angel_IRQ_Address
-	EXPORT handler_swi
-	EXPORT Angel_SWI_Address
-	
-;*********** MARI ******************
-	EXPORT	Process_Table
+	EXPORT 	handler
+	EXPORT 	handler_emulator
+	EXPORT 	handler_currenttaskid_str
+	EXPORT 	handler_task_bottom
+	EXPORT 	Angel_IRQ_Address
+	EXPORT 	handler_swi
+	EXPORT 	Angel_SWI_Address	
+	EXPORT 	Process_Table
 
-;*********** END MARI **************
-	
-	
-	
 	AREA	irq, CODE, READONLY
 
 INTPND		DCD		0x03ff4004
 
+;-----------------------------------------------------
+
 handler_swi
 	STMFD 	sp!,{r0-r12,lr}			;Store registers	
-	
-	;MOV		r0, #0x11000
-	;STR		lr, [r0]
-	
 	LDR		r0,[lr,#-4]				;Calculate address of SWI instruction
 	BIC		r0,r0,#0xff000000		;Mask off top 8 bits of instruction to give SWI 
 									;number
 	LDR		r1, Angel_SWI_Number	;Get Angel SWI Number
 	CMP		r0, r1					;Intercept Angel SWI Early 
-	BEQ		goto_angel
-	
-	MOV		r0, #0x11000
-	MRS		R1, CPSR
-	STR		r1, [r0]
-	
-	;MOV		r2,	#0xc0|0x13
-	;MSR		CPSR_c, r2
-	
-	;MOV		r0, #0x11000
-	;LDR		r1, [r0]
-	
-	MOV		r0, #0x10000
-	STR		lr, [r0]
-	
-	;MOV		r1, #0
-	;CMP		r0, r1
-	;BEQ		user_swis
-	
-	B		user_swis
-	
-	;MOV		r0, #0x11000
-	;LDR		r2,	[r0]
-	;MSR		CPSR_c, r2
-	
-	LDMFD	sp!,{r0-r12,pc}^
+	BEQ		goto_angel	
+	MOV		r1, #0
+	CMP		r0, r1
+	BEQ		user_swis
 
 goto_angel
 	LDMFD	sp!,{r0-r12,lr}			;Restore registers for Angel...
 	LDR		pc, Angel_SWI_Address	;if eq then branch to the Angel SWI
 user_swis							;Non Angel SWI
 	LDMFD	sp!,{r0-r12,lr}
-	NOP
 	STMFD 	sp!,{r0-r12,lr}
 	MOV		r1,	#0
 	CMP		r0, r1
-	BEQ		pre_routine_fork	
-	LDMFD	sp!,{r0-r12,pc}^		;restore registers and return.
+	BEQ		pre_routine_fork
+	MOV		r1,	#1
+	CMP		r0, r1
+	BEQ		pre_routine_exec
+	MOV		r1,	#2
+	CMP		r0, r1
+	BEQ		pre_routine_exit
 
 pre_routine_fork
 	LDMFD	sp!,{r0-r12,lr}
-	NOP
 	STMFD 	sp!,{r0-r12,lr}
 	B	routine_fork
+	
+pre_routine_exec
+	LDMFD	sp!,{r0-r12,lr}
+	STMFD 	sp!,{r0-r12,lr}
+	B	routine_exec
+
+pre_routine_exit
+	LDMFD	sp!,{r0-r12,lr}
+	STMFD 	sp!,{r0-r12,lr}
+	B	routine_exit
+
+
+;-----------------------------------------------------
 
 handler_emulator
 	; Save current context for APCS
@@ -106,9 +94,6 @@ handler_timer
 	; If it is not the last task, go to handler_swaptonext
 	LDR		r0, =handler_currenttaskid_str
 	LDR		r1,[r0]
-	
-;*********** MARI ******************
-
 	
 get_next_taskid
 	CMP 	r1, #9
@@ -163,9 +148,6 @@ handler_next_process
 	B		handler_contextswitch
 	
 	
-;*********** END MARI **************
-
-
 ; Carry out process switch
 handler_contextswitch 
 	; Reset and save IRQ stack
@@ -196,12 +178,10 @@ handler_contextswitch
 	; Load the IRQ stack into r13_irq 
 	LDR		r13, =handler_irqstack_str
 	LDR		r13,[r13]
-
-;********** MARI ******************	
+	
 	B		end_handler_next_process
 
 handler_contextNOTswitch
-
 	; Reset and save IRQ stack
 	LDR		r0, =handler_irqstack_str
 	MOV		r1, sp
@@ -212,17 +192,13 @@ handler_contextNOTswitch
 	; Load the IRQ stack into r13_irq 
 	LDR		r13, =handler_irqstack_str
 	LDR		r13,[r13]
-	; Return the next task
-	;SUBS 		pc, r14, #4
 
 end_handler_next_process
 	; Return the next task
 	SUBS 		pc, r14, #4
-	
-	
-;********** END MARI ******************	
 
 
+;-----------------------------------------------------
 
 handler_button
 
@@ -261,17 +237,10 @@ Angel_SWI_Address
 handler_task_bottom
 	% 680
 
-
-;********** MARI ******************	
 	
 ;--- Process Table ----;
-	
 	AREA	ProcessTable, DATA, READWRITE
-	
 Process_Table
 	% 40
-	
-;********** END MARI ***************
-
 
 	END
