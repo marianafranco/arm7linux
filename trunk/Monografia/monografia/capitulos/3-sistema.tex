@@ -7,8 +7,13 @@
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
 
-(Explicar em algum lugar as divisões que existem no assembly.)\\
+(Explicar em algum lugar as divisões que existem no assembly.)
+
 (Explicar que temos 10 threads)
+
+(Ver como colocar referencias e colocar a referencia do "Interrupt handling" para a figura do PCB e a figura da memoria)
+
+(Colocar a referencia para a parte que fala do vetor de interrupcao na parte da memoria)
 
 \section{Organização}
 
@@ -16,7 +21,7 @@ Nesta etapa descreveremos algumas das estruturas de dados em assembly que utiliz
 
 \subsection{Process Control Block}
 
-O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das dez threads que estão sendo executadas, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}.
+O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das dez threads, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é a base do PCB menos quatro bytes, a segunda a base menos oito bytes e assim por diante. Como podemos observar pela figura, as posições um a quinze (base - 4 a base - 60) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição dezesseis (base - 64) armazena o registrador quatorze do modo IRQ, que nada mais é o endereço de retorno (link register) da interrupção que realizou a troca de processos. Finalmente, a posição dezessete armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um ``snapshot'' preciso do estado do processo quando houve o chaveamento, e permite que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. Esta estrutura tem seu espaço reservado no arquivo handler.s, e é nomeado com a variável handler\_task\_bottom, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, para acessarmos o segundo PCB, devemos subtrair 68 do endereço de base, 136 bytes para o terceiro PCB e assim por diante.
 
 \begin{figure}[!ht]
 \centering 
@@ -26,10 +31,21 @@ O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guard
 
 \subsection{Lista de processos}
 
+A lista de processos é um vetor que armazena quais dos processos estão ativos e quais não estão. Este vetor tem 40 bytes, onde 4 são para cada processo. Ele é declarado no arquivo handler.s com o nome de Process\_Table, que indica sua base. Cada endereço reservado deve ter o valor 0, caso o processo esteja inativo ou 1, caso esteja ativo.
+
 \subsection{Memória}
+
+Estruturamos a memória utilizada como indicado na figura \ref{memoria}. Para todo espaço das pilhas, programas, kernel, vetor de interrupções e área de dados, vamos limitar o espaço disponível para 128KB (de 0x0 a 0x20000).Como pode ser visto na seção \ref{bbb}, a memória entre 0x0 e 0x20 contém o vetor de interrupções e deve ser reservado. A pilha do modo SVC começa no endereço 0x7F80, cresce para baixo e não deve invadir a área reservada para o vetor de interrupção. Já a pilha do modo IRQ, começa no endereço 0x8000, também cresce para baixo e não deve invadir o espaço reservado para a pilha do modo SVC. O código do kernel e dos programas começa no endereço 0x8000, mas ao contrário da pilha do modo SVC, cresce para cima. Logo após o código, temos uma área reservada para os dados globais. Finalmente, as pilhas de usuário começam no endereço 0x20000 e crescem para baixo. Cada uma tem um offset relativo à anterior de 4048 bytes.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=13cm]{figuras/memoria.pdf}
+\caption{Estrutura da memória. Fonte: \cite{aaa} \label{memoria}}
+\end{figure}
 
 \subsection{Modos}
 
+Dentre os sete modos dsiponíveis na placa, utilizamos apenas três deles: o modo user, o modo SVC e o modo IRQ. O primeiro é o modo não privilegiado no qual rodamos os processos. O segundo, é o modo de inicialização do kernel e de execução das system calls, que é privilegiado. Já o terceiro, é um modo que também é privilegiado, mas que é usado quando há interrupções de hardware e portanto, é usado quando há o chaveamento de processos (interrupção de timer) ou qualquer outra interrupção que não a de software.
 
 \section{Inicialização}
 
