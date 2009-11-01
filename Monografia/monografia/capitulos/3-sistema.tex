@@ -13,7 +13,6 @@ Lembretes:
 \item{Explicar em algum lugar as divisões que existem no assembly.}
 \item{Ver como colocar referencias e colocar a referencia das figuras}
 \item{Colocar a referencia das seções}
-\item{Escrever sobre a interrupcao de timer e o chaveamento de processos}
 \item{Escrever sobre o Angel}
 \item{Variáveis em assembly}
 \end{itemize}
@@ -76,6 +75,10 @@ Dentre os sete modos dsiponíveis na placa, utilizamos apenas três deles: o modo 
 
 Debugar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não podemos debugar o programa na placa. Para contornar tal problema, utilizamos o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, colocamos ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo rpsarmul.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa.
 
+\section{Angel}
+
+O Angel é um programa contido na ROM da placa que realiza a comunicação entre a mesma e o computador que efetuou o upload do código. Além de permitir com que o código seja carregado na placa, o Angel realiza o processo de debug do código durante a execução. Para isso, deve haver uma comunicação constante entre a placa e o computador, que é feita através de interrupções constantes. Uma vez que a placa é iniciada, o endereço do vetor de interrupções responsável pelas interrupções de hardware e se software apontam para um endereço pré-estabelecido do Angel. Caso queiramos adicionar alguma rotina de tratamento de interrupções, não podemos de nos esquecer de encadear a rotina do Angel caso identifiquemos que a fonte de interrupção não foi de algo causado por um código do usuário. Descreveremos mais à frente como isso é feito durante a instalação da rotina de tratamento de interrupções.
+
 \section{Inicialização}
 
 O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de processos. Após esta etapa, a uma inicialização em C, feita no arquivo cinit.c, que ao fim de sua execução, roda o primeiro processo.
@@ -130,9 +133,53 @@ Criamos algums programas exemplo que se utilizam dos periféricos da placa. \ldot
 
 \section{Chaveamento de processos}
 
+O chaveamento de processos é realizado inteiramente com o assembly escrito no arquivo handler.s. Nele, o estado do processo que está sendo executado é armazenado e o próximo processo, obtido através de round-robin, é colocado para execução.
+
+\subsection{Identificação da interrupção}
+
+Uma vez que há a interrupção de timer, a chamada de interrupção de hardware é realizada. Durante a instalação da rotina de tratamento de interrupção de hardware, apontamos para a rotina handler caso estejamos usando a placa ou a rotina handler\_emulator caso estajamos usando o emulador. A direrença básica é que enquanto a primeira tenta identificar qual a fonte de interrupção que pode ser tanto o timer quando o Angel, a segunda já assume que a fonte é o timer, já que não há o Angel no emulador. Devemos salientar que deve-se armazenar toda informação contida nos registradores que é alterada durante o processo de tratamento de interrupção. Para tal, empilhamos os valores dos registradores usados a fim de se poder recuperar estes valores durante a etapa de salvamento do estado atual.
+
+No caso do uso da placa, a fonte da interrupção se encontra no endereço 0x03ff4004, identificado como INTPND. Se o valor contido neste endereço é 0x0400, a fonte foi uma interrupção de timer, caso seja 0x0001, a fonte foi o botão da placa e caso contrário, a fonte foi o Angel.
+
+\subsection{Recomeçar o timer}
+
+Quando é identificada a iterrupção de timer, devemos reinicializar o contador do timer a fim de que possa interromper novamente no futuro. Para tal, executamos a rotina timer\_irq, encontrada no arquivo irq.c.
+
+\subsection{Identificação do PCBs da troca de processos}
+
+A rotina de troca de processos tem como entrada duas variáveis: o fundo do PCB do processo atual e o fundo do PCB do próximo processo. Para obtermos tais dados, inicialmente precisamos identificar o número do processo atual, armazenado na variável handler\_currenttaskid\_str. A partir disso, com o auxílio da tabela de processos, veririficamos um a um em round-robin qual o próximo processo ativo.
+
+Tendo o número dos processos atual e próximo, podemos calcular o endereço do PCB de ambos. Para isso, realizamos a simples equação $PCB_{id} = (id - 1) * 68 + base$ para os dois processos e armazenamos os resultados nas variáveis handler\_currenttaskid\_str e handler\_nexttask\_str, que serão usadas na etapa da troca de processos.
+
+Caso o próximo processo a ser executado venha a ser o mesmo que está atualmente sendo executado, a rotina de tratamento de interrupção ignora a etapa de troca de processos e retorna à execução da rotina que estava sendo executada anteriormente sem qualquer alteração, já que o valor dos registradores antes da interrupção estavam sendo armazenados na pilha.
+
+\subsection{A troca de processos}
+
+A troca de processos se dá em poucos passos usando-se instruções especiais que permmitem que haja um grande número de dados empilhados/desempilhados com apenas uma instrução. Inicialmente zera-se a pilha do modo IRQ e restabelece-se os registradores como estavam antes di início da troca de processos. Depois disso, muda-se o endereço do ponteiro de pilha para o PCB do processo atual. O grande truque vem no próximo passo: empilha-se todos os registradores. Como a estrutura do PCB foi feito tendo este processo em mente, a posição dos dados dos registradores cai exatamente como foi descrito na figura \ref{pcb}. Após o armazenamento do estado atual, muda-se novamente o endereço do ponteiro de pilha para o PCB da próxima instrução. Do mesmo modo que o armazenamento, desempilha-se os o valor dos registradores, que são exatamente como estava empilhado este processo quando foi armazenado. Com isso, falta apenas restaurar o process counter para o ponto que o processo estava executando, o que vai ser descrito em seguida.
+
+\subsection{Um caso especial}
+
+Como descrito acima, caso se confirme que há apenas uma instrução ativa na tabela de processos, não é feita a troca de processos. Porém, antes de se retornar ao processo anterior, não podemos nos esquecer que devemos zerar a pilha do modo IRQ já não há deve haver mais dados relevantes nela e assim prevenimos que ela estoure seu tamanho. Outra ação importante é a restauração dos registradores que foram utilizados durante a rotina de tratamento.
+
+\subsection{Retorno à execução da nova rotina}
+
+Como os registradores, o ponteiro de pilha, o endereço de retorno e o registrador de estados já estão com os dados do próximo processo, devemos agora apenas fazer com que o a instrução imediatamente posterior à aquela executada antes da interrupção seja executada. Porém, não podemos nos esquecer que o pipeline do processador fez com que o endereço da instrução duas vezes à frente tivesse sido armazenada. Para compensar isso, devemos subtrair o tamanho de uma instrução (quatro bytes) do endereço que vai ser colocado no process counter.
+
 \section{System calls}
 
+Uma system call nada mais é do que uma interrupção de software causada pelo kernel. Como uma interrupção de hardware, uma vez que é causada, ela executa a instrução apontada no vetor de interrupções, que foi instalada anteriormente na inicialização do sistema. A rotina de tratamento também está localizada no arquivo handler.s e é executada em modo SVC, que é privilegiado. As únicas instruções que chamam tais system calls são as rotinas fork, exec e exit.
+
+\subsection{Propriedades gerais das system calls}
+
+Escrever quando terminar de juntar as system calls\ldots
+
 \subsection{fork}
+
+Em um sistema operacional, a system call fork é responsável pela criação de novos processos. Para tal, ela duplica o processo que a criou, onde o único meio de se identificar qual o processo pai é pelo número de retorno. Caso o número de retorno seja 0, significa que este é o processo filho, e caso seja qualquer outro número, é o processo pai que retornou o identificador do processo filho. 
+
+Nosso fork teve de ser ligeiramente alterado por causa de uma simplificação que fizemos em nosso kernel. Como dito anteriormente, temos uma área de dados única para todos os processos. Com isso, fica impossível de se duplicar a área de dados de um processo, o que não fazemos.
+
+
 
 \subsection{exec}
 
