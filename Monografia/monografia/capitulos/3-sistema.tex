@@ -7,21 +7,46 @@
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
 
-(Explicar em algum lugar as divisões que existem no assembly.)
+Lembretes:
+\begin{itemize}
+\item{Escrever algo aqui}
+\item{Explicar em algum lugar as divisões que existem no assembly.}
+\item{Ver como colocar referencias e colocar a referencia das figuras}
+\item{Colocar a referencia das seções}
+\item{Escrever sobre a interrupcao de timer e o chaveamento de processos}
+\item{Escrever sobre o Angel}
+\item{Variáveis em assembly}
+\end{itemize}
 
-(Explicar que temos 10 threads)
-
-(Ver como colocar referencias e colocar a referencia do "Interrupt handling" para a figura do PCB e a figura da memoria)
-
-(Colocar a referencia para a parte que fala do vetor de interrupcao na parte da memoria)
 
 \section{Organização}
 
-Nesta etapa descreveremos algumas das estruturas de dados em assembly que utilizamos em nosso projeto, assim como organizamos a memória na placa e utilizamos os modos.
+Nesta etapa descreveremos algumas das estruturas de dados em assembly que utilizamos em nosso projeto, assim como organizamos a memória na placa e utilizamos os modos. O código está estruturado da maneira indicada na tabela \ref{codigo}.
+
+\begin{center}
+\begin{table}[ht!]
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Arquivo}	&	\textbf{Função}\\
+\hline
+startup.s & Inicialização em assembly ARM\\
+cinit.c & Inicialização em C\\
+button, dips, segment e timer & Rotinas de inicialização e uso dos periféricos\\
+fork.s & Rotina de duplicação de processo em assembly\\
+handler.s & Rotina de tratamento de interrupcões em assembly\\
+mutex.mcp & Arquivo de projeto do CodeWarrior\\
+rpsarmul.h & Arquivo com as constantes da placa e do emulador\\
+tasks & Processos a serem executados\\
+irq e swi & Inicialização e controle das interrupções de HW e SW\\
+\hline
+\end{tabular}
+\caption{Relação de arquivos com suas funções\label{codigo}}
+\end{table}
+\end{center}
 
 \subsection{Process Control Block}
 
-O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das dez threads, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é a base do PCB menos quatro bytes, a segunda a base menos oito bytes e assim por diante. Como podemos observar pela figura, as posições um a quinze (base - 4 a base - 60) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição dezesseis (base - 64) armazena o registrador quatorze do modo IRQ, que nada mais é o endereço de retorno (link register) da interrupção que realizou a troca de processos. Finalmente, a posição dezessete armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um ``snapshot'' preciso do estado do processo quando houve o chaveamento, e permite que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. Esta estrutura tem seu espaço reservado no arquivo handler.s, e é nomeado com a variável handler\_task\_bottom, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, para acessarmos o segundo PCB, devemos subtrair 68 do endereço de base, 136 bytes para o terceiro PCB e assim por diante.
+O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das nove threads, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é a base do PCB menos quatro bytes, a segunda a base menos oito bytes e assim por diante. Como podemos observar pela figura, as posições um a quinze (base - 4 a base - 60) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição dezesseis (base - 64) armazena o registrador quatorze do modo IRQ, que nada mais é o endereço de retorno (link register) da interrupção que realizou a troca de processos. Finalmente, a posição dezessete armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um ``snapshot'' preciso do estado do processo quando houve o chaveamento, e permite que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. Esta estrutura tem seu espaço reservado no arquivo handler.s, e é nomeado com a variável handler\_task\_bottom, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, para acessarmos o segundo PCB, devemos subtrair 68 do endereço de base, 136 bytes para o terceiro PCB e assim por diante.
 
 \begin{figure}[!ht]
 \centering 
@@ -47,6 +72,10 @@ Estruturamos a memória utilizada como indicado na figura \ref{memoria}. Para tod
 
 Dentre os sete modos dsiponíveis na placa, utilizamos apenas três deles: o modo user, o modo SVC e o modo IRQ. O primeiro é o modo não privilegiado no qual rodamos os processos. O segundo, é o modo de inicialização do kernel e de execução das system calls, que é privilegiado. Já o terceiro, é um modo que também é privilegiado, mas que é usado quando há interrupções de hardware e portanto, é usado quando há o chaveamento de processos (interrupção de timer) ou qualquer outra interrupção que não a de software.
 
+\subsection{Modos de operação}
+
+Debugar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não podemos debugar o programa na placa. Para contornar tal problema, utilizamos o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, colocamos ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo rpsarmul.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa.
+
 \section{Inicialização}
 
 O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de processos. Após esta etapa, a uma inicialização em C, feita no arquivo cinit.c, que ao fim de sua execução, roda o primeiro processo.
@@ -63,13 +92,50 @@ Como podemos ver na figura \ref{organmem}, a pilha do modo user começa no endere
 
 \subsection{Tabela de processos}
 
+Uma vez inicializadas as pilhas, podemos inicializar também a tabela de processos. Quando estamos inicializando o kernel, apenas um programa está a funcionar. Portanto, colocamos 0 em todas as entradas da tabela de processos, indidicando que os processos estão inativos, menos para o processo 1, que nada mais é que o primeiro programa a ser rodado após a inicialização. Além disso, devemos setar como o processo atual (variável handler\_currenttaskid\_str, declarada em handler.s), o processo 1.
 
+Após este ponto, o código pode ser escrito em C, já que inicializamos todas as estruturas de baixo nível. Portando, passamos o controle para o arquivo C\_Entry, que vai continuar com o processo de inicialização descrito a partir do item abaixo.
 
 \subsection{Periféricos}
 
-\subsection{Installhandler}
+Para cada periférico da placa, como o display de sete segmentos, o DIP switch, os botões, o timer e os LEDs, há uma rotina de inicialização. Elas consitem apenas em habilitar flags e são executadas logo no início da etapa C do processo de inicialização da placa.
+
+\subsection{Instalação do tratamento de interrupção}
+
+Como á foi descrito anteriormente na seção \ref{ccc}, quando uma interrupção ocorre, a instrução no endereço 0x18 é executada caso ela seja uma interrupção de hardware ou no endereço 0x08 caso seja uma interrupção de software. Portanto, devemos colocar instruções adequadas nestas posições, o que é feito pela rotina de instalação do tratamento de interrupção.
+
+A rotina de tratamento de interrupção funciona de modo similar para interrupções de hardware e se software. Em ambos os casos, recebemos o endereço da posição do vetor de interrupções onde ela deve ser instalada e o endereço da rotina que será executada quando uma interrupção ocorre. Com isso, adicionamos através de uma máscara a instrução branch.
+
+Porém, há um caso especial quando executamos o código com a placa. Como já descrito anteriormente na seção \ref{ddd}, o Angel se utiliza das interrupções de hardware e software para se comunicar com a placa. Portanto, se apenas modificarmos o código e substituirmos a instrução que está contida no vetor de interrupção, essa comunicação não se realiza e tanto a placa quanto o programa de debugger travam. Para solucionarmos este problema, devemos passar para a rotina de tratamento de interrupção os endereços que estavam anteriormente no vetor de interrupção, para o caso da interrupção ser do Angel, a rotina correta ser executada (vide figura \ref{chain}).
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[width=13cm]{figuras/chain.pdf}
+\caption{Encadeamento de interrupções. Fonte: \cite{aaa} \label{chain}}
+\end{figure}
 
 \subsection{Interrupção de timer}
 
-\section{Inicialização}
+A fim de se utilizar as interrupções de timer para o chaveamento de processos, devemos além de inicializá-lo, definir algumas configurações como o tempo para a interrupção.
 
+\subsection{Habilitando interrupções}
+
+O último passo antes de se começar a executar o código do primeiro programa é habilitar simultaneamente o modo user e as interrupções de hardware. Como isso só pode ser feito por código assembly, temos de usar a instrução especial de C \_\_asm. Finalmente, após este passo passamos o controle para o primeiro processo.
+
+\section{Processos}
+
+O kernel pode lidar com no máximo nove processos, nomeados de task1 a task9 no arquivo tasks.c. Como eles não têm área de dados própria, não poderíamos chamá-los de processos. A implicação de se ter uma área de dados em comum é que todos os processos que rodam um mesmo programa compartilham os valores das variáveis. O mais correto, porntanto, seria o chamá-os de threads.
+
+Criamos algums programas exemplo que se utilizam dos periféricos da placa. \ldots
+
+\section{Chaveamento de processos}
+
+\section{System calls}
+
+\subsection{fork}
+
+\subsection{exec}
+
+\subsection{exit}
+
+\section{Shell}
