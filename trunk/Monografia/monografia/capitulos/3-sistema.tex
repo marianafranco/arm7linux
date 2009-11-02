@@ -13,10 +13,8 @@ Lembretes:
 \item{Explicar em algum lugar as divisões que existem no assembly.}
 \item{Ver como colocar referencias e colocar a referencia das figuras}
 \item{Colocar a referencia das seções}
-\item{Escrever sobre o Angel}
 \item{Variáveis em assembly}
 \end{itemize}
-
 
 \section{Organização}
 
@@ -179,7 +177,7 @@ Em um sistema operacional, a system call fork é responsável pela criação de novo
 
 Nosso fork teve de ser ligeiramente alterado por causa de uma simplificação que fizemos em nosso kernel. Como dito anteriormente, temos uma área de dados única para todos os processos. Com isso, fica impossível de se duplicar a área de dados de um processo, o que não fazemos.
 
-
+O processo de duplicação de um processo se inicia com o empilhamento dos registradores de dados (r0 a r12) e do endereço de retorno (link register) por duas vezes. O motivo é que o primeiro empilhamento serve para a restauração do estado ao fim do processo de duplicação e a segunda para o processo que vai a ser duplicado. Então, tentamos encontrar qual o primeiro espaço disponível dentro da tabela de processos. Uma vez encontrado o espaço, temos de encontrar o espaço do PCB reservado para este processo, onde iremos popular com os dados do estado em execução. Porém, além disso, temos também de duplicar a pilha, que é um processo um pouco mais complexo. Para tal, primeiro temos de descobrir o tamanho da pilha atual. Então, começamos a copiar os dados de uma pilha para a outra. Finalmente, colocamos no ponteiro de pilha do PCB do novo processo o topo da pilha recém copiada. Uma vez resolvido o problema da cópia de pilha, apenas duplicamos os dados do registrador de estados, do link register, do process counter e de todos os registradores de dados. Finalmente, quando o processo está totalmente copiado, devemos habilitar o processo na tabela de processos e restaurar todos os registradores empilhados de volta ao seus lugares, onde o link register entrará no lugar do process counter.
 
 \subsection{exec}
 
