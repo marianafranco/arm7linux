@@ -2,7 +2,7 @@
 \section{O Processador ARM7TDMI} \label{sec:conceitos_processador}
 \index{conceitos!processador} 
 
-O ARM7TDMI faz parte da família de processadores ARM7 32 bits conhecida por oferecer bom desempenho aliado a um baixo consumo de energia. Essas características fazem com que o ARM7TDMI seja bastante utilizado em media players, vídeo games e, principalmente, em sistemas embarcados e num grande número de aparelhos celulares.
+O ARM7TDMI faz parte da família de processadores ARM7 32 bits conhecida por oferecer bom desempenho aliado a um baixo consumo de energia. Essas características fazem com que o ARM7TDMI seja bastante utilizado em media players, vídeo games e, principalmente, em sistemas embarcados e num grande número de aparelhos celulares \cite{Sloss2004}.
 
 
 
@@ -16,7 +16,7 @@ Os processadores ARM, incluindo o ARM7TDMI, foram projetados com a arquitetura R
 
 RISC (\emph{Reduced Instruction Set Computer}) é uma arquitetura de computadores baseada em um conjunto simples e pequeno de instruções capazes de serem executadas em um único ou poucos ciclos de relógio.
  
-A idéia por trás da arquitetura RISC é de reduzir a complexidade das instruções executadas pelo \emph{hardware} e deixar as tarefas mais complexas para o \emph{software}. Como resultado, o RISC demanda mais do compilador do que os tradicionais computadores CISC (\emph{Complex Instruction Set Computer}) que, por sua vez, dependem mais do processador já que suas instruções são mais complicadas.
+A idéia por trás da arquitetura RISC é de reduzir a complexidade das instruções executadas pelo \emph{hardware} e deixar as tarefas mais complexas para o \emph{software}. Como resultado, o RISC demanda mais do compilador do que os tradicionais computadores CISC (\emph{Complex Instruction Set Computer}) que, por sua vez, dependem mais do processador já que suas instruções são mais complicadas \cite{Sloss2004}.
 
 As principais características da arquitetura RISC são:
 
@@ -42,14 +42,14 @@ As principais características da arquitetura RISC são:
 \subsection{Pipeline} \label{sub:pipeline}
 \index{conceitos!processador!pipeline}
 
-A arquitetura de \emph{pipeline} aumenta a velocidade do fluxo de instruções para o processador, pois permite que várias operações ocorram simultaneamente, fazendo o processador e a memória operarem continuamente. 
+A arquitetura de \emph{pipeline} aumenta a velocidade do fluxo de instruções para o processador, pois permite que várias operações ocorram simultaneamente, fazendo o processador e a memória operarem continuamente \cite{TechManual}. 
 
 O ARM7 possui uma arquitetura de \emph{pipeline} de três estágios. Durante operação normal, o processador estará sempre ocupado em executar três instruções em diferentes estágios. Enquanto executa a primeira, decodifica a segunda e busca a terceira.
 
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.25]{figuras/pipeline.pdf}
-		\caption{Pipeline de 3 estágios\label{fig:pipeline}}
+		\caption{Pipeline de 3 estágios \cite{TechManual} \label{fig:pipeline}}
 	\end{center}
 \end{figure}
 
@@ -61,7 +61,7 @@ O primeiro estágio de \emph{pipeline} lê a instrução da memória e incrementa o v
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.75]{figuras/pipeline_blockdiagram.jpg}
-		\caption{\emph{Pipeline} do ARM7TDMI\label{fig:pipeline_blockdiagram}}
+		\caption{\emph{Pipeline} do ARM7TDMI \cite{Ryzhyk2006} \label{fig:pipeline_blockdiagram}}
 	\end{center}
 \end{figure}
 
@@ -88,7 +88,7 @@ Algumas características importantes do \emph{pipeline} do ARM7:
 \subsection{Estados de Operação} \label{sub:estados}
 \index{conceitos!processador!estados}
 
-O processador ARM7TDMI possui dois estados de operação:
+O processador ARM7TDMI possui dois estados de operação \cite{TechManual}:
 
 \begin{itemize}
 \item ARM: modo normal, onde o processador executa instruções de 32 bits (cada instrução corresponde a uma palavra);
@@ -131,14 +131,14 @@ Os processadores ARM possuem 7 modos de operação:
 		Indefinido		&	und			&	Modo usado quando uma instrução desconhecida é executada.	\\
 \hline
 \end{tabular}
-\caption{Modos de operação\label{modos}}
+\caption{Modos de operação \cite{ArchManual} \label{modos}}
 \end{center}
 \end{table}
 
 
 Mudanças no modo de operação podem ser feitas através de programas, ou podem ser causadas por interrupções externas ou exceções (interrupções de software).
 
-A maioria dos programas roda no modo Usuário. Quando o processador esta no modo Usuário, o programa que esta sendo executado não pode acessar alguns recursos protegidos do sistema ou mudar de modo sem ser através de uma interrupção.
+A maioria dos programas roda no modo Usuário. Quando o processador esta no modo Usuário, o programa que esta sendo executado não pode acessar alguns recursos protegidos do sistema ou mudar de modo sem ser através de uma interrupção \cite{ArchManual}.
 
 Os outros modos são conhecidos como modos privilegiados. Eles têm total acesso aos recursos do sistema e podem mudar livremente de modo de operação. Cinco desses modos são conhecidos como modos de interrupção: FIQ, IRQ, Supervisor, \emph{Abort} e Indefinido.
 
@@ -161,13 +161,13 @@ O processador ARM7TDMI tem um total de 37 registradores:
 \item 6 registradores de estado
 \end{itemize}
 
-Esses registradores não são todos acessíveis ao mesmo tempo. O modo de operação do processador determina quais registradores são disponíveis ao programador.
+Esses registradores não são todos acessíveis ao mesmo tempo. O modo de operação do processador determina quais registradores são disponíveis ao programador \cite{TechManual}.
 
 \subsubsection{Modo Usuário e Sistema}
 
 O conjunto de registradores para o modo Usuário (o mesmo usado no modo Sistema) contém 16 registradores diretamente acessíveis, R0 à R15. Um registrador adicional, o CPSR (\emph{Current Program Status Register}), contem os bits de \emph{flag} e de modo. 
 
-Os registradores R13 à R15 possuem as seguintes funções especiais: 
+Os registradores R13 à R15 possuem as seguintes funções especiais \cite{Sloss2004}: 
 
 \begin{itemize}
 \item R13: usado como ponteiro de pilha, \emph{Stack Pointer} (SP)
