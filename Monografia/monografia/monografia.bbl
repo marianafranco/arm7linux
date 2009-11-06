@@ -1,0 +1,93 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{1.40 }
+
+\bibitem[Alvares e Sichman 1997]{alvares:97}
+\abntrefinfo{Alvares e Sichman}{ALVARES; SICHMAN}{1997}
+{ALVARES, L.~O.; SICHMAN, J.~S. Introdução aos sistemas multiagentes. In:
+  MEDEIROS, C. M.~B. (Ed.). \emph{Jornada de Atualização em Informática
+  (JAI'97)}. Brasília: UnB, 1997. cap.~1, p. 1--38.}
+
+\bibitem[Bordini, Vieira e Moreira 2001]{bordini:01}
+\abntrefinfo{Bordini, Vieira e Moreira}{BORDINI; VIEIRA; MOREIRA}{2001}
+{BORDINI, R.~H.; VIEIRA, R.; MOREIRA, {\'{A}}.~F. Fundamentos de sistemas
+  multiagentes. In:  FERREIRA, C.~E. (Ed.). \emph{Jornada de Atualização em
+  Informática (JAI'01)}. Fortaleza, Brasil: SBC, 2001. v.~2, cap.~1, p. 3--44.}
+
+\bibitem[Briot e Demazeau 2002]{briot:02}
+\abntrefinfo{Briot e Demazeau}{BRIOT; DEMAZEAU}{2002}
+{BRIOT, J.-P.; DEMAZEAU, Y. (Ed.). \emph{Principes et architecture des systèmes
+  multi-agents}. Paris: Hermes, 2002.}
+
+\bibitem[Castelfranchi 1990]{castelfranchi:90}
+\abntrefinfo{Castelfranchi}{CASTELFRANCHI}{1990}
+{CASTELFRANCHI, C. Social power: A point missed in multi-agent, {DAI} and
+  {HCI}. In:  DEMAZEAU, Y.; M{\"U}LLER, J.-P. (Ed.). \emph{Decentralized
+  Artificial Intelligence}. Amsterdam: Elsevier, 1990.}
+
+\bibitem[Demazeau e M{\"u}ller 1990]{demazeau:90}
+\abntrefinfo{Demazeau e M{\"u}ller}{DEMAZEAU; M{\"U}LLER}{1990}
+{DEMAZEAU, Y.; M{\"U}LLER, J.-P. (Ed.). \emph{Decentralized Artificial
+  Intelligence}. Amsterdam: Elsevier, 1990.}
+
+\bibitem[Ferber 1999]{ferber:99}
+\abntrefinfo{Ferber}{FERBER}{1999}
+{FERBER, J. \emph{Multi-Agent Systems: An Introduction to Distributed
+  Artificial Intelligence}. London: Addison-Wesley, 1999.}
+
+\bibitem[H{\"u}bner, Sichman e Boissier 2002]{hubner:02b}
+\abntrefinfo{H{\"u}bner, Sichman e Boissier}{H{\"U}BNER; SICHMAN;
+  BOISSIER}{2002}
+{H{\"U}BNER, J.~F.; SICHMAN, J.~S.; BOISSIER, O. A model for the structural,
+  functional, and deontic specification of organizations in multiagent systems.
+  \textbf{{\normalfont Brazilian Symposium on Artificial Intelligence
+  (SBIA'02), 16, Porto de Galinhas, PE, Brazil, 2002}. Proceedings}. Berlin:
+  Springer, 2002.  (LNAI 2507), p. 118--128.
+ISSN 0302-9743. Dispon{\'\i}vel em:
+  $<$\url{http://www.inf.furb.br/~jomi/pubs/2002/Hubner-sbia2002.pdf}$>$.
+  Acesso em: 20 fev. 2003.}
+
+\bibitem[Jennings e Wooldridge 1998]{jennings:98a}
+\abntrefinfo{Jennings e Wooldridge}{JENNINGS; WOOLDRIDGE}{1998}
+{JENNINGS, N.~R.; WOOLDRIDGE, M.~J. \emph{Agent Technology: foundations,
+  applications, and markets}. London: Springer Verlag, 1998.}
+
+\bibitem[Shoham 1991]{COMP.IA.IAD.ARQ.003}
+\abntrefinfo{Shoham}{SHOHAM}{1991}
+{SHOHAM, Y. Agent0: A simple agent language and its interpreter.
+  \textbf{{\normalfont National Conference on Artificial Intelligence, 9, Menlo
+  Park, California, 1991}. Proceedings}. [S.l.]: The MIT Press \& AAAI Press,
+  1991. p. 704--9.
+ISBN 0-262-51059-6.}
+
+\bibitem[Sichman 1995]{sichman:95}
+\abntrefinfo{Sichman}{SICHMAN}{1995}
+{SICHMAN, J.~S.
+\emph{Du Raisonnment Social Chez les Agents: Une Approche Fondeé sur la Théorie
+  de la Dépendance}.
+Thèse (Doctorat) --- Institut National Polytechnique de Grenoble, 1995.}
+
+\bibitem[Souza et al. 2001]{souza:01}
+\abntrefinfo{Souza et al.}{SOUZA et al.}{2001}
+{SOUZA, M. A.~F. de; H\"UBNER, J.~F.; SICHMAN, J.~S.; FERREIRA, M. A. G.~V.
+  Interoperability in multi-agent systems: Lessons learned.
+  \textbf{{\normalfont Workshop on Multi-Agent Systems : Theory \& Applications
+  (MASTA 2001), 2, Porto, Portugual, 2001}. Proceedings}. [s.n.], 2001. p.
+  55--66. Dispon{\'\i}vel em:
+  $<$\url{http://www.inf.furb.br/~jomi/pubs/2001/Souza-masta2001.pdf}$>$.}
+
+\bibitem[Wei{\ss} 1999]{weiss:99}
+\abntrefinfo{Wei{\ss}}{WEI{SS}}{1999}
+{WEI{SS}, G. (Ed.). \emph{Multiagent Systems: A modern approach to distributed
+  artificial intelligence}. London: MIT Press, 1999. 619~p.
+ISBN 0-262-23203-0.}
+
+\bibitem[Wooldridge 2002]{wooldridge:02}
+\abntrefinfo{Wooldridge}{WOOLDRIDGE}{2002}
+{WOOLDRIDGE, M. \emph{An Introduction to MultiAgent Systems}. [S.l.]: John
+  Wiley and Sons, 2002.}
+
+\end{thebibliography}
