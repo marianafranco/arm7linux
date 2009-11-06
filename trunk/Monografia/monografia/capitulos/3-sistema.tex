@@ -7,14 +7,20 @@
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
 
-Lembretes:
-\begin{itemize}
-\item{Escrever algo aqui}
-\item{Explicar em algum lugar as divisões que existem no assembly.}
-\item{Ver como colocar referencias e colocar a referencia das figuras}
-\item{Colocar a referencia das seções}
-\item{Variáveis em assembly}
-\end{itemize}
+
+
+
+%Lembretes:
+%\begin{itemize}
+%\item{Escrever algo aqui}
+%\item{Explicar em algum lugar as divisões que existem no assembly.}
+%\item{Ver como colocar referencias e colocar a referencia das figuras}
+%\item{Colocar a referencia das seções}
+%\item{Variáveis em assembly}
+%\item{Explicar que o código foi baseado na experiencia do mutex}
+%\item{Na descricao do fork poderia dizer que ao duplicar a pilha estah copiando as variaveis locais; isto eh, embora as variaveis globais sejam comuns a todos os processos (e por isso eles talvez devessem ser chamados de threads), as variaveis locais sao copiadas.}
+%\item{Daria para fazer uns testes com variaveis locais, mostrando que depois de se criar dois processos; os dois estao com variaveis locais diferentes?}
+%\end{itemize}
 
 \section{Organização}
 
@@ -157,7 +163,7 @@ A troca de processos se dá em poucos passos usando-se instruções especiais que p
 
 \subsection{Um caso especial}
 
-Como descrito acima, caso se confirme que há apenas uma instrução ativa na tabela de processos, não é feita a troca de processos. Porém, antes de se retornar ao processo anterior, não podemos nos esquecer que devemos zerar a pilha do modo IRQ já não há deve haver mais dados relevantes nela e assim prevenimos que ela estoure seu tamanho. Outra ação importante é a restauração dos registradores que foram utilizados durante a rotina de tratamento.
+Como descrito acima, caso se confirme que há apenas uma instrução ativa na tabela de processos, não é feita a troca de processos. Porém, antes de se retornar ao processo anterior, não podemos nos esquecer que devemos zerar a pilha do modo IRQ já não há mais dados relevantes nela e assim prevenimos que ela estoure seu tamanho. Outra ação importante é a restauração dos registradores que foram utilizados durante a rotina de tratamento.
 
 \subsection{Retorno à execução da nova rotina}
 
