@@ -36,6 +36,6 @@ void exec(int process_id, pt2Task process_addr){
 	syscall(1, process_id, process_addr);
 }
 
-void exit(){
-	syscall(2, 0, 0);
+void exit(int process_id){
+	syscall(2, process_id, 0);
 }

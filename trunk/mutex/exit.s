@@ -5,7 +5,8 @@
 	AREA	exit, CODE, READONLY
 	
 routine_exit
-	MOV		r2, r0					; r2 = task id
+	STMFD 	sp!,{r0-r12,lr}
+	MOV		r2, r1					; r2 = task id
 	LDR		r0, =Process_Table
 	MOV		r1, #0					; r1 is the state value = inactive
 	SUB		r2, r2, #1
@@ -14,6 +15,6 @@ routine_exit
 	ADD		r4, r0, r4				; r4 = r0 + r4
 	STR		r1, [r4]				; Mem[r4] = r1 (inactive)
 	
-	BX		lr		; return
+	LDMFD	sp!,{r0-r12,pc}^		; return
 	
 	END

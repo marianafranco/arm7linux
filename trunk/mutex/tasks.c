@@ -26,6 +26,8 @@ void task1 (void) {
 	
 	char* newTask = "task2";
 	
+	int j;
+	
 	a = fork();
 	
 	
@@ -33,6 +35,10 @@ void task1 (void) {
 	
 	while (1) {
 		segment_set(1);
+		if(j==1000000000){
+			exit(2);
+		}
+		j++;
 	}
 }
 
