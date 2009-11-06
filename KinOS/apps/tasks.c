@@ -1,6 +1,5 @@
 #include "tasks.h"
 
-
 struct { char* name; void (*task_ptr)(void); } tasks_name[] = {
 	{"task1", &task1},
 	{"task2", &task2}

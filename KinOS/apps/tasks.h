@@ -1,5 +1,5 @@
-#include "segment.h"
-#include "swi.h"
+#include "../peripherals/segment.h"
+#include "../interrupt/swi.h"
 #include <string.h>
 
 void task1 (void);
