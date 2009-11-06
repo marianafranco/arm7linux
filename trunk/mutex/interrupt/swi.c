@@ -5,7 +5,7 @@ extern void routine_fork(void);
 extern void routine_exec(void);
 extern void routine_exit(void);
 
-void irq_installSWIhandler (unsigned routine, unsigned *vector) {
+void install_SWI_handler (unsigned routine, unsigned *vector) {
 
 	if (emulator == 1) {
 		unsigned vec;

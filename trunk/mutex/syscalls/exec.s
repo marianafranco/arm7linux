@@ -1,6 +1,6 @@
 	EXPORT routine_exec
 	
-	IMPORT handler_task_bottom
+	IMPORT process_control_block
 	
 	AREA	exec, CODE, READONLY
 
@@ -18,7 +18,7 @@ routine_exec
 	; -- Put the task address in handler_task2pcb_str - 4
 	MOV		r0, r3
 	ADD		r0,r0,#4
-	LDR		r1, =handler_task_bottom
+	LDR		r1, =process_control_block
 	SUB		r5,r4,#2
 	MOV		r6,#68
 	MUL		r7,r5,r6

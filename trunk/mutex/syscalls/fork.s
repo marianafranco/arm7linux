@@ -1,6 +1,6 @@
-	IMPORT	Process_Table
-	IMPORT	handler_task_bottom
-	IMPORT	handler_currenttaskid_str
+	IMPORT	thread_array
+	IMPORT	process_control_block
+	IMPORT	current_thread_id
 	
 	EXPORT	routine_fork
 
@@ -12,7 +12,7 @@ routine_fork
 	STMFD 	sp!,{lr} 
 	NOP
 	; Finds the first available space in the process table (return id in r0 and its address in r1)
-	LDR		r1, =Process_Table
+	LDR		r1, =thread_array
 	MOV		r0,	#1
 routine_fork_loop
 	LDR		r2, [r1]
@@ -23,7 +23,7 @@ routine_fork_loop
 	B		routine_fork_loop
 pcb_bottom
 ; Get the bottom of the PCB (return bottom in r2)
-	LDR		r2,	=handler_task_bottom
+	LDR		r2,	=process_control_block
 	MOV		r3,	#68
 	MUL		r3,	r0, r3
 	ADD		r2,	r2,	r3
@@ -37,7 +37,7 @@ pcb_bottom
 	; Pega base do modo de usuario (r4)
 	MOV		r4,#0x20000
 	MOV		r5,#4048
-	LDR		r6, =handler_currenttaskid_str
+	LDR		r6, =current_thread_id
 	LDR		r6,[r6]
 	SUB		r6,	r6,	#1
 	MUL		r5,	r6,	r5
