@@ -6,16 +6,16 @@
 	
 	EXPORT 	handler
 	EXPORT 	handler_emulator
-	EXPORT 	handler_currenttaskid_str
-	EXPORT 	handler_task_bottom
+	EXPORT 	current_thread_id
+	EXPORT 	process_control_block
 	EXPORT 	Angel_IRQ_Address
 	EXPORT 	handler_swi
 	EXPORT 	Angel_SWI_Address	
-	EXPORT 	Process_Table
+	EXPORT 	thread_array
 
 	AREA	irq, CODE, READONLY
 
-INTPND		DCD		0x03ff4004
+IRQStatus		DCD		0x03ff4004
 
 ;-----------------------------------------------------
 
@@ -75,7 +75,7 @@ handler
 	; Save current context for APCS
 	STMFD	sp!, {r0 - r3, LR}
 	; If it is a timer interrupt, branch
-	LDR 	r0, INTPND	 
+	LDR 	r0, IRQStatus	 
 	LDR 	r0, [r0]		
 	TST 	r0, #0x0400
 	BNE		handler_timer 
@@ -92,7 +92,7 @@ handler_timer
 	BL		timer_irq
 	LDMFD		sp!, {r4 - r12}
 	; If it is not the last task, go to handler_swaptonext
-	LDR		r0, =handler_currenttaskid_str
+	LDR		r0, =current_thread_id
 	LDR		r1,[r0]
 	
 get_next_taskid
@@ -108,7 +108,7 @@ get_next_taskid_2
 	SUB		r4, r3, #1
 	MOV		r5, #4
 	MUL		r6, r4, r5
-	LDR		r5, =Process_Table
+	LDR		r5, =thread_array
 	ADD		r5, r5, r6
 	LDR		r4, [r5]
 	CMP		r4, #1
@@ -120,17 +120,17 @@ end_get_nexttaskid
 
 handler_next_process
 	; Verifica se o atual eh igual ao proximo
-	LDR		r2, =handler_currenttaskid_str
+	LDR		r2, =current_thread_id
 	LDR		r2, [r2]
 	CMP		r2, r3
 	BEQ		handler_contextNOTswitch
 		
 	; Set current_task_addr to current task n
-	LDR		r2, =handler_currenttaskid_str
+	LDR		r2, =current_thread_id
 	LDR		r2, [r2]
 	MOV		r0, #68
 	MUL		r1,	r2, r0
-	LDR		r0, =handler_task_bottom
+	LDR		r0, =process_control_block
 	ADD		r1, r1, r0
 	LDR		r0, =handler_currenttaskaddr_str
 	STR		r1, [r0]
@@ -139,11 +139,11 @@ handler_next_process
 	MOV		r2, r3
 	MOV		r0, #68
 	MUL		r1,	r2, r0
-	LDR		r0, =handler_task_bottom
+	LDR		r0, =process_control_block
 	ADD		r1, r1, r0
 	LDR		r0, =handler_nexttask_str
 	STR		r1, [r0]
-	LDR		r0, =handler_currenttaskid_str
+	LDR		r0, =current_thread_id
 	STR		r3, [r0]				; currrent task id = r3
 	B		handler_contextswitch
 	
@@ -216,7 +216,7 @@ handler_button
 Angel_IRQ_Address	
 	DCD 0x00000000
 ; Context task ID 
-handler_currenttaskid_str
+current_thread_id
 	DCD 0x0
 ; Address of the PCB for the next Task
 handler_currenttaskaddr_str
@@ -234,13 +234,13 @@ Angel_SWI_Number
 Angel_SWI_Address
 	DCD 0x00000000	
 ; Context PCB for all the tasks (each size = 68) Offsets are from (bottom + 68 * process#)
-handler_task_bottom
+process_control_block
 	% 680
 
 	
 ;--- Process Table ----;
 	AREA	ProcessTable, DATA, READWRITE
-Process_Table
+thread_array
 	% 40
 
 	END

@@ -3,7 +3,7 @@
 extern int  Angel_IRQ_Address;
 
 // Installs a handler to the interruption vector
-void irq_installhandler (unsigned routine, unsigned *vector) { 
+void install_IRQ_handler (unsigned routine, unsigned *vector) { 
 	
 	if (emulator == 1) {
 		unsigned vec;

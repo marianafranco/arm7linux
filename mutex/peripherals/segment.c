@@ -21,8 +21,8 @@ static unsigned int numeric_display [16] =  {
 
 
 void segment_setdisplay (unsigned d) {
-		*IOPDATA 	&= ~SEG_MASK;
-		*IOPDATA 	|= d;	
+		*IOData 	&= ~SEG_MASK;
+		*IOData 	|= d;	
 }
 
 void segment_set (int seg) {
@@ -34,5 +34,5 @@ void segment_set (int seg) {
 // Initialize 7-segment display
 void segment_init (void) {
 	*IOPMOD 	|= SEG_MASK;
-	*IOPDATA 	|= SEG_MASK;
+	*IOData 	|= SEG_MASK;
 }

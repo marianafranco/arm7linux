@@ -1,0 +1,11 @@
+#include "constants.h"
+#include "apps/tasks.h"
+#include "interrupt/irq.h"
+#include "interrupt/swi.h"
+#include "peripherals/button.h"
+#include "peripherals/segment.h"
+#include "peripherals/timer.h"
+
+extern void handler(void);
+extern void handler_swi(void);
+extern void handler_emulator(void);

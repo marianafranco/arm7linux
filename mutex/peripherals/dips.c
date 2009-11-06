@@ -2,5 +2,5 @@
 
 unsigned dips_read (void) 
 {
-	return SWITCH_MASK & *IOPDATA;
+	return 0xf & *IOData; // 0xf = SWITCH MASK
 }

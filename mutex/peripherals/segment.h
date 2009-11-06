@@ -1,9 +1,9 @@
- void segment_init (void);
- void segment_set (int seg);
+#include "constants.h"
+
+void segment_init (void);
+void segment_set (int seg);
  
-#define SYSCFG			0x03ff0000
-#define IOPMOD          ((volatile unsigned *)(SYSCFG+0x5000))
-#define IOPDATA         ((volatile unsigned *)(SYSCFG+0x5008))
+#define IOPMOD          ((volatile unsigned *)(0x03ff0000+0x5000))
  
  /* The bits taken up by the display in IODATA register */
 

@@ -1,4 +1,4 @@
-#include "rpsarmul.h"
+#include "constants.h"
 
 void timer_init (void);
 void timer_irq (void); 
