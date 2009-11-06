@@ -4,7 +4,7 @@
 
 O principal elemento de hardware deste projeto é a placa experimental ARM Evaluator-7T, baseada no processador ARM7TDMI, um processador RISC de 32 bits capaz de executar o conjunto de instruções denominado Thumb.
 
-Os elementos presentes na arquitetura da placa Evaluator-7T são os seguintes:
+Os principais elementos presentes na arquitetura da placa Evaluator-7T são os seguintes:
 
 \begin{itemize}
 
@@ -30,23 +30,30 @@ Os elementos presentes na arquitetura da placa Evaluator-7T são os seguintes:
 
 \end{itemize}
 
-%inserir diagrama da arquitetura da placa aqui
+A figura \ref{arch_e7t} mostra a organização desses elementos na placa experimental.
 
-Com relação à memória flash da placa, ela vem de fábrica com o bootstrap loader da placa e programa monitor de debug. O restante dela pode ser usado para os programas de usuário. A tabela abaixo mostra a faixa de endereços de cada região da memória.
+%Não esquecer de corrigir a fonte!
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=12cm]{figuras/board_arch.png}
+\caption{Arquitetura da placa Evaluator-7T. Fonte: \cite{aaa} \label{arch_e7t}}
+\end{figure}
+
+
+Com relação à memória flash da placa, ela vem de fábrica com o bootstrap loader da placa e programa monitor de debug. O restante dela pode ser usado para os programas de usuário. A tabela \ref{table:mapamemflash}  mostra a faixa de endereços de cada região da memória.
 
 % a tabela nao esta aparecendo no lugar certo (logo após o parágrafo acima)
-\begin{table}[h]
+\begin{table}[!ht]
 \caption{Mapa da memória flash}
 \centering
-\begin{tabular}{l l}
-\hline\hline
-Faixa de endereço & Descrição\\
-\hline\hline
-0x01800000 a 0x01806FFF & Bootstrap loader \\ %\hline
-0x01807000 a 0x01807FFF & Teste de produção \\ %\hline
-0x01808000 a 0x0180FFFF & Reservado \\ %\hline
-0x01810000 a 0x0181FFFF & Angel \\ %\hline
-0x01820000 a 0x0187FFFF & Disponível para outros programas e dados \\ \hline
+\begin{tabular}{| c | c |}
+\hline  \textbf{Faixa de endereço} & \textbf{Descrição}  \\ 
+\hline  0x01800000 a 0x01806FFF & Bootstrap loader  \\ 
+\hline  0x01807000 a 0x01807FFF & Teste de produção  \\ 
+\hline  0x01808000 a 0x0180FFFF & Reservado  \\ 
+\hline  0x01810000 a 0x0181FFFF & Angel  \\ 
+\hline  0x01820000 a 0x0187FFFF & Disponível para outros programas e dados  \\ 
+\hline 
 \end{tabular}
 \label{table:mapamemflash}
 \end{table}
@@ -54,7 +61,7 @@ Faixa de endereço & Descrição\\
 Já em relação às duas portas seriais presentes na placa, cada uma tem usos específicos. A primeira, chamada DEBUG, é usada pelo monitor de debug ou pelo programa bootstrap presente na placa. Ela está conectada ao UART1 do microcontrolador. A segunda, chamada USER, é de uso genérico e está disponível para uso em programas. Ela está conectada ao UART0 do microcontrolador.
 
 %BSL
-\subsection{Os programas Bootstrap Loader e Angel}
+\subsection{Bootstrap Loader}
 
 Como mencionado anteriormente, a memória flash da placa contém uma região reservada para os programas Bootstrap Loader (BSL) e o programa monitor de debug chamado Angel.
 
@@ -75,3 +82,22 @@ O BSL é o primeiro programa a ser executado pelo microcontrolador quando esta é 
 \end{itemize}
 
 %Angel
+\subsection{Angel Debug Monitor}
+
+O monitor de debug Angel é fornecido conjuntamente com diversas placas da ARM e suas parceiras. Suas principais funcionalidades são:
+
+\begin{itemize}
+
+\item Função de depuração de código, incluindo inspeção de memória, download e execução de imagens de memória, uso de breakpoints e execução passo-a-passo
+
+\item Inicialização da CPU e da placa e tratamento básico de exceções
+
+\item Uma biblioteca ANSI C completa, com uso de semihosting para prover serviços do computador host que não estão disponíveis na placa
+
+\end{itemize}
+
+Há duas maneiras pelas quais o Angel se comunica com o ambiente de desenvolvimento de software.
+
+A primeira é através da biblioteca de interfaces chamada "Remote\_A". Por ela, os depuradores se comunicam com um alvo do Angel quando fazem depuração ou execução de código.
+
+A segunda é por meio de interrupções de software (SWI). O código do programa faz uma SWI para solicitar serviços dos Angel diretamente ou através da biblioteca C dod toolkit.
