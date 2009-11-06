@@ -4,11 +4,11 @@
 	
 	AREA	exec, CODE, READONLY
 
-; Description: Sets up TASK B Processor Control Block
-; task2[-4]  = "PCB R14" = &task
-; task2[-8]  = "PCB SP"  = SP_USER_BOTTOM - 4048;
-; task2[-60] = "LR"      = &task 
-; task2[-64] = "SPSR"	 = %nzcvift_User32 = 0x10
+; Description: Sets up TASK Processor Control Block
+; task[-4]  = "PCB R14" = &task
+; task[-8]  = "PCB SP"  = SP_USER_BOTTOM - 4048;
+; task[-60] = "LR"      = &task 
+; task[-64] = "SPSR"	 = %nzcvift_User32 = 0x10
 	
 routine_exec
 	STMFD 	sp!,{r0-r12,lr}
@@ -46,12 +46,11 @@ end_loop
 	STR		r0,[r1]
 
 	; -- set up SPSR .....................................
-	; Obs: Todos os processos rodam no modo usuário.	
+	; Obs: All process run in User mode
 	SUB		r1,r1,#4
 	MOV		r0,#0x10 
 	STR		r0,[r1]
 	
-	;BX   	lr			; return
-	LDMFD	sp!,{r0-r12,pc}^
+	LDMFD	sp!,{r0-r12,pc}^	; return
 	
 	END
