@@ -1,6 +1,6 @@
 /********* GENERAL VARIABLES *********/
 /* Defines if the program is running on CodeWarrior ARMUlator (0) or the Evaluator 7-T board (1) */
-#define emulator	0
+#define emulator	1
 /* The number of the operating system software interrupt */
 #define	OS_SWI		0
 /* Interrupt table SWI instruction position */

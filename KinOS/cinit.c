@@ -15,7 +15,7 @@ int C_Entry (void) {
 		install_IRQ_handler ((unsigned)handler_emulator, (unsigned *)IRQVector);
 	}
 	else {
-		install_IRQ_handler ((unsigned)handler, (unsigned *)IRQVector);
+		install_IRQ_handler ((unsigned)handler_board, (unsigned *)IRQVector);
 	}
 	/* Install software interruption handler */
 	install_SWI_handler ((unsigned)handler_swi, (unsigned *)SWIVector);
