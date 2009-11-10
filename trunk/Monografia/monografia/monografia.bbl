@@ -5,6 +5,22 @@
 \providecommand{\abntbstabout}[1]{}
 \abntbstabout{1.40 }
 
+\bibitem[Abdelrazek 2006]{}
+\abntrefinfo{Abdelrazek}{ABDELRAZEK}{2006}
+{ABDELRAZEK, A. F.~M. \emph{Exception and Interrupt Handling in ARM}.
+[S.l.], Setembro 2006.}
+
+\bibitem[ARM Limited 1995]{DataSheet1995}
+\abntrefinfo{ARM Limited}{ARM LIMITED}{1995}
+{ARM LIMITED. \emph{ARM7TDMI Data Sheet (ARM DDI 0029E)}.
+[S.l.], Agosto 1995.}
+
+\bibitem[ARM Limited 1996]{Note1996}
+\abntrefinfo{ARM Limited}{ARM LIMITED}{1996}
+{ARM LIMITED. \emph{Application Note 25 - Exception Handling on the ARM (ARM
+  DAI 0025E)}.
+[S.l.], Setembro 1996.}
+
 \bibitem[ARM Limited 2001]{TechManual}
 \abntrefinfo{ARM Limited}{ARM LIMITED}{2001}
 {ARM LIMITED. \emph{ARM7TDMI Technical Reference Manual (ARM DDI 0029G)}.
@@ -14,6 +30,18 @@ Rev 3. [S.l.], Abril 2001.}
 \abntrefinfo{ARM Limited}{ARM LIMITED}{2005}
 {ARM LIMITED. \emph{ARM Architecture Reference Manual (ARM DDI 0100I)}.
 [S.l.], Julho 2005.}
+
+\bibitem[Kinoshita, Cugnasca e Hirakawa 2007]{Kinoshita}
+\abntrefinfo{Kinoshita, Cugnasca e Hirakawa}{KINOSHITA; CUGNASCA;
+  HIRAKAWA}{2007}
+{KINOSHITA, P. D.~J.; CUGNASCA, P. D. C.~E.; HIRAKAWA, P. D. A.~R.
+  \emph{Experiência 5 - Interrupções}.
+[S.l.], 2007.}
+
+\bibitem[Morrow 2008]{Morrow2008}
+\abntrefinfo{Morrow}{MORROW}{2008}
+{MORROW, M.~G. \emph{ARM7TDMI Instruction Set Reference}.
+[S.l.], Setembro 2008.}
 
 \bibitem[Ryzhyk 2006]{Ryzhyk2006}
 \abntrefinfo{Ryzhyk}{RYZHYK}{2006}
@@ -28,5 +56,11 @@ Dispon{\'\i}vel em:
   and optimizing system software}. 1. ed. United States of America: Morgan
   Kauffman, 2004.
 ISBN 1-55860-874-5.}
+
+\bibitem[Zaitseff 2003]{Zaitseff2003}
+\abntrefinfo{Zaitseff}{ZAITSEFF}{2003}
+{ZAITSEFF, J. \emph{ELEC2041 Microprocessors - Laboratory Manual}.
+[S.l.], Junho 2003. Dispon{\'\i}vel em:
+  $<$http://www.zap.org.au/elec2041-cdrom/unsw/elec2041/README.html$>$.}
 
 \end{thebibliography}

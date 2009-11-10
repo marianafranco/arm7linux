@@ -49,7 +49,8 @@ O ARM7 possui uma arquitetura de \emph{pipeline} de três estágios. Durante opera
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.25]{figuras/pipeline.pdf}
-		\caption{Pipeline de 3 estágios \cite{TechManual} \label{fig:pipeline}}
+		\caption{Pipeline de 3 estágios \cite{TechManual}}
+		\label{fig:pipeline}
 	\end{center}
 \end{figure}
 
@@ -61,7 +62,8 @@ O primeiro estágio de \emph{pipeline} lê a instrução da memória e incrementa o v
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.75]{figuras/pipeline_blockdiagram.jpg}
-		\caption{\emph{Pipeline} do ARM7TDMI \cite{Ryzhyk2006} \label{fig:pipeline_blockdiagram}}
+		\caption{\emph{Pipeline} do ARM7TDMI \cite{Ryzhyk2006}}
+		\label{fig:pipeline_blockdiagram}
 	\end{center}
 \end{figure}
 
@@ -182,17 +184,18 @@ Além dos registradores acessíveis ao programador, o ARM coloca à disposição mais
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.65]{figuras/registradores.jpg}
-		\caption{Organização dos registradores no modo ARM\label{fig:registradores}}
+		\caption{Organização dos registradores no modo ARM \cite{TechManual}}
+		\label{fig:registradores}
 	\end{center}
 \end{figure}
 
-Como se pode verificar na figura, cada modo tem o seu próprio R13 e R14. Isso permite que cada modo mantenha seu próprio ponteiro de pilha (SP) e endereço de retorno (LR).
+Como se pode verificar na figura \ref{fig:registradores}, cada modo tem o seu próprio R13 e R14. Isso permite que cada modo mantenha seu próprio ponteiro de pilha (SP) e endereço de retorno (LR) \cite{Zaitseff2003}.
 
 Além desses dois registradores, o modo FIQ possui mais cinco registradores especiais: R8\textunderscore fiq-R12\textunderscore fiq. Isso significa que quando o processador muda para o modo FIQ, o programa não precisa salvar os registradores R8-R12.
 
 Esses registradores especiais mapeiam de um pra um os registradores do modo usuário. Se você mudar o modo do processador, um registrador particular do novo modo irá substituir o registrador existente.
 
-Por exemplo, quando o processador esta no modo IRQ, as instruções executadas continuarão a acessar os registradores R13 e R14. No entanto, esses serão os registradores especiais R13\textunderscore irq e R14\textunderscore irq. Os registradores do modo usuário (R13\textunderscore usr e R14\textunderscore usr) não serão afetados pelas instruções referenciando esses registradores. O programa continua tendo acesso normal aos outros registradores R0 à R12.
+Por exemplo, quando o processador esta no modo IRQ, as instruções executadas continuarão a acessar os registradores R13 e R14. No entanto, esses serão os registradores especiais R13\textunderscore irq e R14\textunderscore irq. Os registradores do modo usuário (R13\textunderscore usr e R14\textunderscore usr) não serão afetados pelas instruções referenciando esses registradores. O programa continua tendo acesso normal aos outros registradores R0 à R12 \cite{Sloss2004}.
 
 
 
@@ -202,9 +205,9 @@ Por exemplo, quando o processador esta no modo IRQ, as instruções executadas con
 \subsection{Registradores de Estado} \label{sub:reg_estado}
 \index{conceitos!processador!reg_estado}
 
-O \emph{Current Program Status Register} (CPRS) é acessível em todos os modos do processador. Ele contém as \emph{flags} de condição, os bits para desabilitar as interrupções, o modo atual do processador, e outras informações de estado e controle. Cada modo de interrupção possui também um \emph{Saved Program Register} (SPRS), que é usado para preservar o valor do CPSR quando a interrupção associada acontece. 
+O \emph{Current Program Status Register} (CPRS) é acessível em todos os modos do processador. Ele contém as \emph{flags} de condição, os bits para desabilitar as interrupções, o modo atual do processador, e outras informações de estado e controle. Cada modo de interrupção possui também um \emph{Saved Program Register} (SPRS), que é usado para preservar o valor do CPSR quando a interrupção associada acontece \cite{ArchManual}.
 
-Os registradores de estado do programa:
+Os registradores de estado do programa \cite{TechManual}:
 
 \begin{itemize}
 \item Guardam informação sobre a operação mais recente executada pela ALU.
@@ -212,20 +215,22 @@ Os registradores de estado do programa:
 \item Determinam o modo de operação do processador.
 \end{itemize}
 
-\paragraph{} % linha em branco
-\paragraph{}
-\paragraph{}
+Como mostrado na figura \ref{fig:status_register} o CPSR é dividido em 3 campos: \emph{flag}, reservado (não utilizado) e controle.
+
+O campo de controle guarda os bits de modo, estado e de interrupção, enquanto o campo \emph{flag} armazena os bits de condição.
 
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.65]{figuras/status_register.jpg}
-		\caption{Formato dos registradores de estado CPSR e SPSR\label{fig:status_register}}
+		\caption{Formato dos registradores de estado CPSR e SPSR \cite{TechManual}}
+		\label{fig:status_register}
 	\end{center}
 \end{figure}
 
+
 \subsubsection{Flags de Condição}
 
-Os bits N, Z, C e V são \emph{flags} de condição, e é possível alterá-los através do resultado de operações lógicas ou aritméticas. 
+Os bits N, Z, C e V são \emph{flags} de condição, e é possível alterá-los através do resultado de operações lógicas ou aritméticas \cite{ArchManual}. 
 
 Os \emph{flags} de condição são normalmente modificados por:
 
@@ -255,7 +260,7 @@ Nesses dois casos, as novas \emph{flags} de condição (depois de a instrução ter 
 
 \subsubsection{Bits de Controle}
 
-Os oito primeiros bits de um PSR (\emph{Program Status Register}) são conhecidos como bits de controle. Eles são:
+Os oito primeiros bits de um PSR (\emph{Program Status Register}) são conhecidos como bits de controle \cite{ArchManual}. Eles são:
 
 \begin{itemize}
 \item Bits de desativação de interrupção
@@ -314,7 +319,8 @@ Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits 
 		11111	&	Sistema(sys)	&	PC,R14-R0,CPRS	\\
 \hline
 \end{tabular}
-\caption{Valores para o bit de modo \label{bit_tipo}}
+\caption{Valores para o bit de modo \cite{ArchManual}}
+\label{bit_tipo}
 \end{center}
 \end {table}
 
@@ -326,14 +332,10 @@ Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits 
 \subsection{Interrupções} \label{sub:interrupcoes}
 \index{conceitos!processador!interrupcoes}
 
-Interrupções surgem sempre que o fluxo normal de um programa deve ser interrompido temporariamente, por exemplo, para servir uma interrupção vinda de um periférico ou a tentativa de executar uma instrução desconhecida. Antes de tentar lidar com uma interrupção, o ARM7TDMI preserva o estado atual de forma que o programa original possa ser retomado quando a rotina de interrupção tiver acabado. 
+Interrupções surgem sempre que o fluxo normal de um programa deve ser interrompido temporariamente, por exemplo, para servir uma interrupção vinda de um periférico ou a tentativa de executar uma instrução desconhecida. Antes de tentar lidar com uma interrupção, o ARM7TDMI preserva o estado atual de forma que o programa original possa ser retomado quando a rotina de interrupção tiver acabado \cite{TechManual}. 
 
-A arquitetura ARM suporta 7 tipos de interrupções. A figura a baixo lista os tipos de interrupção e o modo do processador usado para lidar com cada tipo. Quando uma interrupção acontece, a execução é forçada para um endereço fixo de memória correspondente ao tipo de interrupção. Esses endereços fixos são chamados de vetores de interrupção.
+A arquitetura ARM suporta 7 tipos de interrupções. A figura a baixo lista os tipos de interrupção e o modo do processador usado para lidar com cada tipo. Quando uma interrupção acontece, a execução é forçada para um endereço fixo de memória correspondente ao tipo de interrupção. Esses endereços fixos são chamados de vetores de interrupção \cite{ArchManual}.
 
-\paragraph{}
-\paragraph{}
-\paragraph{}
-\paragraph{}
 
 \begin{table}[ht]
 \begin{center}
@@ -356,12 +358,13 @@ A arquitetura ARM suporta 7 tipos de interrupções. A figura a baixo lista os tip
 		Interrupção rápida(FIQ)			&	FIQ			&	0x0000001C	\\
 \hline
 \end{tabular}
-\caption{Vetor de interrupção \label{interrupt_vector}}
+\caption{Vetor de interrupção \cite{ArchManual}}
+\label{table:interrupt_vector}
 \end{center}
 \end {table}
 
 
-Deve-se notar olhando para a tabela a cima, que existe espaço suficiente para apenas uma instrução entre cada vetor de interrupção (4 bytes). Estes são inicializados com instruções de desvio (\emph{branch}).
+Deve-se notar olhando para a tabela \ref{table:interrupt_vector}, que existe espaço suficiente para apenas uma instrução entre cada vetor de interrupção (4 bytes). Estes são inicializados com instruções de desvio (\emph{branch}).
 
 
 \subsubsection{Prioridade das Interrupções}
@@ -382,7 +385,8 @@ alta 	& Reset \\ % inserting body of the table
 baixa 	& Instrução indefinida e interrupção de software (swi) \\ 
 \hline %inserts single line
 \end{tabular}
-\caption{Ordem de prioridade das interrupções} \label{table:prior_interrupt}
+\caption{Ordem de prioridade das interrupções \cite{TechManual}} 
+\label{table:prior_interrupt}
 \end{center}
 \end{table}
 
@@ -390,7 +394,7 @@ baixa 	& Instrução indefinida e interrupção de software (swi) \\
 
 Executar uma interrupção necessita que o processador preserve o estado atual: em geral, o conteúdo de todos os registradores (especialmente PC e CPSR) devem ser o mesmo depois da interrupção.
 
-O processador ARM usa os registradores adicionais de cada modo para ajudar a salvar o estado do processador. Quando uma interrupção acontece, o R14 e o SPSR são usados para guardar o estado atual da seguinte maneira:
+O processador ARM usa os registradores adicionais de cada modo para ajudar a salvar o estado do processador. Quando uma interrupção acontece, o R14 e o SPSR são usados para guardar o estado atual da seguinte maneira \cite{TechManual}:
 
 \begin{enumerate}
 \item Preserva o endereço da próxima instrução (PC+4 ou PC+8, depende da interrupção) no apropriado LR (R14). Isso permite ao programa continuar do lugar de onde parou no retorno da interrupção.
@@ -404,14 +408,15 @@ O processador ARM7TDMI também pode ativar a \emph{flag} de interrupção desabilit
 \begin{figure}[ht]
 	\begin{center}
 		\includegraphics[scale=0.90]{figuras/interrupt.jpg}
-		\caption{Esquema de uma interrupção no ARM7TDMI \label{fig:interrupt}}
+		\caption{Esquema de uma interrupção no ARM7TDMI \cite{Zaitseff2003}}
+		\label{fig:interrupt}
 	\end{center}
 \end{figure}
 
 
 \subsubsection{Saída de interrupção}
 
-Quando uma interrupção é completada deve-se:
+Quando uma interrupção é completada deve-se \cite{TechManual}:
 
 \begin{enumerate}
 \item Mover o LR (R14), menos um \emph{offset}, para o PC. O offset varia de acordo com o tipo de interrupção mostrada na figura anterior.
@@ -422,9 +427,9 @@ Quando uma interrupção é completada deve-se:
 
 \subsubsection{Interrupções de software}
 
-Uma interrupção de software é uma interrupção inicializada inteiramente por um programa para entrar no modo Supervisor e assim poder utilizar alguma rotina particular, como operações de entrada e saída do sistema.
+Uma interrupção de software é uma interrupção inicializada inteiramente por um programa para entrar no modo Supervisor e assim poder utilizar alguma rotina particular, como operações de entrada e saída do sistema \cite{Zaitseff2003}.
 
-Quando uma interrupção de software é executada, as seguintes ações são realizadas:
+Quando uma interrupção de software é executada, as seguintes ações são realizadas \cite{ArchManual}:
 
 \begin{enumerate}
 \item Copia o endereço da próxima instrução no registrador LR\textunderscore svc (R14\textunderscore svc).
@@ -474,13 +479,13 @@ MOVS PC,LR
 
 \subsubsection{Interrupções de hardware}
 
-Interrupções de hardware são mecanismos que permitem que um sinal externo (pedido de interrupção) interrompa a execução normal do programa corrente e desvie a execução para um bloco de código chamado de rotina de interrupção.
+Interrupções de hardware são mecanismos que permitem que um sinal externo (pedido de interrupção) interrompa a execução normal do programa corrente e desvie a execução para um bloco de código chamado de rotina de interrupção \cite{Kinoshita}.
 
 Interrupções são úteis, pois permitem que o processador manuseie periféricos de uma maneira mais eficiente. Sem interrupções o processador teria que verificar periodicamente a entrada/saída de um dispositivo para ver se esse necessita de atenção.  Com interrupções, por outro lado, a entrada/saída do dispositivo pode indicar diretamente a ocorrência de um dado evento externo, que será tratado com maior facilidade e rapidez, de modo que o microprocessador não necessite consumir tempo de processamento para pesquisar a ocorrência de eventos externos.
 
-O processador ARM fornece dois sinais que são usados pelos periféricos para pedir uma interrupção: o sinal de interrupção nIRQ e o sinal de interrupção rápida nFIQ. Ambos são ativados em nível baixo, ou seja, colocando o sinal em nível baixo geramos a interrupção correspondente, se a interrupção não tiver sido desabilitada no CPSR.
+O processador ARM fornece dois sinais que são usados pelos periféricos para pedir uma interrupção: o sinal de interrupção nIRQ e o sinal de interrupção rápida nFIQ. Ambos são ativados em nível baixo, ou seja, colocando o sinal em nível baixo geramos a interrupção correspondente, se a interrupção não tiver sido desabilitada no CPSR \cite{Zaitseff2003}.
 
-Quando uma interrupção de \emph{hardware} IRQ (ou FIQ) é detectada, as seguintes ações são realizadas:
+Quando uma interrupção de \emph{hardware} IRQ (ou FIQ) é detectada, as seguintes ações são realizadas \cite{ArchManual}:
 
 \begin{enumerate}
 \item Copia o endereço da próxima instrução à ser executada + 4 no registrador LR\textunderscore irq(R14\textunderscore irq). Isso significa que o LR\textunderscore irq irá apontar para a segunda instrução à partir do ponto de pedido da interrupção.
@@ -536,6 +541,6 @@ SUBS PC, R14,#4
 
 Note que a instrução é SUBS, e não SUB: a instrução SUBS copia automaticamente SPSR no CPSR, mas apenas quando o registrador de destino é o PC (R15) e a instrução é executada em um modo privilegiado.
 
-O processamento das \emph{Fast Interrupt} (FIQ) é praticamente igual ao de uma interrupção normal (IRQ). As diferenças são que um conjunto diferente de registradores é usado (i.e. R14\textunderscore fiq no lugar de R14\textunderscore irq), que tanto as interrupções IRQ quanto as FIQ são desativadas (ou seja, os bits I e F do CPSR são ativados), e que o endereço do vetor de interrupção é 0x0000001C.
+O processamento das \emph{Fast Interrupt} (FIQ) é praticamente igual ao de uma interrupção normal (IRQ). As diferenças são que um conjunto diferente de registradores é usado (i.e. R14\textunderscore fiq no lugar de R14\textunderscore irq), que tanto as interrupções IRQ quanto as FIQ são desativadas (ou seja, os bits I e F do CPSR são ativados), e que o endereço do vetor de interrupção é 0x0000001C \cite{Zaitseff2003}.
 
 \paragraph{}
