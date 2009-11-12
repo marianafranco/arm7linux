@@ -48,20 +48,18 @@ O ARM7 possui uma arquitetura de \emph{pipeline} de três estágios. Durante opera
 
 \begin{figure}[ht]
 	\begin{center}
-		\includegraphics[scale=0.25]{figuras/pipeline.pdf}
-		\caption{Pipeline de 3 estágios \cite{TechManual}}
+		\includegraphics[scale=0.40]{figuras/pipeline.png}
+		\caption{\emph{Pipeline} de 3 estágios \cite{TechManual}}
 		\label{fig:pipeline}
 	\end{center}
 \end{figure}
 
 O primeiro estágio de \emph{pipeline} lê a instrução da memória e incrementa o valor do registrador de endereços, que guarda o valor da próxima instrução a ser buscada. O próximo estágio decodifica a instrução e prepara os sinais de controle necessários para executá-la.  O terceiro lê os operandos do banco de registradores, executa as operações através da ALU (\emph{Arithmetic Logic Unit}), lê ou escreve na memória, se necessário, e guarda o resultado das instruções no banco de registradores.
 
-\paragraph{} % linha em branco
-\paragraph{}
 
 \begin{figure}[ht]
 	\begin{center}
-		\includegraphics[scale=0.75]{figuras/pipeline_blockdiagram.jpg}
+		\includegraphics[scale=0.15]{figuras/pipeline_blockdiagram.png}
 		\caption{\emph{Pipeline} do ARM7TDMI \cite{Ryzhyk2006}}
 		\label{fig:pipeline_blockdiagram}
 	\end{center}
@@ -74,7 +72,7 @@ Algumas características importantes do \emph{pipeline} do ARM7:
 
 \item O \emph{Program Counter} (PC) ao invés de apontar para a instrução que esta sendo executada, aponta para a instrução que esta sendo buscada na memória.
 
-\item O processador só processa a instrução quando essa passa completamente pelo estágio execução (\emph{execute}). Ou seja, somente quando a quarta instrução é buscada (\emph{fetched}).
+\item O processador só processa a instrução quando essa passa completamente pelo estágio de execução (\emph{execute}). Ou seja, somente quando a quarta instrução é buscada (\emph{fetched}).
 
 \item A execução de uma instrução de \emph{branch} através da modificação do PC provoca a descarga de todas as outras instruções do \emph{pipeline}.
 
@@ -99,7 +97,7 @@ O processador ARM7TDMI possui dois estados de operação \cite{TechManual}:
 
 Instruções Thumbs são um conjunto de instruções de 16 bits equivalentes as instruções 32 bits ARM. A vantagem em tal esquema, é que a densidade de código aumenta, já que o espaço necessário para um mesmo número de instruções é menor. Em compensação, nem todas as instruções ARM tem um equivalente Thumb.
 
-Neste projeto, decidimos pela utilização do processador no modo ARM que facilita o desenvolvimento por possuir um número maior de instruções.
+Neste projeto, o processador é usado no modo ARM que facilita o desenvolvimento por possuir um número maior de instruções.
 
 
 
@@ -146,7 +144,7 @@ Os outros modos são conhecidos como modos privilegiados. Eles têm total acesso a
 
 Entra-se nesses modos quando uma interrupção ocorre. Cada um deles possui registradores adicionais que permitem salvar o modo Usuário quando uma interrupção ocorre.
 
-O modo remanescente é o modo Sistema, que não é acessível por interrupção e usa os mesmos registradores disponíveis para o modo Usuário. No entanto, este é um modo privilegiado e, assim, não possui as restrições do modo Usuário.  Este modo destina-se as operações que necessitam de acesso aos recursos do sistema, mas que querem evitar o uso adicional dos registradores associados aos modos de interrupção.
+O modo remanescente é o modo Sistema, que não é acessível por interrupção e usa os mesmos registradores disponíveis para o modo Usuário. No entanto, este é um modo privilegiado e, assim, não possui as restrições do modo Usuário.  Este modo destina-se as operações que necessitam de acesso aos recursos do sistema, mas querem evitar o uso adicional dos registradores associados aos modos de interrupção.
 
 
 
@@ -167,7 +165,7 @@ Esses registradores não são todos acessíveis ao mesmo tempo. O modo de operação 
 
 \subsubsection{Modo Usuário e Sistema}
 
-O conjunto de registradores para o modo Usuário (o mesmo usado no modo Sistema) contém 16 registradores diretamente acessíveis, R0 à R15. Um registrador adicional, o CPSR (\emph{Current Program Status Register}), contem os bits de \emph{flag} e de modo. 
+O conjunto de registradores para o modo Usuário (o mesmo usado no modo Sistema) contém 16 registradores diretamente acessíveis, R0 à R15. Um registrador adicional, o CPSR (\emph{Current Program Status Register}), contém os bits de \emph{flag} e de modo. 
 
 Os registradores R13 à R15 possuem as seguintes funções especiais \cite{Sloss2004}: 
 
@@ -183,7 +181,7 @@ Além dos registradores acessíveis ao programador, o ARM coloca à disposição mais
 
 \begin{figure}[ht]
 	\begin{center}
-		\includegraphics[scale=0.65]{figuras/registradores.jpg}
+		\includegraphics[scale=0.08]{figuras/registradores.png}
 		\caption{Organização dos registradores no modo ARM \cite{TechManual}}
 		\label{fig:registradores}
 	\end{center}
@@ -221,7 +219,7 @@ O campo de controle guarda os bits de modo, estado e de interrupção, enquanto o 
 
 \begin{figure}[ht]
 	\begin{center}
-		\includegraphics[scale=0.65]{figuras/status_register.jpg}
+		\includegraphics[scale=0.10]{figuras/status_register.png}
 		\caption{Formato dos registradores de estado CPSR e SPSR \cite{TechManual}}
 		\label{fig:status_register}
 	\end{center}
@@ -253,7 +251,7 @@ Nesses dois casos, as novas \emph{flags} de condição (depois de a instrução ter 
 	\end{itemize}
 \item V: Possui dois significados:
 	\begin{itemize}
-	\item Para adição ou subtração, V contem 1 caso tenha ocorrido um \emph{overflow} considerando os operandos e o resultado em complemento de dois.
+	\item Para adição ou subtração, V contém 1 caso tenha ocorrido um \emph{overflow} considerando os operandos e o resultado em complemento de dois.
 	\item Para outras instruções, V normalmente não é usado.
 	\end{itemize}
 \end{itemize}
@@ -334,7 +332,7 @@ Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits 
 
 Interrupções surgem sempre que o fluxo normal de um programa deve ser interrompido temporariamente, por exemplo, para servir uma interrupção vinda de um periférico ou a tentativa de executar uma instrução desconhecida. Antes de tentar lidar com uma interrupção, o ARM7TDMI preserva o estado atual de forma que o programa original possa ser retomado quando a rotina de interrupção tiver acabado \cite{TechManual}. 
 
-A arquitetura ARM suporta 7 tipos de interrupções. A figura a baixo lista os tipos de interrupção e o modo do processador usado para lidar com cada tipo. Quando uma interrupção acontece, a execução é forçada para um endereço fixo de memória correspondente ao tipo de interrupção. Esses endereços fixos são chamados de vetores de interrupção \cite{ArchManual}.
+A arquitetura ARM suporta 7 tipos de interrupções. A tabela \ref{table:interrupt_vector} lista os tipos de interrupção e o modo do processador usado para lidar com cada tipo. Quando uma interrupção acontece, a execução é forçada para um endereço fixo de memória correspondente ao tipo de interrupção. Esses endereços fixos são chamados de vetores de interrupção \cite{ArchManual}.
 
 
 \begin{table}[ht]
@@ -369,7 +367,7 @@ Deve-se notar olhando para a tabela \ref{table:interrupt_vector}, que existe esp
 
 \subsubsection{Prioridade das Interrupções}
 
-Quando várias interrupções acontecem ao mesmo tempo, uma prioridade fixa do sistema determina a ordem na qual elas serão manipuladas. Essa prioridade é listada na tabela a baixo:
+Quando várias interrupções acontecem ao mesmo tempo, uma prioridade fixa do sistema determina a ordem na qual elas serão manipuladas. Essa prioridade é listada na tabela \ref{table:prior_interrupt}:
 
 \begin{table}[ht]
 \begin{center}
@@ -392,7 +390,7 @@ baixa 	& Instrução indefinida e interrupção de software (swi) \\
 
 \subsubsection{Entrada de interrupção}
 
-Executar uma interrupção necessita que o processador preserve o estado atual: em geral, o conteúdo de todos os registradores (especialmente PC e CPSR) devem ser o mesmo depois da interrupção.
+Executar uma interrupção necessita que o processador preserve o estado atual: em geral, o conteúdo de todos os registradores (especialmente PC e CPSR) devem ser o mesmo depois de uma interrupção.
 
 O processador ARM usa os registradores adicionais de cada modo para ajudar a salvar o estado do processador. Quando uma interrupção acontece, o R14 e o SPSR são usados para guardar o estado atual da seguinte maneira \cite{TechManual}:
 
@@ -407,7 +405,7 @@ O processador ARM7TDMI também pode ativar a \emph{flag} de interrupção desabilit
 
 \begin{figure}[ht]
 	\begin{center}
-		\includegraphics[scale=0.90]{figuras/interrupt.jpg}
+		\includegraphics[scale=0.10]{figuras/interrupt.png}
 		\caption{Esquema de uma interrupção no ARM7TDMI \cite{Zaitseff2003}}
 		\label{fig:interrupt}
 	\end{center}
