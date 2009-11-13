@@ -1,3 +1,7 @@
+/* The program was based on the mutex program by ARM - Strategic Support Group,
+contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+source/examples/mutex/ */
+
 /* Initialization code in C */
 
 #include "cinit.h"

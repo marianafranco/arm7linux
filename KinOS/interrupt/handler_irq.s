@@ -65,7 +65,7 @@ next_thread
 	BEQ		set_addresses			; If yes, branch to set_addresses
 									; Send to the next step the next active
 									; thread in r1
-	MOV		r0, r3					; If not, r0 = r1
+	MOV		r0, r1					; If not, r0 = r1
 	B		get_next_taskid_loop	; and loop to get_next_taskid_loop
 
 ; Sets current and next thread PCB addresses
@@ -142,7 +142,7 @@ return
 
 IRQStatus				; IRQ interrupt type address
 	DCD 0x03ff4004
-Angel_IRQ_Address		; Angel routine address
+Angel_IRQ_Address		; Reserved space for the Angel IRQ Interrupt address
 	DCD 0x00000000
 current_thread_id		; Context task ID 
 	DCD 0x0

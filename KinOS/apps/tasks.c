@@ -34,7 +34,7 @@ void task1 (void) {
 	
 	while (1) {
 		segment_set(1);
-		if(j==1000000000){
+		if(j==1000000){
 			exit(2);
 		}
 		j++;
