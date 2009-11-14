@@ -187,8 +187,34 @@ Nosso fork teve de ser ligeiramente alterado por causa de uma simplificação que 
 
 O processo de duplicação de um processo se inicia com o empilhamento dos registradores de dados (r0 a r12) e do endereço de retorno (link register) por duas vezes. O motivo é que o primeiro empilhamento serve para a restauração do estado ao fim do processo de duplicação e a segunda para o processo que vai a ser duplicado. Então, tentamos encontrar qual o primeiro espaço disponível dentro da tabela de processos. Uma vez encontrado o espaço, temos de encontrar o espaço do PCB reservado para este processo, onde iremos popular com os dados do estado em execução. Porém, além disso, temos também de duplicar a pilha, que é um processo um pouco mais complexo. Para tal, primeiro temos de descobrir o tamanho da pilha atual. Então, começamos a copiar os dados de uma pilha para a outra. Finalmente, colocamos no ponteiro de pilha do PCB do novo processo o topo da pilha recém copiada. Uma vez resolvido o problema da cópia de pilha, apenas duplicamos os dados do registrador de estados, do link register, do process counter e de todos os registradores de dados. Finalmente, quando o processo está totalmente copiado, devemos habilitar o processo na tabela de processos e restaurar todos os registradores empilhados de volta ao seus lugares, onde o link register entrará no lugar do process counter.
 
+
+
+
+
+%-------------------------------------------
+% System call EXEC
+%-------------------------------------------
 \subsection{exec}
 
+A chamada de sistema exec é responsável por substituir a imagem núcleo de um processo pela imagem do programa passado como argumento.
+
+Nos sistemas operacionais tradicionais , como o Linux ou o Minix, o exec é utilizado para iniciar um novo programa no mesmo ambiente do processo que executa a chamada de sistema. Normalmente o exec é utilizado na criação de um novo processo da seguinte maneira: um processo já existente se duplica através da chamada de sistema fork. O processo filho tem, então, seu código substituído pelo código que deve ser executado através da chamada de sistema exec, que permite ao processo filho assumir seu próprio conteúdo, apagando de si o conteúdo do processo pai.
+
+
+
+
+
+%-------------------------------------------
+% System call EXIT
+%-------------------------------------------
 \subsection{exit}
+
+A chamada de sistema exit é responsável por finalizar um processo, liberando espaço de memória para a execução de um novo processo.
+
+
+
+
+
+  
 
 \section{Shell}
