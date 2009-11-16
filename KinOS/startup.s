@@ -42,7 +42,7 @@ start
 	LDR		r0, =thread_array		; r0 = thread_array start address
 	MOV		r1, #1					; r1 = 1
 	STR		r1, [r0]				; address(r0) = r1
-	MOV		r1, #0					; r1 = 0
+	MOV		r1, #0					; r1 = 0 (disabled)
 	MOV		r2, #0					; r2 = 0
 init_thread_array_loop
 	ADD		r2, r2, #4				; r2 = r2 + 4

@@ -19,18 +19,18 @@ pt2Task  get_task_addr(char* name){
 
 
 
-int a = 1;
 
 void task1 (void) {
-	
+
+	int a = 0;
 	char* newTask = "task2";
 	
 	int j;
 	
 	a = fork();
-	
-	
-	exec(2,get_task_addr(newTask));
+	if(a != -1 && a != 0){
+		exec(a ,get_task_addr(newTask));
+	}
 	
 	while (1) {
 		segment_set(1);

@@ -28,8 +28,8 @@ void install_SWI_handler (unsigned routine, unsigned *vector) {
 }	
 
 int fork(){
-	syscall(0, 0, 0);
-	return 0;
+	int a = syscall(0, 0, 0);
+	return a; 
 }
 
 void exec(int process_id, pt2Task process_addr){

@@ -7,7 +7,7 @@
 	AREA	fork, CODE, READONLY
 	
 routine_fork
-	STMFD 	sp!,{r0-r12,lr}
+	STMFD 	sp!,{r1-r12,lr}		; r0 will return the child id
 	STMFD 	sp!,{r0-r12}
 	STMFD 	sp!,{lr} 
 	NOP
@@ -19,6 +19,8 @@ routine_fork_loop
 	CMP		r2,	#0
 	BEQ		pcb_bottom
 	ADD		r0,	r0,	#1
+	CMP		r0, #10
+	BEQ		fork_fail
 	ADD		r1,	r1,	#4
 	B		routine_fork_loop
 pcb_bottom
@@ -31,7 +33,7 @@ pcb_bottom
 ; Descobre o tamanho da pilha (r5)
 	; Pega conteudo de R13 do modo usuario (r3)
 	SUB		r13,r13,#4
-	STMIA 		r13, {r13}^
+	STMIA 	r13, {r13}^
 	NOP
 	LDMFD	sp!,{r3}
 	; Pega base do modo de usuario (r4)
@@ -70,6 +72,7 @@ set_stack_pointer ;
 ;r14 and LR (keep r7, as it is the return address)
 	ADD		r2,	r2,	#4
 	LDMFD	sp!,{r7}
+	ADD		r7, r7, #4   ;MARI
 	STR		r7,[r2]
 	SUB		r2,	r2,	#60
 	STR		r7,[r2]
@@ -87,9 +90,16 @@ registers_loop
 final_jump
 	MOV		r11,#1
 	STR		r11,[r1]
-	LDMFD	sp!,{r0-r12,pc}^
+	LDMFD	sp!,{r1-r12,pc}^	; r0 return the child ID
+
+
 	
-		
-	; Return process ID
+	; Return -1 (not possible to run more than 10 process)
+fork_fail
+	LDMFD	sp!,{lr}
+	LDMFD	sp!,{r0-r12}
+	LDMFD	sp!,{r1-r12}
+	MOV		r0,#0xFFFFFFFF
+	LDMFD	sp!,{pc}^
 	
 	END
