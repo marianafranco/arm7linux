@@ -200,8 +200,16 @@ A chamada de sistema exec é responsável por substituir a imagem núcleo de um pro
 
 Nos sistemas operacionais tradicionais , como o Linux ou o Minix, o exec é utilizado para iniciar um novo programa no mesmo ambiente do processo que executa a chamada de sistema. Normalmente o exec é utilizado na criação de um novo processo da seguinte maneira: um processo já existente se duplica através da chamada de sistema fork. O processo filho tem, então, seu código substituído pelo código que deve ser executado através da chamada de sistema exec, que permite ao processo filho assumir seu próprio conteúdo, apagando de si o conteúdo do processo pai.
 
+LIVRO, pag 400
 
+To start SLOS running, the PCB for each task has to be initialized. A PCB is a
+reserved data structure and holds a copy of the entire ARM register set (see Table 11.1).
+A task is made active by copying the appropriate task’s PCB data into the processor registers.
+The PCB of each task has to be set up prior to a context switch occurring since the switch will transfer the PCB data into registers r0 to r15 and cpsr. Left uninitialized, the context switch will copy garbage data into these registers.
 
+There are four major parts of the PCB that have to be initialized: the program counter, the link register, the user mode stack, and the saved processor status register (in other words registers r13, r14, r15, and the spsr) for each task.
+
+To help illustrate this, we have extracted the routine for initializing PCBs. The routine pcbSetUp is called to set up tasks 2 and 3. Register r0 is the task entry address—label entryAddr. This is the execution address for a task. Register r1 is the PCB data structure address—label pcbAddr. This address points into a block of memory that stores the PCB for a task. Register r2 is the stack offset and is used to position the stack in the memory map. Note that task 1 does not require initialization since it is the first task to be executed.
 
 
 %-------------------------------------------
