@@ -49,7 +49,7 @@ irq e swi & Inicialização e controle das interrupções de HW e SW\\
 \end{table}
 \end{center}
 
-\subsection{Process Control Block}
+\subsection{Process Control Block} \label{sub:PCB}
 
 O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das nove threads, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é a base do PCB menos quatro bytes, a segunda a base menos oito bytes e assim por diante. Como podemos observar pela figura, as posições um a quinze (base - 4 a base - 60) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição dezesseis (base - 64) armazena o registrador quatorze do modo IRQ, que nada mais é o endereço de retorno (link register) da interrupção que realizou a troca de processos. Finalmente, a posição dezessete armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um ``snapshot'' preciso do estado do processo quando houve o chaveamento, e permite que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. Esta estrutura tem seu espaço reservado no arquivo handler.s, e é nomeado com a variável handler\_task\_bottom, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, para acessarmos o segundo PCB, devemos subtrair 68 do endereço de base, 136 bytes para o terceiro PCB e assim por diante.
 
@@ -196,20 +196,65 @@ O processo de duplicação de um processo se inicia com o empilhamento dos registr
 %-------------------------------------------
 \subsection{exec}
 
-A chamada de sistema exec é responsável por substituir a imagem núcleo de um processo pela imagem do programa passado como argumento.
+A chamada de sistema \emph{exec} é responsável por substituir a imagem núcleo de um processo pela imagem do programa passado como argumento \cite{Tanenbaum2000}.
 
-Nos sistemas operacionais tradicionais , como o Linux ou o Minix, o exec é utilizado para iniciar um novo programa no mesmo ambiente do processo que executa a chamada de sistema. Normalmente o exec é utilizado na criação de um novo processo da seguinte maneira: um processo já existente se duplica através da chamada de sistema fork. O processo filho tem, então, seu código substituído pelo código que deve ser executado através da chamada de sistema exec, que permite ao processo filho assumir seu próprio conteúdo, apagando de si o conteúdo do processo pai.
+Nos sistemas operacionais tradicionais, como o Linux ou o Minix, o \emph{exec} é utilizado para iniciar um novo programa no mesmo ambiente do programa que executa a chamada de sistema. Normalmente o \emph{exec} é utilizado na criação de um novo processo da seguinte maneira: um processo já existente se duplica através da chamada de sistema \emph{fork}. O processo filho tem, então, seu código substituído pelo código que deve ser executado através da chamada de sistema \emph{exec}, que permite ao processo filho assumir seu próprio conteúdo, apagando de si o conteúdo do processo pai.
 
-LIVRO, pag 400
+No KinOS, para que um \emph{thread} passe a executar outro programa, é necessário reinicializar o seu PCB, isso é feito pela chamada de sistema \emph{exec}.
 
-To start SLOS running, the PCB for each task has to be initialized. A PCB is a
-reserved data structure and holds a copy of the entire ARM register set (see Table 11.1).
-A task is made active by copying the appropriate task’s PCB data into the processor registers.
-The PCB of each task has to be set up prior to a context switch occurring since the switch will transfer the PCB data into registers r0 to r15 and cpsr. Left uninitialized, the context switch will copy garbage data into these registers.
+Existem 4 principais entradas do PCB que necessitam ser reinicializadas: 
 
-There are four major parts of the PCB that have to be initialized: the program counter, the link register, the user mode stack, and the saved processor status register (in other words registers r13, r14, r15, and the spsr) for each task.
+\begin{itemize}
+\item o \emph{program counter} (PC - R13);
+\item o \emph{link register} (LR - R14);
+\item o \emph{stack pointer} (SP - R15);
+\item e o \emph{saved processor status register} (SPSR).
+\end{itemize}
 
-To help illustrate this, we have extracted the routine for initializing PCBs. The routine pcbSetUp is called to set up tasks 2 and 3. Register r0 is the task entry address—label entryAddr. This is the execution address for a task. Register r1 is the PCB data structure address—label pcbAddr. This address points into a block of memory that stores the PCB for a task. Register r2 is the stack offset and is used to position the stack in the memory map. Note that task 1 does not require initialization since it is the first task to be executed.
+Para reinicializar essas entradas, de forma que a \emph{thread} passe à executar um novo programa, primeiro é necessário calcular o início do PCB da \emph{thread} correspondente.
+
+A rotina \emph{exec}, recebe como parâmetros o id da \emph{thread} que será alterada e o ponteiro para a função/programa que pretende-se executar, como mostrado a seguir:
+
+
+\begin{lstlisting}
+	void exec(int process_id, pt2Task process_addr);
+\end{lstlisting}
+
+Assim para calcular o endereço inicial do PCB, obtêm-se o endereço inicial da área reservada para armazenar todos os PCBs, a \textbf{process\_control\_block}, e adiciona-se à esta o valor de 68 multiplicado por \textbf{process\_id}, visto que cada PCB ocupa um espaço de 68 endereços de memória como mencionado na sessão \ref{sub:PCB}. O código responsável por calcular o PCB é apresentado a baixo:
+
+\begin{lstlisting}
+  LDR r3, =process_control_block  ; r3 = the start address of the PCB area
+  MOV r4,#68         ; r4 = 68 (space for each process in the PCB)
+  MUL r5,r1,r4       ; r5 = (task id) * 68
+  ADD r3,r3,r5       ; r3 = PCB start address + r5
+\end{lstlisting}
+
+Em seguida, calculado o endereço inicial do PCB, altera-se suas entradas da seguinte maneira:
+
+\begin{itemize}
+\item LR (PCB[-4]) e PC (PCB[-64]) recebem o endereço da primeira instrução do novo programa (\textbf{process\_addr}).
+
+\begin{lstlisting}
+PCB[-4] = process_addr;
+PCB[-64] = process_addr;
+\end{lstlisting}
+
+\item SP (PCB[-8]) recebe o endereço de início da pilha da \emph{thread}, fazendo com que esta seja zerada. Para cada pilha de \emph{thread}, 4048 bytes são reservados. 
+
+\begin{lstlisting}
+PCB[-8] =  início da pilha do modo usuário - (4048 * thread id);
+\end{lstlisting}
+
+\item SPSR (PCB[-68]) recebe 0x10, pois os programas devem rodar no modo usuário.
+
+\begin{lstlisting}
+PCB[-68] = 0x10;
+\end{lstlisting}
+
+\end{itemize}
+
+Finalmente, após alterar as entradas mostradas a cima, a \emph{thread} começa a executar o novo programa.
+
 
 
 %-------------------------------------------
@@ -217,12 +262,19 @@ To help illustrate this, we have extracted the routine for initializing PCBs. Th
 %-------------------------------------------
 \subsection{exit}
 
-A chamada de sistema exit é responsável por finalizar um processo, liberando espaço de memória para a execução de um novo processo.
+A chamada de sistema \emph{exit} é responsável por finalizar um processo, liberando espaço de memória para a execução de um novo processo \cite{Tanenbaum2000}.
 
+No KinOS isso é realizado apenas colocando como desativado (igual à 0) o byte na lista de processos que  corresponde a \emph{thread} que se deseja finalizar. 
 
+Para isso a rotina \emph{exit} recebe como parâmetro o id da \emph{thread} a ser terminada.
 
-
+\begin{lstlisting}
+	void exit(int process_id);
+\end{lstlisting}
 
   
 
+%-------------------------------------------
+% Shell
+%-------------------------------------------
 \section{Shell}

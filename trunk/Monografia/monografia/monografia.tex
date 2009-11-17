@@ -30,9 +30,30 @@
 \usepackage{helvet} \renewcommand{\familydefault}{\sfdefault}
 \usepackage{ae}
 \usepackage{poli} % personalização da ABNT para a Poli
-
-\usepackage{listings}
 %\usepackage{indentfirst} % primeiro parágrafo indentado
+\usepackage{listings}
+
+\lstset {
+%    language=c++,                  % language code
+    basicstyle=\footnotesize,      % font size
+%    numbers=none,                  % where to put line numbers
+%    numberstyle=\footnotesize,     % numbers size
+%    numbersep=5pt,                 % how far the line numbers are from the code
+%    backgroundcolor=\color{white}, % background color
+%    showspaces=false,              % show spaces (with underscores)
+%    showstringspaces=false,        % underline spaces within strings
+%    showtabs=false,                % show tabs using underscores
+    frame=single,                  % adds a frame around the code
+    tabsize=2,                     % default tabsize
+    breaklines=true,               % automatic line breaking
+%    columns=fullflexible,
+%    breakautoindent=false,
+%    framerule=1pt,
+%    xleftmargin=0pt,
+%    xrightmargin=0pt,
+%    breakindent=0pt,
+%    resetmargins=true
+}
 
 %\versaofinal % descomente para gerar a versão final
               % sem as notas de pendencias, margens laterais, \ldots
