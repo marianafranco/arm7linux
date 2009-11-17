@@ -19,9 +19,9 @@ static unsigned int numeric_display [16] =  {
 	DISP_F
 };
 
-
+/*  */
 void segment_setdisplay (unsigned d) {
-		*IOData 	&= ~SEG_MASK;
+		*IOData 	&= ~Segment_mask;
 		*IOData 	|= d;	
 }
 
@@ -31,8 +31,8 @@ void segment_set (int seg) {
 
 }
 
-// Initialize 7-segment display
+/* Initialize 7-segment display */
 void segment_init (void) {
-	*IOPMOD 	|= SEG_MASK;
-	*IOData 	|= SEG_MASK;
+	*IOPMod |= Segment_mask;
+	*IOData |= Segment_mask;
 }
