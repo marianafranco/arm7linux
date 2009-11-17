@@ -1,6 +1,8 @@
 #include "dips.h"
 
+/* Return the value of the dip switches */
 unsigned dips_read (void) 
 {
-	return 0xf & *IOData; // 0xf = SWITCH MASK
+	/* 0xf = switch mask */
+	return 0XF & *IOData; 
 }

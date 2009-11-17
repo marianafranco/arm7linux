@@ -16,13 +16,13 @@ int C_Entry (void) {
 	button_init();
 	/* Install hardware interruption handler */
 	if (emulator == 1) {
-		install_IRQ_handler ((unsigned)handler_emulator, (unsigned *)IRQVector);
+		install_handler ((unsigned)handler_emulator, (unsigned *)IRQVector);
 	}
 	else {
-		install_IRQ_handler ((unsigned)handler_board, (unsigned *)IRQVector);
+		install_handler ((unsigned)handler_board, (unsigned *)IRQVector);
 	}
 	/* Install software interruption handler */
-	install_SWI_handler ((unsigned)handler_swi, (unsigned *)SWIVector);
+	install_handler ((unsigned)handler_swi, (unsigned *)SWIVector);
 	/* Start timer */
 	timer_start();
 	/* Enabling IRQ interruption and changing to user mode */

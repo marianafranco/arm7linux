@@ -1,6 +1,6 @@
 /********* GENERAL VARIABLES *********/
 /* Defines if the program is running on CodeWarrior ARMUlator (0) or the Evaluator 7-T board (1) */
-#define emulator	0
+#define emulator	1
 /* The number of the operating system software interrupt */
 #define	OS_SWI		0
 /* Interrupt table SWI instruction position */
@@ -30,5 +30,33 @@
 #define TimerEnableSet				(volatile unsigned *) 0x03ff6000
 #define EvaluatorIRQTimerLoad		(volatile unsigned *) 0x03ff6004
 #define EvaluatorIRQTimerControl	(volatile unsigned *) 0x03ff4008
-// Button addresses
+/* Button addresses */
 #define IRQButtonControl			(volatile unsigned *) 0x03ff5004
+/* Segment addresses */
+#define IOPMod          			(volatile unsigned *)0x03ff5000
+ /* The bits taken up by the display in IOData register */
+#define	Segment_mask	0x1FC00
+/* Define segments in terms of IO lines */
+#define	SEG_A		(1<<10)
+#define	SEG_B		(1<<11)
+#define	SEG_C		(1<<12)
+#define	SEG_D		(1<<13)
+#define	SEG_E		(1<<14)
+#define	SEG_F		(1<<16)
+#define	SEG_G		(1<<15)
+#define	DISP_0		(SEG_A|SEG_B|SEG_C|SEG_D|SEG_E|SEG_F)
+#define	DISP_1		(SEG_B|SEG_C)
+#define	DISP_2		(SEG_A|SEG_B|SEG_D|SEG_E|SEG_G)
+#define	DISP_3		(SEG_A|SEG_B|SEG_C|SEG_D|SEG_G)
+#define	DISP_4		(SEG_B|SEG_C|SEG_F|SEG_G)
+#define	DISP_5		(SEG_A|SEG_C|SEG_D|SEG_F|SEG_G)
+#define	DISP_6		(SEG_A|SEG_C|SEG_D|SEG_E|SEG_F|SEG_G)
+#define	DISP_7		(SEG_A|SEG_B|SEG_C)
+#define	DISP_8		(SEG_A|SEG_B|SEG_C|SEG_D|SEG_E|SEG_F|SEG_G)
+#define	DISP_9		(SEG_A|SEG_B|SEG_C|SEG_D|SEG_F|SEG_G)
+#define	DISP_A		(SEG_A|SEG_B|SEG_C|SEG_E|SEG_F|SEG_G)
+#define	DISP_B		(SEG_C|SEG_D|SEG_E|SEG_F|SEG_G)
+#define	DISP_C		(SEG_A|SEG_D|SEG_E|SEG_F)
+#define	DISP_D		(SEG_B|SEG_C|SEG_D|SEG_E|SEG_G)
+#define	DISP_E		(SEG_A|SEG_D|SEG_E|SEG_F|SEG_G)
+#define	DISP_F		(SEG_A|SEG_E|SEG_F|SEG_G)
