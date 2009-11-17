@@ -5,10 +5,10 @@
 	AREA	exec, CODE, READONLY
 
 ; Description: Sets up TASK Processor Control Block
-; taskPCB[-4]  = &task
+; taskPCB[-4]  = "LR" = &task
 ; taskPCB[-8]  = "PCB SP" = SP_USER_BOTTOM - 4048;
-; taskPCB[-60] = "LR" = &task 
-; taskPCB[-64] = "SPSR"	= %nzcvift_User32 = 0x10
+; taskPCB[-64] = "PC" = &task 
+; taskPCB[-68] = "SPSR"	= %nzcvift_User32 = 0x10
 
 
 ; r2 = task address
