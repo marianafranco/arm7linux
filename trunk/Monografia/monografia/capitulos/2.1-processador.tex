@@ -30,7 +30,7 @@ As principais características da arquitetura RISC são:
 
 \item Arquitetura \emph{Load-Store}: o processador opera somente sobre os dados contidos nos registradores e instruções de \emph{load}/\emph{store} transferem dados entre a memória e os registradores.
 
-\item Modos simples de endereçamento à memória.
+\item Modos simples de endereçamento de memória.
 
 \end{enumerate}
 
@@ -74,9 +74,9 @@ Algumas características importantes do \emph{pipeline} do ARM7:
 
 \item O processador só processa a instrução quando essa passa completamente pelo estágio de execução (\emph{execute}). Ou seja, somente quando a quarta instrução é buscada (\emph{fetched}).
 
-\item A execução de uma instrução de \emph{branch} através da modificação do PC provoca a descarga de todas as outras instruções do \emph{pipeline}.
+\item A execução de uma instrução de \emph{branch} através da modificação do PC provoca a descarga, eliminação, de todas as outras instruções do \emph{pipeline}.
 
-\item Uma instrução no estágio \emph{execute} será completada mesmo se acontecer uma interrupção. As outras instruções no \emph{pipeline} serão abandonadas e o processador começará a encher o \emph{pipeline} a partir da entrada apropriada no vetor de interrupção.
+\item Uma instrução no estágio \emph{execute} será completada mesmo se acontecer uma interrupção. As outras instruções no \emph{pipeline} serão abandonadas e o processador começará a preencher o \emph{pipeline} a partir da entrada apropriada no vetor de interrupção.
 
 \end{itemize}
 
@@ -107,7 +107,7 @@ Neste projeto, o processador é usado no modo ARM que facilita o desenvolvimento 
 \subsection{Modos de Operação} \label{sub:modo}
 \index{conceitos!processador!modos}
 
-Os processadores ARM possuem 7 modos de operação:
+Os processadores ARM possuem 7 modos de operação, como apresentado na tabela \ref{table:modos}.
 
 
 \begin{table}[ht]
@@ -131,12 +131,12 @@ Os processadores ARM possuem 7 modos de operação:
 		Indefinido		&	und			&	Modo usado quando uma instrução desconhecida é executada.	\\
 \hline
 \end{tabular}
-\caption{Modos de operação \cite{ArchManual} \label{modos}}
+\caption{Modos de operação \cite{ArchManual}} \label{table:modos}
 \end{center}
 \end{table}
 
 
-Mudanças no modo de operação podem ser feitas através de programas, ou podem ser causadas por interrupções externas ou exceções (interrupções de software).
+Mudanças no modo de operação podem ser realizadas através de programas, ou podem ser causadas por interrupções externas ou exceções (interrupções de software).
 
 A maioria dos programas roda no modo Usuário. Quando o processador esta no modo Usuário, o programa que esta sendo executado não pode acessar alguns recursos protegidos do sistema ou mudar de modo sem ser através de uma interrupção \cite{ArchManual}.
 
@@ -189,11 +189,11 @@ Além dos registradores acessíveis ao programador, o ARM coloca à disposição mais
 
 Como se pode verificar na figura \ref{fig:registradores}, cada modo tem o seu próprio R13 e R14. Isso permite que cada modo mantenha seu próprio ponteiro de pilha (SP) e endereço de retorno (LR) \cite{Zaitseff2003}.
 
-Além desses dois registradores, o modo FIQ possui mais cinco registradores especiais: R8\textunderscore fiq-R12\textunderscore fiq. Isso significa que quando o processador muda para o modo FIQ, o programa não precisa salvar os registradores R8-R12.
+Além desses dois registradores, o modo FIQ possui mais cinco registradores especiais: R8\textunderscore fiq-R12\textunderscore fiq. Isso significa que quando o processador muda para o modo FIQ, o programa não precisa salvar os registradores de R8 à R12.
 
-Esses registradores especiais mapeiam de um pra um os registradores do modo usuário. Se você mudar o modo do processador, um registrador particular do novo modo irá substituir o registrador existente.
+Esses registradores especiais mapeiam de um pra um os registradores do modo Usuário. Se ocorrer uma mudança de modo do processador, um registrador particular do novo modo irá substituir o registrador existente.
 
-Por exemplo, quando o processador esta no modo IRQ, as instruções executadas continuarão a acessar os registradores R13 e R14. No entanto, esses serão os registradores especiais R13\textunderscore irq e R14\textunderscore irq. Os registradores do modo usuário (R13\textunderscore usr e R14\textunderscore usr) não serão afetados pelas instruções referenciando esses registradores. O programa continua tendo acesso normal aos outros registradores R0 à R12 \cite{Sloss2004}.
+Por exemplo, quando o processador esta no modo IRQ, as instruções executadas continuarão a acessar os registradores R13 e R14. No entanto, esses serão os registradores especiais R13\textunderscore irq e R14\textunderscore irq. Os registradores do modo usuário (R13\textunderscore usr e R14\textunderscore usr) não serão afetados pelas instruções referenciando esses registradores. O programa continua tendo acesso normal aos outros registradores de R0 à R12 \cite{Sloss2004}.
 
 
 
@@ -205,7 +205,7 @@ Por exemplo, quando o processador esta no modo IRQ, as instruções executadas con
 
 O \emph{Current Program Status Register} (CPRS) é acessível em todos os modos do processador. Ele contém as \emph{flags} de condição, os bits para desabilitar as interrupções, o modo atual do processador, e outras informações de estado e controle. Cada modo de interrupção possui também um \emph{Saved Program Register} (SPRS), que é usado para preservar o valor do CPSR quando a interrupção associada acontece \cite{ArchManual}.
 
-Os registradores de estado do programa \cite{TechManual}:
+Assim, os registradores de estado \cite{TechManual}:
 
 \begin{itemize}
 \item Guardam informação sobre a operação mais recente executada pela ALU.
@@ -234,7 +234,7 @@ Os \emph{flags} de condição são normalmente modificados por:
 
 \begin{itemize}
 \item Uma instrução de comparação (CMN, CMP, TEQ, TST).
-\item Alguma outra instrução aritmética, lógica ou move, onde o registrador de destino não é o R15 (PC).
+\item Alguma outra instrução aritmética, lógica ou \emph{move}, onde o registrador de destino não é o R15 (PC).
 \end{itemize}
 
 Nesses dois casos, as novas \emph{flags} de condição (depois de a instrução ter sido executada) normalmente significam:
@@ -286,14 +286,14 @@ O bit T reflete o modo de operação:
 
 \begin{itemize}
 \item Quando o bit T é ativado, o processador é executado em estado Thumb.
-\item Quando o bit T é limpo, o processador é executado em estado ARM.
+\item Quando o bit T é desativado, o processador é executado em estado ARM.
 \end{itemize}
 
 
 \paragraph{Bits de modo}
 \paragraph{}
 
-Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits de modo definem um modo válido, portando deve-se tomar cuidado para usar somente as combinações mostradas a seguir:
+Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits de modo definem um modo válido, portando deve-se tomar cuidado para usar somente as combinações mostradas na tabela \ref{table:bit_tipo}.
 
 
 \begin{table}[ht]
@@ -318,7 +318,7 @@ Os bits M[4:0] determinam o modo de operação. Nem todas as combinações dos bits 
 \hline
 \end{tabular}
 \caption{Valores para o bit de modo \cite{ArchManual}}
-\label{bit_tipo}
+\label{table:bit_tipo}
 \end{center}
 \end {table}
 
@@ -401,7 +401,7 @@ O processador ARM usa os registradores adicionais de cada modo para ajudar a sal
 \item Força o PC buscar a próxima instrução no vetor de interrupção.
 \end{enumerate}
 
-O processador ARM7TDMI também pode ativar a \emph{flag} de interrupção desabilitada para prevenir próximas interrupções.
+O processador ARM7TDMI também pode ativar a \emph{flag} de interrupção para desabilitar próximas interrupções.
 
 \begin{figure}[ht]
 	\begin{center}
@@ -419,7 +419,7 @@ Quando uma interrupção é completada deve-se \cite{TechManual}:
 \begin{enumerate}
 \item Mover o LR (R14), menos um \emph{offset}, para o PC. O offset varia de acordo com o tipo de interrupção mostrada na figura anterior.
 \item Copiar o SPSR de volta para o CPSR.
-\item Limpar os \emph{flags} de interrupção desabilitada que foram ativados na entrada.
+\item Desativa as \emph{flags} de interrupção que foram ativadas na entrada.
 \end{enumerate} 
 
 
@@ -442,7 +442,7 @@ R14_svc = endereço da próxima instrução
 SPSR_svc = CPSR
 \end{lstlisting}
 
-\item Coloca os bits de modo do CPSR para o valor correspondente ao modo Supervisor.
+\item Ativa os bits de modo do CPSR com o valor correspondente ao modo Supervisor.
 
 \begin{lstlisting}
 CPSR[4:0] = 0b10011 /* modo Supervisor */
@@ -454,7 +454,7 @@ CPSR[4:0] = 0b10011 /* modo Supervisor */
 CPSR[5] = 0 /* estado ARM */
 \end{lstlisting}
 
-\item Desabilita as interrupções normais colocando o bit I do CPSR a um. Interrupções FIQ não são desabilitadas e podem continuar ocorrendo.
+\item Desabilita as interrupções normais ativando o bit I do CPSR. Interrupções FIQ não são desabilitadas e podem continuar ocorrendo.
 
 \begin{lstlisting}
 CPSR[7] = 1 /* desabilita interrupções normais */
@@ -468,7 +468,7 @@ PC = 0x00000008
 
 \end{enumerate}
 
-Para retornar da operação de interrupção, é usada a seguinte instrução para restaurar o PC (a partir do R14\textunderscore svc) e CPSR (a partir do SPSR\textunderscore svc):
+Para retornar da operação de interrupção, é usada a seguinte instrução para restaurar o PC (a partir do R14\textunderscore svc) e o CPSR (a partir do SPSR\textunderscore svc):
 
 \begin{lstlisting}
 MOVS PC,LR
@@ -486,7 +486,7 @@ O processador ARM fornece dois sinais que são usados pelos periféricos para pedi
 Quando uma interrupção de \emph{hardware} IRQ (ou FIQ) é detectada, as seguintes ações são realizadas \cite{ArchManual}:
 
 \begin{enumerate}
-\item Copia o endereço da próxima instrução à ser executada + 4 no registrador LR\textunderscore irq(R14\textunderscore irq). Isso significa que o LR\textunderscore irq irá apontar para a segunda instrução à partir do ponto de pedido da interrupção.
+\item Copia o endereço da próxima instrução à ser executada + 4 no registrador LR\textunderscore irq (R14\textunderscore irq). Isso significa que o LR\textunderscore irq irá apontar para a segunda instrução à partir do ponto de pedido da interrupção.
 
 \begin{lstlisting}
 R14_irq = endereço da próxima instrução + 4
@@ -510,7 +510,7 @@ CPSR[4:0] = 0b10010 /* modo IRQ */
 CPSR[5] = 0 /* estado ARM */
 \end{lstlisting}
 
-\item Desabilita as interrupções normais colocando o bit I do CPSR a um. Interrupções FIQ não são desabilitadas e podem continuar ocorrendo.
+\item Desabilita as interrupções normais ativando o bit I do CPSR. Interrupções FIQ não são desabilitadas e podem continuar ocorrendo.
 
 \begin{lstlisting}
 CPSR[7] = 1 /* desabilita interrupções normais */
