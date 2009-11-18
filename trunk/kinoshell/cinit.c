@@ -1,40 +1,37 @@
-#include "tasks.h"
-#include "timer.h"
-#include "irq.h"
-#include "button.h"
-#include "segment.h"
-#include "swi.h"
-#include "rpsarmul.h"
+/* The program was based on the mutex program by ARM - Strategic Support Group,
+contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+source/examples/mutex/ */
 
-extern void handler(void);
-extern void handler_swi(void);
-extern void handler_emulator(void);
+/* Initialization code in C */
 
-// Entry point for the program 
-int C_Entry ( void ) {	
-	// Initialize 7-segment display
+#include "cinit.h"
+
+/* Entry point for C part */
+int C_Entry (void) {
+	/* Initialize 7-segment display */
 	segment_init();
-	// Initialize timer
-	timer_init 	();
-	// Initialize button
-	button_init ();
-	// Install handler
+	/* Initialize timer */
+	timer_init();
+	/* Initialize button */
+	button_init();
+	/* Install hardware interruption handler */
 	if (emulator == 1) {
-		irq_installhandler ((unsigned)handler_emulator, (unsigned *)IRQVector);
+		install_handler ((unsigned)handler_emulator, (unsigned *)IRQVector);
 	}
 	else {
-		irq_installhandler ((unsigned)handler, (unsigned *)IRQVector);
+		install_handler ((unsigned)handler_board, (unsigned *)IRQVector);
 	}
-	irq_installSWIhandler ((unsigned)handler_swi, (unsigned *)SWIVector);
-	// Start timer
-	timer_start ();
-	// Enabling IRQ interruption, changing to user mode
+	/* Install software interruption handler */
+	install_handler ((unsigned)handler_swi, (unsigned *)SWIVector);
+	/* Start timer */
+	timer_start();
+	/* Enabling IRQ interruption and changing to user mode */
 	__asm {
 		MOV		r1,	#0x40|0x10
-		MSR CPSR_c, r1
+		MSR 	CPSR_c, r1
 	}
-	// Start with process 1
+	/* Start with process 1 */
 	task1();
-	 // This return is not reachable
+	 /* The return below should not be reachable */
 	return 0;
 }
