@@ -6,6 +6,17 @@ struct { char* name; void (*task_ptr)(int); } tasks_name[] = {
 };
 
 
+int strcmp (char* str1, char* str2){
+	int i;
+	for (i = 0; str1[i] == str2[i]; i++){
+		if (str1[i] == '\0'){
+			return 0;
+		}
+	}
+	return str1[i] - str2[i];
+}
+
+
 pt2Task  get_task_addr(char* name){
 	int i;
 	for(i=0; i<sizeof(tasks_name); i++){
@@ -13,7 +24,7 @@ pt2Task  get_task_addr(char* name){
 			return tasks_name[i].task_ptr;
 		}
 	}
-	return NULL;
+	return 0;
 }
 
 
