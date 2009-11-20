@@ -1,7 +1,12 @@
 /********* GENERAL VARIABLES *********/
+<<<<<<< .mine
+/* Defines if the program is running on CodeWarrior ARMUlator (1) or 
+the Evaluator 7-T board with angel (0) or Evaluator 7-T board with angel */
+=======
 /* Defines if the program is running on: */
 /* 0 - Evaluator 7-T board */
 /* 1 - CodeWarrior ARMUlator */
+>>>>>>> .r104
 #define emulator	1
 /* The number of the operating system software interrupt */
 #define	OS_SWI		0
