@@ -1,6 +1,4 @@
 /********* GENERAL VARIABLES *********/
-/* Defines if the program is running on CodeWarrior ARMUlator (1) or 
-the Evaluator 7-T board with angel (0) or Evaluator 7-T board with angel */
 /* Defines if the program is running on: */
 /* 0 - Evaluator 7-T board with Angel */
 /* 1 - CodeWarrior ARMUlator */
