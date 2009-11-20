@@ -65,7 +65,7 @@ loop_stack_copy
 	LDR		r6,	[r4]			; r6 = original stack data
 	STR		r6, [r5]			; Stores data in new stack (stack_top = r6)
 	CMP		r4,	r3				; Is this the top of the stack? (r4 == r3?)
-	BEQ		build_new_pcb	; if it is, branch to build_new_pcb 
+	BEQ		build_new_pcb		; if it is, branch to build_new_pcb 
 	SUB		r5,	r5,	#4			; if not, go to next space in the new stack (r5 = r5 - 4)
 	SUB		r4,	r4,	#4			; and next data in the original stack (r4 = r4 - 4)
 	B		loop_stack_copy		; restart sequence (go to loop_stack_copy)
@@ -89,14 +89,14 @@ build_new_pcb
 	STR		r3, [r2]	; PCB[-64] = return address
 
 ; Copy registers
-	MOV		r3,	#0			; r3 = 0
+	MOV		r3,	#0		; r3 = 0
 	MOV		r4, #12		; r4 = 12
 registers_loop
 	ADD		r2,	r2,	#4		; r2 = r2 + 4 (Next PCB register space)
 	LDMFD	sp!, {r5}		; Restore register from the stack to r5
 	STR		r5, [r2]		; Store register in the PCB
 	CMP		r3,	r4			; r12 was copied? (r3 == r4?)
-	BEQ 	enable_thread		; If yes, go to enable_thread
+	BEQ 	enable_thread	; If yes, go to enable_thread
 	ADD		r3,	r3,	#1		; r3 = r3 + 1 (Next register)
 	B		registers_loop	; Copy next register
 
