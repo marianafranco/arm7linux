@@ -1,8 +1,8 @@
 #include "tasks.h"
 
-struct { char* name; void (*task_ptr)(void); } tasks_name[] = {
-	{"task1", &task1},
-	{"task2", &task2}
+struct { char* name; void (*task_ptr)(int); } tasks_name[] = {
+	{"task2", &task2},
+	{"set_segment", &set_segment}
 };
 
 
@@ -12,40 +12,49 @@ pt2Task  get_task_addr(char* name){
 		if(strcmp(tasks_name[i].name, name)==0){
 			return tasks_name[i].task_ptr;
 		}
-	
 	}
 	return NULL;
 }
 
 
 
-
 void task1 (void) {
 
 	int a = 0;
-	char* newTask = "task2";
+	char* newTask = "set_segment";
 	
 	int j;
 	
 	a = fork();
 	if(a != -1 && a != 0){
-		exec(a ,get_task_addr(newTask));
+		exec(a ,get_task_addr(newTask), 2);
 	}
 	
 	while (1) {
 		segment_set(1);
 		if(j==1000000){
-			exit(2);
+			exit(a);
 		}
 		j++;
 	}
 }
 
-void task2 (void) {
+
+void task2 (int value) {
 	while (1) {
 		segment_set(2);		 
 	}
 }
+
+
+void set_segment(int value){
+	while (1) {
+		segment_set(value);
+	}
+}
+
+
+
 
 void task3 (void) {
 	while (1) {

@@ -12,7 +12,10 @@ routine_exec
 ; Store variables
 	STMFD 	sp!,{r0-r12,lr}		; Push r0-12 in the stack
 	
+	MOV		r6, r3						; r6 = value of the first argument
+
 ; Put the task address in task_pcb_address - 4 (Process counter)
+
 	MOV		r0, r2						; r0 = task address
 	ADD		r0, r0, #4					; r0 = task address + 4 (+4 due to the pipeline)
 	LDR		r3, =process_control_block	; r3 = PCB bottom
@@ -34,8 +37,12 @@ loop
 end_loop
 	STR		r0,[r3]						; MEM[r3] = r4 (the process stack pointer)
 
+; Set up the r0
+	SUB		r3,r3,#52					; r3 = r3 - 52
+	STR		r6,[r3]
+
 ; Set up link register
-	SUB		r3, r3, #56					; r3 = r3 - 56 (link register)
+	SUB		r3, r3, #4					; r3 = r3 - 4 (link register)
 	MOV		r0, r2						; r0 = task address
 	ADD		r0, r0, #4					; r0 = r0 - 4
 	STR		r0, [r3]					; MEM[r3] = r0
