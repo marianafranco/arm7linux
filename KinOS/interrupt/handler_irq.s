@@ -5,7 +5,8 @@
 
 	EXPORT 	Angel_IRQ_Address
 	EXPORT 	current_thread_id
-	EXPORT 	handler_board
+	EXPORT 	handler_board_angel
+	EXPORT 	handler_board_no_angel
 	EXPORT 	handler_emulator
 	EXPORT 	process_control_block
 	EXPORT 	thread_array
@@ -19,7 +20,7 @@ handler_emulator
 	B		handler_timer		; Branch to  handler_timer
 
 ; Routine designed to the board, have the Angel handler routine, button and timer
-handler_board
+handler_board_angel
 	; Save current context for APCS
 	STMFD	sp!, {r0 - r3, lr}		; Stacking r0 to r3 and the link register
 	LDR 	r0, IRQStatus	 		; r0 = irq type address
@@ -30,6 +31,19 @@ handler_board
 	BNE		handler_button			; If yes, go to handler_button
 	LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
 	LDR 	pc, Angel_IRQ_Address	; and branch to the Angel routine
+
+; Routine designed to the board, not have the Angel handler routine, button and timer
+handler_board_no_angel
+		; Save current context for APCS
+		STMFD	sp!, {r0 - r3, lr}		; Stacking r0 to r3 and the link register
+		LDR 	r0, IRQStatus	 		; r0 = irq type address
+		LDR 	r0, [r0]				; r0 = irq type
+		TST 	r0, #0x0400				; irq type == 0x0400?
+		BNE		handler_timer 			; If yes, go to handler_timer
+		TST		r0, #0x0001				; irq type = 0x0001?
+		BNE		handler_button			; If yes, go to handler_button
+		LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
+		B 		return					; and return
 
 ; handler routine for the button interruption
 handler_button
@@ -120,7 +134,6 @@ set_addresses
 										; to point to the right place for the stacking
 										; (next step)
 ; Load the next task and setup PSR
-	; CMP		r13, #0					; WTF???
 	LDMNEDB	r13, {r0,r14}				; Restore r0 and r14 (IRQ mode)
 	MSRNE 	spsr_cxsf, r0				; Restore status register
 	LDMNEIA	r13, {r0-r14}^				; Restore r0-r14 for the user mode

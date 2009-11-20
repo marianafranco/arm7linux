@@ -9,8 +9,8 @@ extern int  Angel_SWI_Address;
 /* 	Installs a handler branch on the interrupt vector */
 void install_handler (unsigned handler_routine_address, unsigned *vector_address) {
 
-	/* Case it is running in the emulator */
-	if (emulator == 1) {
+	/* Case it is running in the emulator or without angel */
+	if (emulator == 1 || emulator == 2) {
 		/* The instruction that will be put in the IRQ vector */
 		unsigned branch_to_handler_instruction;
 		/* Handler relative address */
@@ -22,7 +22,7 @@ void install_handler (unsigned handler_routine_address, unsigned *vector_address
 		/* Put the instruction in the vector */
 		*vector_address = branch_to_handler_instruction;
 	}
-	/* Case it is running on the board */
+	/* Case it is running with the angel */
 	else {
 		/* Angel branch instruction */
 		unsigned Angel_branch_instruction;
