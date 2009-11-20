@@ -1,5 +1,8 @@
+/* This file contains routines to initialize and handle the 7 segment display */
+
 #include "segment.h"
 
+/* Calculates the proper display addresses value according to the number */
 static unsigned int numeric_display [16] =  {
 	DISP_0,
 	DISP_1,
@@ -19,16 +22,12 @@ static unsigned int numeric_display [16] =  {
 	DISP_F
 };
 
-/*  */
-void segment_setdisplay (unsigned d) {
-		*IOData 	&= ~Segment_mask;
-		*IOData 	|= d;	
-}
-
+/* Set number on the display */
 void segment_set (int seg) {
-	if ( seg >= 0 & seg <= 0xf ) 
-		segment_setdisplay(numeric_display[seg]);
-
+	if ( seg >= 0 & seg <= 0xf ) {
+		*IOData 	&= ~Segment_mask;
+		*IOData 	|= numeric_display[seg];
+	}
 }
 
 /* Initialize 7-segment display */
