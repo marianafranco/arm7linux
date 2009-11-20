@@ -34,7 +34,7 @@ int C_Entry (void) {
 		install_handler ((unsigned)handler_board_angel, (unsigned *)IRQVector);
 	}
 	else {
-		install_handler ((unsigned)handler_board_angel_no_angel, (unsigned *)IRQVector);
+		install_handler ((unsigned)handler_board_no_angel, (unsigned *)IRQVector);
 	}
 	/* Install software interruption handler */
 	install_handler ((unsigned)handler_swi, (unsigned *)SWIVector);
