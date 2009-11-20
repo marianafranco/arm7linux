@@ -1,3 +1,5 @@
+/* This file contains routines to initialize and handle DIPS interruptions */
+
 #include "dips.h"
 
 /* Return the value of the dip switches */
