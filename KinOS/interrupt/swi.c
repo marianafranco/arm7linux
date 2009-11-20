@@ -5,8 +5,9 @@ extern void routine_exec(void);
 extern void routine_exit(void);
 
 int fork(){
-	int a = syscall(0, 0, 0);
-	return a; 
+	int pid = 0;
+	pid = syscall(0, 0, 0);
+	return pid; 
 }
 
 void exec(int process_id, pt2Task process_addr){
