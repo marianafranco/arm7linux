@@ -2,10 +2,10 @@
 /* Defines if the program is running on CodeWarrior ARMUlator (1) or 
 the Evaluator 7-T board with angel (0) or Evaluator 7-T board with angel */
 /* Defines if the program is running on: */
-/* 0 - Evaluator 7-T board */
-/* 1 - CodeWarrior ARMUlator with Angel */
-/* 2 - CodeWarrior ARMUlator no Angel */
-#define emulator	1
+/* 0 - Evaluator 7-T board with Angel */
+/* 1 - CodeWarrior ARMUlator */
+/* 2 - Evaluator 7-T board no Angel */
+#define emulator	2
 /* The number of the operating system software interrupt */
 #define	OS_SWI		0
 /* Interrupt table SWI instruction position */
