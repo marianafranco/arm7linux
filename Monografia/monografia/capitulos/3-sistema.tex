@@ -7,12 +7,16 @@
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
 
-O microkernel desenvolovido no projeto tem apenas algumas funções básicas. Entre elas, podemos citar o chaveamento de 
+O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e da arquitetura ARM nas disciplinas de Sistemas Operacionais e Laboratório de Microprocessadores. Para tal, foi desenvolvido um microkernel, apelidado de KinOS, cujas funções básicas são o chaveamento de threads através de interrupção de timer, as chamadas de sistema, as rotinas de manipulação de hardware, funções de semáforo e um shell.
 
+Grande parte do código foi retirada do código presente na 
 
 %Lembretes:
-%\begin{itemize}
-%\item{Escrever algo aqui}
+%-timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset
+% colocar rotinas dos leds
+% escrever sobre o software utilizado
+% perspectivas
+% escrever sobre os aplicativos desenvolvidos
 %\item{Colocar como o programa foi desenvolvido}
 %\item{Colocar Mutex}
 %\item{Explicar em algum lugar as divisões que existem no assembly.}
@@ -24,86 +28,151 @@ O microkernel desenvolovido no projeto tem apenas algumas funções básicas. Entre
 %\item{Daria para fazer uns testes com variaveis locais, mostrando que depois de se criar dois processos; os dois estao com variaveis locais diferentes?}
 %\item{Colocar pesquisa inicial (ver tambem as referencias e documentos de acompanhamento iniciais)}
 %\item [MARI] Dar uma olhado no artigo sobre interrupções: Exception and Interrupt Handling in ARM. Tem figurinhas legais lá :)
-%\end{itemize}
 
-\section{Organização}
+\section{Organização do código}
 
-Nesta etapa descreveremos algumas das estruturas de dados em assembly que utilizamos em nosso projeto, assim como organizamos a memória na placa e utilizamos os modos. O código está estruturado da maneira indicada na tabela \ref{codigo}.
+A estrutura de arquivos do projeto pode ser vista na figura \ref{arquivos}. Podemos dividi-lo em cinco partes: 
 
-\begin{center}
-\begin{table}[ht!]
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Arquivo}	&	\textbf{Função}\\
-\hline
-startup.s & Inicialização em assembly ARM\\
-cinit.c & Inicialização em C\\
-button, dips, segment e timer & Rotinas de inicialização e uso dos periféricos\\
-fork.s & Rotina de duplicação de processo em assembly\\
-handler.s & Rotina de tratamento de interrupcões em assembly\\
-mutex.mcp & Arquivo de projeto do CodeWarrior\\
-rpsarmul.h & Arquivo com as constantes da placa e do emulador\\
-tasks & Processos a serem executados\\
-irq e swi & Inicialização e controle das interrupções de HW e SW\\
-\hline
-\end{tabular}
-\caption{Relação de arquivos com suas funções\label{codigo}}
-\end{table}
-\end{center}
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=15cm]{figuras/arquivos.pdf}
+\caption{Estrutura de arquivos. \label{arquivos}}
+\end{figure}
+
+\begin{itemize}
+\item{\textbf{Raiz} Contém os arquivos de inicialização da placa}
+\item{\textbf{Pasta ``apps''} Contém os programas que serão executados pelo microkernel}
+\item{\textbf{Pasta ``interrupt''} Contém as rotinas de tratamento de interrupção}
+\item{\textbf{Pasta ``peripherals''} Contém rotinas de manipulação de hardware}
+\item{\textbf{Pasta ``syscalls''} Contém as chamadadas de sistema}
+\item{\textbf{Pasta ``mutex''} Contém rotinas de semáforo}
+\end{itemize}
+
+A pasta \emph{KinOS\_Data} não é considerada parte do projeto pois é utilizada pelo CodeWarrior para o armazenamento do código compilado.
+
+\subsection{Raiz}
+
+Os arquivos encontrados na raiz do projeto são responsáveis pela inicialização da placa e pela declaração de constantes globais.  O arquivo startup.s contém a chamada inicial do microkernel, onde toda parte de incialização em assembly é feita. Já o arquivo cinit.c também contém a parte de inicialização, porém, a parte que deve ser executada em C. Finalmente, o arquivo constants.h é responsável por armazenar as constantes que são utilizadas em todo o projeto.
+
+\subsection{Pasta ``apps''}
+
+Há apenas um arquivo e seu cabeçalho nesta pasta. Nele, várias funções são declaradas, onde cada declaração é considerada uma thread pelo microkernel. 
+
+\subsection{Pasta ``interrupt''}
+
+Todas as rotinas que tratam e instalam interrupções -- tanto de hardware quanto de software -- estão localizadas nesta pasta. O arquivo handler\_irq.s contém a rotina em assembly que trata das interrupções de hardware, as encaminha para a rotina específica de acordo com a sua fonte e faz o chaveamento de threads. O arquivo irq.c contém uma única rotina, que realiza a instalação da rotina de tratamento de interrupção tanto de hardware quanto de software. A rotina de tratamento de iterrupção de software é feita no arquivo handler\_swi.s, que identifica o tipo de interrupção e encaminha para alguma das chamadas de sistema, encontradas em swi.c.
+
+\subsection{Pasta ``peripherals''}
+
+As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button, da chave DIP no arquivo dips, do display de sete segmentos em segment e do timer em timer.
+
+\subsection{Pasta ``syscalls''}
+
+As chamadas de sistema estão escritas em assembly e se encontram em três arquivos, uma para cada chamada. São elas as chamadas fork, exec e exit.
+
+\subsection{Pasta ``mutex''}
+
+No arquivo mutex há apenas as funções que permitem a exclusão mútua de código.
+
+\section{Estruturas de dados}
+
+A fim de se facilitar a programação e o entendimento do projeto, foram criadas duas estruturas de dados que são acessadas em assembly. A primeira, o Process Control Block é responsável pelo armazenamento do estado de um processo. Já a Lista de Threads realiza o controle de quais threads estão ativas.
 
 \subsection{Process Control Block} \label{sub:PCB}
 
-O Process Control Block (ou simplesmente PCB), é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão usando o processador. Temos um PCB para cada uma das nove threads, onde cada uma ocupa 68 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é a base do PCB menos quatro bytes, a segunda a base menos oito bytes e assim por diante. Como podemos observar pela figura, as posições um a quinze (base - 4 a base - 60) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição dezesseis (base - 64) armazena o registrador quatorze do modo IRQ, que nada mais é o endereço de retorno (link register) da interrupção que realizou a troca de processos. Finalmente, a posição dezessete armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um ``snapshot'' preciso do estado do processo quando houve o chaveamento, e permite que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. Esta estrutura tem seu espaço reservado no arquivo handler.s, e é nomeado com a variável handler\_task\_bottom, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, para acessarmos o segundo PCB, devemos subtrair 68 do endereço de base, 136 bytes para o terceiro PCB e assim por diante.
+O Process Control Block (ou simplesmente PCB) é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão ativas. Temos um PCB para cada uma das nove threads e cada uma ocupa 68 bytes. Ou seja, o espaço total ocupado pelos PCBs é de 9 $\cdot$ 68 = 612 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é em (base do PCB - 4), a segunda em (base do PCB - 8) e assim por diante. Como podemos observar pela figura, as posições 1 a 15 ((base do PCB - 4) a (base do PCB - 60)) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição 16 (base do PCB - 64) armazena o link register do modo IRQ, ou seja, o endereço de retorno da interrupção. Finalmente, a posição 17 armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um retrato preciso do estado do processo quando houve o chaveamento e permite também que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. A estrutura tem seu espaço reservado no arquivo handler\_irq.s, e é nomeado com a variável process\_control\_block, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, a base do primeiro PCB está em (process\_control\_block - 68), do segundo em (process\_control\_block - 2 $\cdot$ 68) e assim por diante.
 
 \begin{figure}[!ht]
 \centering 
 \includegraphics[height=10cm]{figuras/pcb.pdf}
-\caption{Estrutura de dados do PCB. Fonte: \cite{aaa} \label{pcb}}
+\caption{Estrutura de dados do PCB. Fonte: \cite{Sloss2001} \label{pcb}}
 \end{figure}
 
-\subsection{Lista de processos}
+\subsection{Vetor de threads}
 
-A lista de processos é um vetor que armazena quais dos processos estão ativos e quais não estão. Este vetor tem 40 bytes, onde 4 são para cada processo. Ele é declarado no arquivo handler.s com o nome de Process\_Table, que indica sua base. Cada endereço reservado deve ter o valor 0, caso o processo esteja inativo ou 1, caso esteja ativo.
+O vetor de threads é uma lista que armazena quais das threads estão ativas e quais não estão, a fim de se identificar quais devem ser colocadas em execução. Cada identificador ocupa 4 bytes, e pode ter os valores 0 (inativo) ou 1 (ativo). Como há 9 processos, o tamanho deste vetor é de 4 $\cdot$ 9 = 36 bytes. Seu espaço é reservado no arquivo handler\_irq.s, com o nome de thread\_array. No exemplo na figura \ref{vetor} podemos ver que as threads 1, 2 e 4 estão ativas, enquanto que as outras não estão.\\
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[width=7.5cm]{figuras/vetorThreads.pdf}
+\caption{Vetor de threads. \label{vetor}}
+\end{figure}
+
+\section{Configuração de hardware e software}
+
+Nesta seção são apresentados os modos como o hardware e o software descritos anteriormente são utilizados. Será indicado como foi feito o particionamento da memória, a utilização dos modos do processador e os modos de teste do código. 
 
 \subsection{Memória}
 
-Estruturamos a memória utilizada como indicado na figura \ref{memoria}. Para todo espaço das pilhas, programas, kernel, vetor de interrupções e área de dados, vamos limitar o espaço disponível para 128KB (de 0x0 a 0x20000).Como pode ser visto na seção \ref{bbb}, a memória entre 0x0 e 0x20 contém o vetor de interrupções e deve ser reservado. A pilha do modo SVC começa no endereço 0x7F80, cresce para baixo e não deve invadir a área reservada para o vetor de interrupção. Já a pilha do modo IRQ, começa no endereço 0x8000, também cresce para baixo e não deve invadir o espaço reservado para a pilha do modo SVC. O código do kernel e dos programas começa no endereço 0x8000, mas ao contrário da pilha do modo SVC, cresce para cima. Logo após o código, temos uma área reservada para os dados globais. Finalmente, as pilhas de usuário começam no endereço 0x20000 e crescem para baixo. Cada uma tem um offset relativo à anterior de 4048 bytes.
+A memória volátil da placa foi estruturada como indicado na figura \ref{memoria}. Para todo espaço das pilhas, programas, código, vetor de interrupções e área de dados, o espaço disponível é de 128KB (de 0x0 a 0x20000). Como pôde ser visto anteriormente, a memória entre 0x0 e 0x20 contém o vetor de interrupções e deve ser reservado. A pilha do modo SVC começa no endereço 0x7F80, cresce para baixo e não deve invadir a área reservada para o vetor de interrupção. Já a pilha do modo IRQ, começa no endereço 0x8000, também cresce para baixo e não deve invadir o espaço reservado para a pilha do modo SVC. O código do kernel e dos programas começa no endereço 0x8000, mas ao contrário da pilha do modo SVC, cresce para cima. Logo após o código, temos uma área reservada para os dados globais. Finalmente, as pilhas de usuário começam no endereço 0x20000 e crescem para baixo. Cada uma tem um offset relativo à anterior de 4048 bytes.
 
 \begin{figure}[!ht]
 \centering 
 \includegraphics[height=13cm]{figuras/memoria.pdf}
-\caption{Estrutura da memória. Fonte: \cite{aaa} \label{memoria}}
+\caption{Estrutura da memória. Fonte: \cite{Sloss2001} \label{memoria}}
 \end{figure}
 
-\subsection{Modos}
+\subsection{Modos do processador}
 
-Dentre os sete modos dsiponíveis na placa, utilizamos apenas três deles: o modo user, o modo SVC e o modo IRQ. O primeiro é o modo não privilegiado no qual rodamos os processos. O segundo, é o modo de inicialização do kernel e de execução das system calls, que é privilegiado. Já o terceiro, é um modo que também é privilegiado, mas que é usado quando há interrupções de hardware e portanto, é usado quando há o chaveamento de processos (interrupção de timer) ou qualquer outra interrupção que não a de software.
+Dentre os sete modos disponíveis na placa, apenas quatro deles são utilizados: o modo d usuário (user), o modo de serviço (SVC), o modo de sistema (SYS) e o modo de interrupção (IRQ). O primeiro é o modo não privilegiado no qual os processos são executados. O segundo, é o modo de inicialização do kernel e de execução das system calls, que é privilegiado. Já o terceiro, é idêntico ao modo de usuário, mas com privilégios. Ele é utilizado na inicialização do sistema para definir a pilha do modo de usuário. Finalmente, o quarto é um modo que também é privilegiado, mas que é usado quando há interrupções de hardware e portanto, é usado quando há o chaveamento de processos (interrupção de timer) ou qualquer outra interrupção que não a de software. É importante ressaltar que os modos privilegiados quando chamados por interrupção desabilitam outras interrupções. Isso não permite que ocorra interrupções aninhadas, essencial para o funcionamento do código.
 
-\subsection{Modos de operação}
+\subsection{Modos de teste}
 
-Debugar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não podemos debugar o programa na placa. Para contornar tal problema, utilizamos o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, colocamos ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo rpsarmul.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa.
+Depurar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não podemos fazê-lo. Para contornar tal problema, foi utilizado o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, foram colocados ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo constants.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa com Angel e caso seja 2 é o código para a placa com o Angel desabilitado. Uma outra vantagem do código no emulador é que ele permite com que ele possa ser testado sem a presença da placa.
 
-\section{Angel}
+\subsection{Angel}
 
-O Angel é um programa contido na ROM da placa que realiza a comunicação entre a mesma e o computador que efetuou o upload do código. Além de permitir com que o código seja carregado na placa, o Angel realiza o processo de debug do código durante a execução. Para isso, deve haver uma comunicação constante entre a placa e o computador, que é feita através de interrupções constantes. Uma vez que a placa é iniciada, o endereço do vetor de interrupções responsável pelas interrupções de hardware e se software apontam para um endereço pré-estabelecido do Angel. Caso queiramos adicionar alguma rotina de tratamento de interrupções, não podemos de nos esquecer de encadear a rotina do Angel caso identifiquemos que a fonte de interrupção não foi de algo causado por um código do usuário. Descreveremos mais à frente como isso é feito durante a instalação da rotina de tratamento de interrupções.
+O Angel é um programa contido na ROM da placa que realiza a comunicação entre a mesma e o computador que efetuou o upload do código. Além de permitir com que o código seja carregado na placa, o Angel realiza o processo de debug do código durante a execução. Para isso, deve haver uma comunicação constante entre a placa e o computador, que é feita através de interrupções constantes. Uma vez que a placa é iniciada, o endereço do vetor de interrupções responsável pelas interrupções de hardware e se software apontam para um endereço pré-estabelecido do Angel. Caso se queira adicionar alguma outra rotina de tratamento de interrupções, deve-se encadear a rotina do Angel para que a comunicação com a placa não seja perdida.
 
 \section{Inicialização}
 
-O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de processos. Após esta etapa, a uma inicialização em C, feita no arquivo cinit.c, que ao fim de sua execução, roda o primeiro processo.
+O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de threads. Após esta etapa, há a inicialização em C, feita no arquivo cinit.c, que inicializa periféricos, instala rotinas de tratamento e inicia a primeira thread em modo usuário.
 
-\subsection{Modo}
+\subsection{Ponto de entrada e tipo de código}
 
-O primeiro passo do programa é informar qual o tipo de código que será executado no programa. Como descrito anteriormente, podemos ter o assembly ARM ou o assembly thumb. Em nosso programa, utlizaremos apenas código ARM, já que ele fornece mais instruções (favorece a legibilidade) e porque o tamanho do código não é um grande problema.
+O ponto de entrada do código é indicado pela instrução \verb|ENTRY|. Por padrão, o compilador assume que o código de entrada é ARM. Como descrito anteriormente, há dois tipos de assembly, o ARM e o THUMB. No microkernel, é utilizado apenas código ARM, já que ele fornece mais instruções e favorece a legibilidade. Um ponto negativo deste tipo de código é seu maior espaço ocupado na memória, mas isso não vem a ser um grande problema, pois temos espaço suficiente.
 
 \subsection{Pilhas}
 
-A fim de podemos utilizar as pilhas, precisamos inicializá-las em cada um dos modos que virão a ser utilizados. Em nosso programa, utilizamos os modos SVC, user e IRQ. Para inicializar as pilhas, devemos primeiro mudar o modo, desabilitar as interrupções temporariamente e só depois mudar o ponteiro de pilha. Podemos fazer os dois primeiros passos de uma vez só, já que estas operações são feitas através do registrador de estado, como descrito anteriormente. Porém, um problema nos surge ao tentarmos inicializar o ponteiro de pilha do modo user: uma vez que entremos neste modo, não podemos ir para nenhum outro estado privilegiado. A solução para este problema é que ao invés de mudarmos para o modo de usuário, vamos ao modo system, que nada mais é do que o modo usuário privilegiado. 
+Antes de poder utilizar as pilhas é preciso que elas sejam inicializadas em cada um dos modos que virão a ser utilizados. Neste microkernel, são utilizados os modos de serviço, usuário/sistema e de interrupção. O modo como isto é feito é descrito abaixo:
 
-Como podemos ver na figura \ref{organmem}, a pilha do modo user começa no endereço 0x20000, a do modo IRQ em 0x8000 e a do modo SVC em 0x7F80. Como convenção para todas as pilhas que utilizaremos, não podemos nos esquecer que elas crescem sempre para baixo.
+\begin{lstlisting}
+	MOV		r0,	#0xC0|0x12		; r0 = 0xC0 or 0x12 (0xC0 = IRQ disabled, 0x12 = IRQ mode)
+	MSR		CPSR_c, r0			; status_register = r0
+	MOV		sp, #0x8000			; stack pointer = 0x8000
+\end{lstlisting}
 
-\subsection{Tabela de processos}
+A primeira instrução copia para r0 o que será substituído no registrador de estado. Neste exemplo, está se desabilitando as interrupções e mudando o modo do processador para o modo de interrupção. Em seguida, os dados do registrador r0 são colodados no registrador de estado. Uma vez que o estado foi alterado, pode-se mudar o ponteiro de pilha, que neste caso aponta para o endereço 0x8000. Uma operação semelhante pode ser feita tanto no modo de serviço quanto no modo de usuário, usando os endereços de pilha indicados anteriormente. Porém, se o estado for alterado para o modo de usuário fica impossível de se alterar o estado novamente. Para se resolver este problema, ao invés de se mudar para o estado de usuário, muda-se para o estado de sistema. Este é o mesmo modo que o de usuário (usa a mesma pilha e registradores), mas permite que o modo seja alterado novamente.
 
-Uma vez inicializadas as pilhas, podemos inicializar também a tabela de processos. Quando estamos inicializando o kernel, apenas um programa está a funcionar. Portanto, colocamos 0 em todas as entradas da tabela de processos, indidicando que os processos estão inativos, menos para o processo 1, que nada mais é que o primeiro programa a ser rodado após a inicialização. Além disso, devemos setar como o processo atual (variável handler\_currenttaskid\_str, declarada em handler.s), o processo 1.
+\subsection{Vetor de threads e número da thread}
+
+O outro ponto importante da inicialização do código em assembly é a criação do vetor de threads. Para tal, temos de definir que todos os processos exceto o primeito são inicializados desabilitados. Isto é feito com o código apresentado a seguir:
+
+\begin{lstlisting}
+	; Initializes the thread array with zeros (0 = thread disabled,
+	; 1 = thread enabled)
+	LDR		r0, =thread_array		; r0 = thread_array start address
+	MOV		r1, #1					; r1 = 1
+	STR		r1, [r0]				; address(r0) = r1
+	MOV		r1, #0					; r1 = 0 (disabled)
+	MOV		r2, #0					; r2 = 0
+init_thread_array_loop
+	ADD		r2, r2, #4				; r2 = r2 + 4
+	CMP		r2, #36					; r2 = 36?
+	BEQ		set_active_thread		; if yes, go to set_active_thread
+	ADD		r3, r0, r2				; r3 = r0 + r2
+	STR		r1, [r3]				; address(r3) = r1
+	B		init_thread_array_loop	; return to init_thread_array_2
+\end{lstlisting}
+
+Nele, r0 armazena a base do vetor, que coincide com o espaço relativo à primeira thread. r1 contém o dado que será colocado na posição de memória. Na posição este valor é 1, e nos demais 0. r2 contém o offset que será somado à base para o cálculo do endereço absoluto, armazenado em r3. O algoritmo funciona inicialmente colocando 1 na base. Após isso, entra em um loop que aumenta o offset de 4 em 4 e coloca 0 em todos os outros espaços.
+
+
+Falar do pid.
+
+
+
+
 
 Após este ponto, o código pode ser escrito em C, já que inicializamos todas as estruturas de baixo nível. Portando, passamos o controle para o arquivo C\_Entry, que vai continuar com o processo de inicialização descrito a partir do item abaixo.
 

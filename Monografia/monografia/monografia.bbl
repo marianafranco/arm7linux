@@ -5,6 +5,12 @@
 \providecommand{\abntbstabout}[1]{}
 \abntbstabout{1.40 }
 
+\bibitem[ 2007]{Kinoshita}
+\abntrefinfo{nada}{NADA}{2007}
+{ARM7TDMI Data Sheet (ARM DDI 0029E).
+[S.l.], 2007. Dispon{\'\i}vel em:
+  $<$http://www.pcs.usp.br/~jkinoshi/2007/tomas5.doc$>$.}
+
 \bibitem[Abdelrazek 2006]{Abdelrazek2006}
 \abntrefinfo{Abdelrazek}{ABDELRAZEK}{2006}
 {ABDELRAZEK, A. F.~M. \emph{Exception and Interrupt Handling in ARM}.
@@ -43,14 +49,6 @@ x.html$>$.}
   Addison-Wesley, 2000.
 ISBN 0-20167-519-6.}
 
-\bibitem[Kinoshita, Cugnasca e Hirakawa 2007]{Kinoshita}
-\abntrefinfo{Kinoshita, Cugnasca e Hirakawa}{KINOSHITA; CUGNASCA;
-  HIRAKAWA}{2007}
-{KINOSHITA, P. D.~J.; CUGNASCA, P. D. C.~E.; HIRAKAWA, P. D. A.~R.
-  \emph{Experiência 5 - Interrupções}.
-[S.l.], 2007. Dispon{\'\i}vel em:
-  $<$http://www.pcs.usp.br/~jkinoshi/2007/tomas5.doc$>$.}
-
 \bibitem[Morrow 2008]{Morrow2008}
 \abntrefinfo{Morrow}{MORROW}{2008}
 {MORROW, M.~G. \emph{ARM7TDMI Instruction Set Reference}.
@@ -65,6 +63,11 @@ Junho 2006.
 Dispon{\'\i}vel em:
   $<$http://www.cse.unsw.edu.au/~cs9244/06/seminars/08-leonidr.pdf$>$.}
 
+\bibitem[Sloss 2001]{Sloss2001}
+\abntrefinfo{Sloss}{SLOSS}{2001}
+{SLOSS, A. \emph{Interrupt Handling}.
+[S.l.], Abril 2001.}
+
 \bibitem[Sloss, Symes e Wright 2004]{Sloss2004}
 \abntrefinfo{Sloss, Symes e Wright}{SLOSS; SYMES; WRIGHT}{2004}
 {SLOSS, A.; SYMES, D.; WRIGHT, C. \emph{ARM System Developer's Guide: designing
@@ -73,8 +76,7 @@ ISBN 1-55860-874-5.}
 
 \bibitem[Tanenbaum e Woodhull 2000]{Tanenbaum2000}
 \abntrefinfo{Tanenbaum e Woodhull}{TANENBAUM; WOODHULL}{2000}
-{TANENBAUM, A.~S.; WOODHULL, A.~S. \emph{Sistemas Operacionais - Projeto e
-  Implementação}. 2. ed. [S.l.]: Bookman, 2000.
+{TANENBAUM, A.~S.; WOODHULL, A.~S. 2. ed. [S.l.]: Bookman, 2000.
 ISBN 85-7307-530-9.}
 
 \bibitem[Zaitseff 2003]{Zaitseff2003}
