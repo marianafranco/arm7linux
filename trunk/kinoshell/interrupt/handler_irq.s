@@ -2,6 +2,7 @@
 
 	IMPORT 	button_irq
 	IMPORT 	timer_irq
+	IMPORT	serial_irq
 
 	EXPORT 	Angel_IRQ_Address
 	EXPORT 	current_thread_id
@@ -42,12 +43,21 @@ handler_board_no_angel
 		BNE		handler_timer 			; If yes, go to handler_timer
 		TST		r0, #0x0001				; irq type = 0x0001?
 		BNE		handler_button			; If yes, go to handler_button
+		;
+		TST		r0, #0x0010				; irq type = 0x0010?
+		BNE		handler_serial			; If yes, go to handler_serial
+		;
 		LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
 		B 		return					; and return
 
 ; handler routine for the button interruption
 handler_button
 	BL	button_irq			; C routine	for the button
+	B	no_thread_switch	; End the handler
+
+; handler routine for the serial interruption
+handler_serial
+	BL	serial_irq			; C routine	for the serial port
 	B	no_thread_switch	; End the handler
 
 ; Timer interruption handler routine
