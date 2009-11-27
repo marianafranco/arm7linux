@@ -32,7 +32,7 @@
  ****************************************************************/
 
 #define		angel_SWI	0x123456
-#define	 	CMD_LENGTH	32
+#define	 	MAX_CMD_LENGTH	80
 
 
 struct { char* name; void (*task_ptr)(int); } tasks_name[] = {
@@ -144,69 +144,57 @@ void comm_getkey (void)
 	serial_getkey(); 
 }
 
-
-char comm_getcmd (void)
-{ 
-	return serial_getcmd(); 
+void clearstring(char *str) {
+	
+	int i;
+	
+	for (i = 0; i < MAX_CMD_LENGTH; i++) {
+		str[i] = 0;
+	}
+	
 }
 
-
-/* -- C_Entry --------------------------------------------------
- *
- * Description	: Entry point into C
- *
- * Parameters	: none...
- * Return		: none...
- * Notes		: none...
- *
- */
+void getcommand(char *cmd) {
+	
+	int i, c;
+	
+	c=0; i=0;
+	
+	clearstring(cmd);
+	
+	while (c != '\r' && i < MAX_CMD_LENGTH) {
+		c = serial_getchar();
+		if (c == 8) {	// backspace
+			if (i>0) {
+			    serial_print(COM0_USER, " ");
+			    i = i - 2;
+			}
+		}
+		else {
+			cmd[i++] = c;
+		}
+	}
+}
 
 void shell (void)
 {
-	char cmd[CMD_LENGTH];
-	char c;
-	int i;
+	char cmd[MAX_CMD_LENGTH];
 	
 	//int a = 0;
 	//char* newTask = "set_segment";
 	
-	comm_print ("\n-- switch to a serial terminal program (baud=9600)\n" );
-		 
 	comm_init();
-	comm_banner();
 	
-	// wait for a key press...
-
-	serial_print (COM0_USER,"-- Press any key \n\r");
+	serial_print(COM0_USER, "Bem-vindo!\r\n");
+	while (1) {
+	serial_print(COM0_USER, "\nDigite algo: ");
 	
+	getcommand(cmd);
 	
-	c=0;
-	i=0;
-	while (c != '\r' && i<CMD_LENGTH) {
-		c = comm_getcmd();
-		if (c == 8) {	// backspace
-			if (i>0) i--;
-		} else {
-			cmd[i++] = c;
-		}
-	} 
-	
-	
-	
-	//a = fork();
-	//if(a != -1 && a != 0){
-	//	exec(a ,get_task_addr(newTask), 1);
-	//}
-	
-	//while(1){
-		segment_set(1);
-	//}
-	
-	comm_getkey();
-	serial_print (COM0_USER,"\n\r-- Key pressed \n\r");
-	serial_print (COM0_USER,"\n\r** Program Terminating **\n\r");
-	
-	comm_print ("\n\n ** program terminating normally **");	
+	serial_print(COM0_USER, "\r\nVc digitou: ");
+	serial_print(COM0_USER, cmd);
+	serial_print(COM0_USER, "\r\n");
+	}
 		
 	Exit();
 }
