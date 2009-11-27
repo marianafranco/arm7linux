@@ -1,33 +1,8 @@
 #include "tasks.h"
 
-struct { char* name; void (*task_ptr)(int); } tasks_name[] = {
-	{"task2", &task2},
-	{"set_segment", &set_segment}
-};
 
 
-int strcmp (char* str1, char* str2){
-	int i;
-	for (i = 0; str1[i] == str2[i]; i++){
-		if (str1[i] == '\0'){
-			return 0;
-		}
-	}
-	return str1[i] - str2[i];
-}
-
-
-pt2Task  get_task_addr(char* name){
-	int i;
-	for(i=0; i<sizeof(tasks_name); i++){
-		if(strcmp(tasks_name[i].name, name)==0){
-			return tasks_name[i].task_ptr;
-		}
-	}
-	return 0;
-}
-
-
+/*
 
 void task1 (void) {
 
@@ -50,6 +25,7 @@ void task1 (void) {
 	}
 }
 
+*/
 
 void task2 (int value) {
 	while (1) {

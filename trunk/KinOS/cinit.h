@@ -1,5 +1,6 @@
 #include "constants.h"
 #include "apps/tasks.h"
+#include "apps/terminal.h"
 #include "interrupt/irq.h"
 #include "peripherals/button.h"
 #include "peripherals/segment.h"
