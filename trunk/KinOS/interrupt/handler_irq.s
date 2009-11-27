@@ -166,9 +166,9 @@ next_task_addr			; Address of the PCB for the next Task
 irq_stack_pointer		; Copy of the IRQ stack
 	DCD 0x0
 process_control_block	; PCB for all the tasks (each size = 68) Offsets = bottom + 
-	% 680				; 68 * process#
+	% 612				; 68 * process#
 thread_array			; Thread status array, where each thread has one word to indicate
-	% 40				; if it is active (1) or inactive (0). Offset = bottom + 4 * thread#
+	% 36				; if it is active (1) or inactive (0). Offset = bottom + 4 * thread#
 	
 	; End of assembly code
 	END
