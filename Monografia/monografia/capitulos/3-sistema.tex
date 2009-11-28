@@ -12,7 +12,7 @@ O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e d
 Grande parte do código foi retirada do código presente na 
 
 %Lembretes:
-%-timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset
+%-timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset, link register, process counter
 % colocar rotinas dos leds
 % escrever sobre o software utilizado
 % perspectivas
@@ -52,7 +52,7 @@ A pasta \emph{KinOS\_Data} não é considerada parte do projeto pois é utilizada p
 
 \subsection{Raiz}
 
-Os arquivos encontrados na raiz do projeto são responsáveis pela inicialização da placa e pela declaração de constantes globais.  O arquivo startup.s contém a chamada inicial do microkernel, onde toda parte de incialização em assembly é feita. Já o arquivo cinit.c também contém a parte de inicialização, porém, a parte que deve ser executada em C. Finalmente, o arquivo constants.h é responsável por armazenar as constantes que são utilizadas em todo o projeto.
+Os arquivos encontrados na raiz do projeto são responsáveis pela inicialização da placa e pela declaração de constantes globais.  O arquivo startup.s contém a chamada inicial do microkernel, onde toda parte de inicialização em assembly é feita. Já o arquivo cinit.c também contém a parte de inicialização, porém, a parte que deve ser executada em C. Finalmente, o arquivo constants.h é responsável por armazenar as constantes que são utilizadas em todo o projeto.
 
 \subsection{Pasta ``apps''}
 
@@ -60,7 +60,7 @@ Há apenas um arquivo e seu cabeçalho nesta pasta. Nele, várias funções são decla
 
 \subsection{Pasta ``interrupt''}
 
-Todas as rotinas que tratam e instalam interrupções -- tanto de hardware quanto de software -- estão localizadas nesta pasta. O arquivo handler\_irq.s contém a rotina em assembly que trata das interrupções de hardware, as encaminha para a rotina específica de acordo com a sua fonte e faz o chaveamento de threads. O arquivo irq.c contém uma única rotina, que realiza a instalação da rotina de tratamento de interrupção tanto de hardware quanto de software. A rotina de tratamento de iterrupção de software é feita no arquivo handler\_swi.s, que identifica o tipo de interrupção e encaminha para alguma das chamadas de sistema, encontradas em swi.c.
+Todas as rotinas que tratam e instalam interrupções -- tanto de hardware quanto de software -- estão localizadas nesta pasta. O arquivo handler\_irq.s contém a rotina em assembly que trata das interrupções de hardware, as encaminha para a rotina específica de acordo com a sua fonte e faz o chaveamento de threads. O arquivo irq.c contém uma única rotina, que realiza a instalação da rotina de tratamento de interrupção tanto de hardware quanto de software. A rotina de tratamento de interrupção de software é feita no arquivo handler\_swi.s, que identifica o tipo de interrupção e encaminha para alguma das chamadas de sistema, encontradas em swi.c.
 
 \subsection{Pasta ``peripherals''}
 
@@ -142,11 +142,11 @@ Antes de poder utilizar as pilhas é preciso que elas sejam inicializadas em cada
 	MOV		sp, #0x8000			; stack pointer = 0x8000
 \end{lstlisting}
 
-A primeira instrução copia para r0 o que será substituído no registrador de estado. Neste exemplo, está se desabilitando as interrupções e mudando o modo do processador para o modo de interrupção. Em seguida, os dados do registrador r0 são colodados no registrador de estado. Uma vez que o estado foi alterado, pode-se mudar o ponteiro de pilha, que neste caso aponta para o endereço 0x8000. Uma operação semelhante pode ser feita tanto no modo de serviço quanto no modo de usuário, usando os endereços de pilha indicados anteriormente. Porém, se o estado for alterado para o modo de usuário fica impossível de se alterar o estado novamente. Para se resolver este problema, ao invés de se mudar para o estado de usuário, muda-se para o estado de sistema. Este é o mesmo modo que o de usuário (usa a mesma pilha e registradores), mas permite que o modo seja alterado novamente.
+A primeira instrução copia para r0 o que será substituído no registrador de estado. Neste exemplo, está se desabilitando as interrupções e mudando o modo do processador para o modo de interrupção. Em seguida, os dados do registrador r0 são colocados no registrador de estado. Uma vez que o estado foi alterado, pode-se mudar o ponteiro de pilha, que neste caso aponta para o endereço 0x8000. Uma operação semelhante pode ser feita tanto no modo de serviço quanto no modo de usuário, usando os endereços de pilha indicados anteriormente. Porém, se o estado for alterado para o modo de usuário fica impossível de se alterar o estado novamente. Para se resolver este problema, ao invés de se mudar para o estado de usuário, muda-se para o estado de sistema. Este é o mesmo modo que o de usuário (usa a mesma pilha e registradores), mas permite que o modo seja alterado novamente.
 
 \subsection{Vetor de threads e número da thread}
 
-O outro ponto importante da inicialização do código em assembly é a criação do vetor de threads. Para tal, temos de definir que todos os processos exceto o primeito são inicializados desabilitados. Isto é feito com o código apresentado a seguir:
+O outro ponto importante da inicialização do código em assembly é a criação do vetor de threads. Para tal, temos de definir que todos os processos exceto o primeiro são inicializados desabilitados. Isto é feito com o código apresentado a seguir:
 
 \begin{lstlisting}
 	; Initializes the thread array with zeros (0 = thread disabled,
@@ -167,40 +167,84 @@ init_thread_array_loop
 
 Nele, r0 armazena a base do vetor, que coincide com o espaço relativo à primeira thread. r1 contém o dado que será colocado na posição de memória. Na posição este valor é 1, e nos demais 0. r2 contém o offset que será somado à base para o cálculo do endereço absoluto, armazenado em r3. O algoritmo funciona inicialmente colocando 1 na base. Após isso, entra em um loop que aumenta o offset de 4 em 4 e coloca 0 em todos os outros espaços.
 
+Ainda na inicialização em assembly, deve-se definir o número da thread que está sendo executada. Este dado é armazenado na variável current\_thread\_id. Pode-se ver abaixo como é definido o id do primeiro processo para 1:
 
-Falar do pid.
+\begin{lstlisting}
+LDR		r0, =current_thread_id	; r0 = current thread id address
+MOV		r1, #1					; r1 = 1
+STR		r1, [r0]				; current thread id = 1
+\end{lstlisting}
 
+Finalmente, a inicialização em C pode ser iniciada. A chamada é feita definindo como endereço de retorno a função C\_entry e colocando este mesmo endereço no process counter.
 
-
-
-
-Após este ponto, o código pode ser escrito em C, já que inicializamos todas as estruturas de baixo nível. Portando, passamos o controle para o arquivo C\_Entry, que vai continuar com o processo de inicialização descrito a partir do item abaixo.
+\begin{lstlisting}
+LDR 	lr, =C_Entry			; link register = C entry
+MOV 	pc, lr					; process counter = C entry
+\end{lstlisting}
 
 \subsection{Periféricos}
 
-Para cada periférico da placa, como o display de sete segmentos, o DIP switch, os botões, o timer e os LEDs, há uma rotina de inicialização. Elas consitem apenas em habilitar flags e são executadas logo no início da etapa C do processo de inicialização da placa.
+Para alguns periférico da placa, como o display de sete segmentos, o timer e os botões, há uma rotina de inicialização que os habilita e define suas configurações. Suas chamadas são \verb|segment_init()|, \verb|timer_init()| e \verb|button_init()| respectivamente. Estas funções se encontram nos arquivos de cada um dos periféricos e são executadas logo no início da etapa C do processo de inicialização da placa.
 
 \subsection{Instalação do tratamento de interrupção}
 
-Como á foi descrito anteriormente na seção \ref{ccc}, quando uma interrupção ocorre, a instrução no endereço 0x18 é executada caso ela seja uma interrupção de hardware ou no endereço 0x08 caso seja uma interrupção de software. Portanto, devemos colocar instruções adequadas nestas posições, o que é feito pela rotina de instalação do tratamento de interrupção.
+Como descrito anteriormente, caso uma interrupção de hardware ocorra, a instrução no endereço 0x18 é executada e caso seja uma interrupção de software, a instrução no endereço 0x08. Toda vez que se reinicia a placa, são colocados nestes endereços uma instrução que realiza um desvio para a rotina Angel, descrita anteriormente. 
 
-A rotina de tratamento de interrupção funciona de modo similar para interrupções de hardware e se software. Em ambos os casos, recebemos o endereço da posição do vetor de interrupções onde ela deve ser instalada e o endereço da rotina que será executada quando uma interrupção ocorre. Com isso, adicionamos através de uma máscara a instrução branch.
+Porém, se algum dos periféricos vai ser utilizado, a interrupção gerada por esse periférico não deve desviada para o Angel, e sim para uma rotina adequada. Para poder identificar qual a origem da interrupção e desviar para a rotina correta, devemos instalar uma nova rotina no vetor de interrupções, substituindo o desvio para o Angel. A instalação da rotina se dá através do desvio para a tal rotina. Todavia, não se pode apenas descartar o endereço do Angel, já que caso não se identifique a origem da interrupção, ainda deve-se desviar para ele. Este processo pode ser observado na figura \ref{chain}. Nele, \emph{Handler2} é a rotina de tratamento de interrupções, e \emph{Handler1} é o Angel.
 
-Porém, há um caso especial quando executamos o código com a placa. Como já descrito anteriormente na seção \ref{ddd}, o Angel se utiliza das interrupções de hardware e software para se comunicar com a placa. Portanto, se apenas modificarmos o código e substituirmos a instrução que está contida no vetor de interrupção, essa comunicação não se realiza e tanto a placa quanto o programa de debugger travam. Para solucionarmos este problema, devemos passar para a rotina de tratamento de interrupção os endereços que estavam anteriormente no vetor de interrupção, para o caso da interrupção ser do Angel, a rotina correta ser executada (vide figura \ref{chain}).
+A instalação da rotina de tratamento de interrupção é a mesma para interrupções de hardware e de software se dá abaixo:
+
+\begin{lstlisting}
+/* Angel branch instruction */
+unsigned Angel_branch_instruction;
+/* Angel instruction */
+unsigned *Angel_address;
+/* Getting Angel branch instruction */		
+Angel_branch_instruction  = *vector_address;
+/* Separate the instruction from the address */
+Angel_branch_instruction ^= 0xe59ff000;
+/* Calculating absolute address */
+Angel_address = (unsigned *) ((unsigned)vector_address + Angel_branch_instruction + 0x8);
+/* Store address in the propoer position */
+if ((unsigned)vector_address == 0x18) {
+	Angel_IRQ_Address = *Angel_address;
+}
+else {
+	Angel_SWI_Address = *Angel_address;
+}
+/* Inserting handler instruction in the vector table */
+*Angel_address = handler_routine_address;
+\end{lstlisting}
+
+Os parâmetros de entrada desta função são \verb|handler_routine_address|, o endereço da rotina de tratamento de interrupção e \verb|vector_address|, um ponteiro para a posição no vetor de interrupções onde será instalada a rotina. Sucintamente, o que esta rotina realiza é obter a instrução que está em \verb|vector_address|, aplica uma máscara à rotina para obter apenas o endereço e o salva em uma das variáveis: \verb|Angel_IRQ_Address| caso se esteja instalando a rotina de interrupção de hardware ou \verb|Angel_SWI_Address| caso seja a de software, além de colocar a nova instrução no vetor de interrupções. 
+
+Um fator importante que deve ser ressaltado a importância do Angel quando se está usando a placa. Como já descrito anteriormente, o Angel se utiliza das interrupções de hardware e software para se comunicar com a placa. Portanto, se apenas modificarmos o código e substituirmos a instrução que está contida no vetor de interrupção, essa comunicação não se realiza e tanto a placa quanto o programa de debugger travam. Para solucionarmos este problema, devemos passar para a rotina de tratamento de interrupção os endereços que estavam anteriormente no vetor de interrupção, para o caso da interrupção ser do Angel, a rotina correta ser executada. Já no caso em que o código é apenas simulado no emulador, não é preciso armazenar o endereço do Angel.
 
 \begin{figure}[!ht]
 \centering 
 \includegraphics[width=13cm]{figuras/chain.pdf}
-\caption{Encadeamento de interrupções. Fonte: \cite{aaa} \label{chain}}
+\caption{Encadeamento de interrupções. Fonte: \cite{Sloss2001} \label{chain}}
 \end{figure}
 
 \subsection{Interrupção de timer}
 
-A fim de se utilizar as interrupções de timer para o chaveamento de processos, devemos além de inicializá-lo, definir algumas configurações como o tempo para a interrupção.
+A interrupção de timer é utilizada neste projeto para realizar o chaveamento entre as threads. Uma vez que haja a interrupção, o estado da thread atual é salva e a próxima thread é colocada em processamento. Para utilizá-la, devemos tanto habilitar quanto iniciar o timer. Essas tarefas são executadas com duas rotinas, sendo que a primeira já foi descrita anteriormente. Já o início do timer é dado pela função \verb|timer_start()|.
 
 \subsection{Habilitando interrupções}
 
-O último passo antes de se começar a executar o código do primeiro programa é habilitar simultaneamente o modo user e as interrupções de hardware. Como isso só pode ser feito por código assembly, temos de usar a instrução especial de C \_\_asm. Finalmente, após este passo passamos o controle para o primeiro processo.
+O último passo antes de se começar a executar o código do primeiro programa é habilitar simultaneamente o modo de usuário e as interrupções. Como isso só pode ser feito por código assembly, temos de usar a instrução especial de C \_\_asm, conforme o exemplo abaixo
+
+\begin{lstlisting}
+__asm {
+	MOV		r1,	#0x40|0x10
+	MSR 	CPSR_c, r1
+}
+\end{lstlisting}
+
+O registrador r1 recebe 0x40, que indica a habilitação das interrupções e 0x10 que altera para o modo de usuário. Logo em seguida, o conteúdo deste registrador é passado para o registrador de estado. Finalmente, o primeiro programa é chamado com a função \verb\shell()\.
+
+
+Finalmente, após este passo passamos o controle para o primeiro processo.
 
 \section{Processos}
 
