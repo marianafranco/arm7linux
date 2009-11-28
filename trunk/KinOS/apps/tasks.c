@@ -1,19 +1,16 @@
 #include "tasks.h"
 
 
-
-/*
-
 void task1 (void) {
 
 	int a = 0;
-	char* newTask = "set_segment";
+	//char* newTask = "set_segment";
 	
 	int j;
 	
 	a = fork();
 	if(a != -1 && a != 0){
-		exec(a ,get_task_addr(newTask), 2);
+	//	exec(a ,get_task_addr(newTask), 2);
 	}
 	
 	while (1) {
@@ -24,8 +21,6 @@ void task1 (void) {
 		j++;
 	}
 }
-
-*/
 
 void task2 (int value) {
 	while (1) {

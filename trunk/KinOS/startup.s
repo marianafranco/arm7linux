@@ -54,13 +54,13 @@ init_thread_array_loop
 
 	; Setting the thread id to 1
 set_active_thread
-	LDR		r0, =current_thread_id
-	MOV		r1, #1
-	STR		r1, [r0]
+	LDR		r0, =current_thread_id	; r0 = current thread id address
+	MOV		r1, #1					; r1 = 1
+	STR		r1, [r0]				; current thread id = 1
 
 	; Pass control to C_Entry
-	LDR 	lr, =C_Entry
-	MOV 	pc, lr
+	LDR 	lr, =C_Entry			; link register = C entry
+	MOV 	pc, lr					; process counter = C entry
 
 	; End of assembly code
 	END
