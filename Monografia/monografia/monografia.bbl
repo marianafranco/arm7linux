@@ -5,12 +5,6 @@
 \providecommand{\abntbstabout}[1]{}
 \abntbstabout{1.40 }
 
-\bibitem[ 2007]{Kinoshita}
-\abntrefinfo{nada}{NADA}{2007}
-{ARM7TDMI Data Sheet (ARM DDI 0029E).
-[S.l.], 2007. Dispon{\'\i}vel em:
-  $<$http://www.pcs.usp.br/~jkinoshi/2007/tomas5.doc$>$.}
-
 \bibitem[Abdelrazek 2006]{Abdelrazek2006}
 \abntrefinfo{Abdelrazek}{ABDELRAZEK}{2006}
 {ABDELRAZEK, A. F.~M. \emph{Exception and Interrupt Handling in ARM}.
@@ -49,6 +43,12 @@ x.html$>$.}
   Addison-Wesley, 2000.
 ISBN 0-20167-519-6.}
 
+\bibitem[Kinoshita 2007]{Kinoshita}
+\abntrefinfo{Kinoshita}{KINOSHITA}{2007}
+{KINOSHITA, C. C. e. A.~H. J. \emph{Experi{\^e}ncia 5: Interrup{\c c}{\~o}es}.
+[S.l.], 2007. Dispon{\'\i}vel em:
+  $<$http://www.pcs.usp.br/~jkinoshi/2007/tomas5.doc$>$.}
+
 \bibitem[Morrow 2008]{Morrow2008}
 \abntrefinfo{Morrow}{MORROW}{2008}
 {MORROW, M.~G. \emph{ARM7TDMI Instruction Set Reference}.
@@ -74,10 +74,11 @@ Dispon{\'\i}vel em:
   and optimizing system software}. 1. ed. [S.l.]: Morgan Kauffman, 2004.
 ISBN 1-55860-874-5.}
 
-\bibitem[Tanenbaum e Woodhull 2000]{Tanenbaum2000}
-\abntrefinfo{Tanenbaum e Woodhull}{TANENBAUM; WOODHULL}{2000}
-{TANENBAUM, A.~S.; WOODHULL, A.~S. 2. ed. [S.l.]: Bookman, 2000.
-ISBN 85-7307-530-9.}
+\bibitem[Tanenbaum e Woodhull 2006]{Tanenbaum2000}
+\abntrefinfo{Tanenbaum e Woodhull}{TANENBAUM; WOODHULL}{2006}
+{TANENBAUM, A.~S.; WOODHULL, A.~S. \emph{Operating Systems: Design and
+  Implementation}. 3rd. ed. [S.l.]: Pearson Prentice Hall, 2006.
+ISBN 0-13-142938-8.}
 
 \bibitem[Zaitseff 2003]{Zaitseff2003}
 \abntrefinfo{Zaitseff}{ZAITSEFF}{2003}

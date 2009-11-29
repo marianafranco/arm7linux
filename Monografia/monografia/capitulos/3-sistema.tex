@@ -9,18 +9,14 @@
 
 O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e da arquitetura ARM nas disciplinas de Sistemas Operacionais e Laboratório de Microprocessadores. Para tal, foi desenvolvido um microkernel, apelidado de KinOS, cujas funções básicas são o chaveamento de threads através de interrupção de timer, as chamadas de sistema, as rotinas de manipulação de hardware, funções de semáforo e um shell.
 
-Grande parte do código foi retirada do código presente na 
-
 %Lembretes:
+% se todos os slots estiverem ocupados, ao se iniciar o 10o processo, o programa trava
 %-timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset, link register, process counter
-% colocar rotinas dos leds
+%escrever sobre os processos-exemplo
 % escrever sobre o software utilizado
 % perspectivas
-% escrever sobre os aplicativos desenvolvidos
 %\item{Colocar como o programa foi desenvolvido}
 %\item{Colocar Mutex}
-%\item{Explicar em algum lugar as divisões que existem no assembly.}
-%\item{Ver como colocar referencias e colocar a referencia das figuras}
 %\item{Colocar a referencia das seções}
 %\item{Variáveis em assembly}
 %\item{Explicar que o código foi baseado na experiencia do mutex}
@@ -28,14 +24,16 @@ Grande parte do código foi retirada do código presente na
 %\item{Daria para fazer uns testes com variaveis locais, mostrando que depois de se criar dois processos; os dois estao com variaveis locais diferentes?}
 %\item{Colocar pesquisa inicial (ver tambem as referencias e documentos de acompanhamento iniciais)}
 %\item [MARI] Dar uma olhado no artigo sobre interrupções: Exception and Interrupt Handling in ARM. Tem figurinhas legais lá :)
+%revisar portugues e fazer leitura cruzada
+%Colocar mais bibliografias
 
 \section{Organização do código}
 
-A estrutura de arquivos do projeto pode ser vista na figura \ref{arquivos}. Podemos dividi-lo em cinco partes: 
+A estrutura de arquivos do projeto pode ser vista na figura \ref{arquivos}. Pode-se dividi-lo em cinco partes: 
 
 \begin{figure}[!ht]
 \centering 
-\includegraphics[height=15cm]{figuras/arquivos.pdf}
+\includegraphics[width=4cm]{figuras/arquivos.pdf}
 \caption{Estrutura de arquivos. \label{arquivos}}
 \end{figure}
 
@@ -64,7 +62,7 @@ Todas as rotinas que tratam e instalam interrupções -- tanto de hardware quanto 
 
 \subsection{Pasta ``peripherals''}
 
-As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button, da chave DIP no arquivo dips, do display de sete segmentos em segment e do timer em timer.
+As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button, da chave DIP no arquivo dips, do display de sete segmentos em segment, dos LEDs em led e do timer em timer.
 
 \subsection{Pasta ``syscalls''}
 
@@ -80,7 +78,7 @@ A fim de se facilitar a programação e o entendimento do projeto, foram criadas d
 
 \subsection{Process Control Block} \label{sub:PCB}
 
-O Process Control Block (ou simplesmente PCB) é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão ativas. Temos um PCB para cada uma das nove threads e cada uma ocupa 68 bytes. Ou seja, o espaço total ocupado pelos PCBs é de 9 $\cdot$ 68 = 612 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é em (base do PCB - 4), a segunda em (base do PCB - 8) e assim por diante. Como podemos observar pela figura, as posições 1 a 15 ((base do PCB - 4) a (base do PCB - 60)) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição 16 (base do PCB - 64) armazena o link register do modo IRQ, ou seja, o endereço de retorno da interrupção. Finalmente, a posição 17 armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um retrato preciso do estado do processo quando houve o chaveamento e permite também que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. A estrutura tem seu espaço reservado no arquivo handler\_irq.s, e é nomeado com a variável process\_control\_block, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, a base do primeiro PCB está em (process\_control\_block - 68), do segundo em (process\_control\_block - 2 $\cdot$ 68) e assim por diante.
+O Process Control Block (ou simplesmente PCB) é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão ativas. Há um PCB para cada uma das nove threads e cada uma ocupa 68 bytes. Ou seja, o espaço total ocupado pelos PCBs é de 9 $\cdot$ 68 = 612 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é em (base do PCB - 4), a segunda em (base do PCB - 8) e assim por diante. Como podemos observar pela figura, as posições 1 a 15 ((base do PCB - 4) a (base do PCB - 60)) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição 16 (base do PCB - 64) armazena o link register do modo IRQ, ou seja, o endereço de retorno da interrupção. Finalmente, a posição 17 armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um retrato preciso do estado do processo quando houve o chaveamento e permite também que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. A estrutura tem seu espaço reservado no arquivo handler\_irq.s, e é nomeado com a variável process\_control\_block, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, a base do primeiro PCB está em (process\_control\_block - 68), do segundo em (process\_control\_block - 2 $\cdot$ 68) e assim por diante.
 
 \begin{figure}[!ht]
 \centering 
@@ -118,15 +116,21 @@ Dentre os sete modos disponíveis na placa, apenas quatro deles são utilizados: o
 
 \subsection{Modos de teste}
 
-Depurar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não podemos fazê-lo. Para contornar tal problema, foi utilizado o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, foram colocados ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo constants.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa com Angel e caso seja 2 é o código para a placa com o Angel desabilitado. Uma outra vantagem do código no emulador é que ele permite com que ele possa ser testado sem a presença da placa.
+Depurar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não se pode fazê-lo. Para contornar tal problema, foi utilizado o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, foram colocados ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo constants.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa com Angel e caso seja 2 é o código para a placa com o Angel desabilitado. Uma outra vantagem do código no emulador é que ele permite com que ele possa ser testado sem a presença da placa.
 
 \subsection{Angel}
 
-O Angel é um programa contido na ROM da placa que realiza a comunicação entre a mesma e o computador que efetuou o upload do código. Além de permitir com que o código seja carregado na placa, o Angel realiza o processo de debug do código durante a execução. Para isso, deve haver uma comunicação constante entre a placa e o computador, que é feita através de interrupções constantes. Uma vez que a placa é iniciada, o endereço do vetor de interrupções responsável pelas interrupções de hardware e se software apontam para um endereço pré-estabelecido do Angel. Caso se queira adicionar alguma outra rotina de tratamento de interrupções, deve-se encadear a rotina do Angel para que a comunicação com a placa não seja perdida.
+O Angel é um programa contido na ROM da placa que realiza a comunicação entre a mesma e o computador que efetuou o upload do código. Além de permitir com que o código seja carregado na placa, o Angel realiza o processo de debug do código durante a execução. Para isso, deve haver uma comunicação constante entre a placa e o computador, que é feita através de interrupções. Uma vez que a placa é iniciada, o endereço do vetor de interrupções responsável pelas interrupções de hardware e se software apontam para um endereço pré-estabelecido do Angel. Caso se queira adicionar alguma outra rotina de tratamento de interrupções, deve-se encadear a rotina do Angel para que a comunicação com a placa não seja perdida.
 
 \section{Inicialização}
 
-O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de threads. Após esta etapa, há a inicialização em C, feita no arquivo cinit.c, que inicializa periféricos, instala rotinas de tratamento e inicia a primeira thread em modo usuário.
+O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de threads. Após esta etapa, há a inicialização em C, feita no arquivo cinit.c, que inicializa periféricos, instala rotinas de tratamento e inicia a primeira thread em modo usuário. A rotina completa de inicialização pode ser vista no esquema da figura \ref{inicializacao}.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=10cm]{figuras/inicializacao.pdf}
+\caption{Fluxograma de inicialização. \label{inicializacao}}
+\end{figure}
 
 \subsection{Ponto de entrada e tipo de código}
 
@@ -243,68 +247,209 @@ __asm {
 
 O registrador r1 recebe 0x40, que indica a habilitação das interrupções e 0x10 que altera para o modo de usuário. Logo em seguida, o conteúdo deste registrador é passado para o registrador de estado. Finalmente, o primeiro programa é chamado com a função \verb\shell()\.
 
-
-Finalmente, após este passo passamos o controle para o primeiro processo.
-
 \section{Processos}
 
-O kernel pode lidar com no máximo nove processos, nomeados de task1 a task9 no arquivo tasks.c. Como eles não têm área de dados própria, não poderíamos chamá-los de processos. A implicação de se ter uma área de dados em comum é que todos os processos que rodam um mesmo programa compartilham os valores das variáveis. O mais correto, porntanto, seria o chamá-os de threads.
+O kernel pode lidar com no máximo nove processos, nomeados de task1 a task9 no arquivo tasks.c. Como eles não têm área de dados própria, não pode-se chamá-los de processos. A implicação de se ter uma área de dados em comum é que todos os processos que rodam um mesmo programa compartilham os valores das variáveis. O mais correto, portanto, seria o chamá-os de threads.
 
-Criamos algums programas exemplo que se utilizam dos periféricos da placa. \ldots
+Criamos algums programas exemplo que se utilizam dos periféricos da placa. 
+
+TODO\ldots (Fazer código antes)
 
 \section{Chaveamento de processos}
 
-O chaveamento de processos é realizado inteiramente com o assembly escrito no arquivo handler.s. Nele, o estado do processo que está sendo executado é armazenado e o próximo processo, obtido através de round-robin, é colocado para execução.
+O chaveamento de processos é realizado inteiramente com o assembly escrito no arquivo handler\_irq.s. Ele consiste em sete passos, indicados na figura \ref{chaveamento}.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[width=15.5cm]{figuras/chaveamento.pdf}
+\caption{Chaveamento de processos. \label{chaveamento}}
+\end{figure}
 
 \subsection{Identificação da interrupção}
 
-Uma vez que há a interrupção de timer, a chamada de interrupção de hardware é realizada. Durante a instalação da rotina de tratamento de interrupção de hardware, apontamos para a rotina handler caso estejamos usando a placa ou a rotina handler\_emulator caso estajamos usando o emulador. A direrença básica é que enquanto a primeira tenta identificar qual a fonte de interrupção que pode ser tanto o timer quando o Angel, a segunda já assume que a fonte é o timer, já que não há o Angel no emulador. Devemos salientar que deve-se armazenar toda informação contida nos registradores que é alterada durante o processo de tratamento de interrupção. Para tal, empilhamos os valores dos registradores usados a fim de se poder recuperar estes valores durante a etapa de salvamento do estado atual.
+\begin{lstlisting}
+STMFD	sp!, {r0 - r3, lr}		; Stacking r0 to r3 and the link register
+LDR 	r0, IRQStatus	 		; r0 = irq type address
+LDR 	r0, [r0]				; r0 = irq type
+TST 	r0, #0x0400				; irq type == 0x0400?
+BNE		handler_timer 			; If yes, go to handler_timer
+TST		r0, #0x0001				; irq type = 0x0001?
+BNE		handler_button			; If yes, go to handler_button
+LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
+LDR 	pc, Angel_IRQ_Address	; and branch to the Angel routine
+\end{lstlisting}
 
-No caso do uso da placa, a fonte da interrupção se encontra no endereço 0x03ff4004, identificado como INTPND. Se o valor contido neste endereço é 0x0400, a fonte foi uma interrupção de timer, caso seja 0x0001, a fonte foi o botão da placa e caso contrário, a fonte foi o Angel.
+Uma vez que há a interrupção de timer, a chamada de interrupção de hardware que se encontra no vetor de interrupção é executada. Durante a instalação da rotina de tratamento de interrupção de hardware, colocou-se nesta posição a rotina handler\_board\_angel caso se estivesse usando a placa com o Angel, a rotina handler\_board\_no\_angel caso se estivesse usando a placa sem o Angel ou a rotina handler\_emulator caso estivesse usando o emulador. A direrença é que enquanto a primeira e a segunda tentam identificar qual a fonte de interrupção, a terceira já assume que a fonte é o timer, já que não há outros periféricos no emulador. Deve-se armazenar toda informação contida nos registradores que sao alterados durante o processo de tratamento de interrupção. Para tal, empilhamos os valores dos registradores r0 a r3, usados durante a rotina de chaveamento, a fim de que nenhum dado se perca durante o processo.
 
-\subsection{Recomeçar o timer}
+No caso do uso da placa, a fonte da interrupção se encontra no endereço 0x03ff4004, identificado com a variável \verb|INTPND|. Se o valor contido neste endereço é 0x0400, a fonte foi uma interrupção de timer, caso seja 0x0001, a fonte foi o botão da placa e caso contrário, a fonte foi o Angel. No primeiro caso, há um desvio para a rotina \verb|handler_timer|, no segundo para a rotina \verb|handler_button| e na terceira, para o endereço salvo durante a instalação de rotina de tratamento.
 
-Quando é identificada a iterrupção de timer, devemos reinicializar o contador do timer a fim de que possa interromper novamente no futuro. Para tal, executamos a rotina timer\_irq, encontrada no arquivo irq.c.
+\subsection{Limpeza da interrupção de timer}
 
-\subsection{Identificação do PCBs da troca de processos}
+Quando é identificada a interrupção de timer, deve-se limpar a interrupção de timer, a fim de que ele possa interromper novamente no futuro. Para tal, executa-se a rotina timer\_irq, encontrada no arquivo timer.c. Como não podemos garantir que a rotina em C manterá intactos os registradores, temos de salvar todos e recupera-los após a chamada. Abaixo podemos observar o código que realiza o salvamento e a recuperação destes registradores.
 
-A rotina de troca de processos tem como entrada duas variáveis: o fundo do PCB do processo atual e o fundo do PCB do próximo processo. Para obtermos tais dados, inicialmente precisamos identificar o número do processo atual, armazenado na variável handler\_currenttaskid\_str. A partir disso, com o auxílio da tabela de processos, veririficamos um a um em round-robin qual o próximo processo ativo.
+\begin{lstlisting}
+STMFD	sp!, {r4 - r12}			; Stack the rest of the registers (r4-r12)
+BL		timer_irq				; Clear timer interruption
+LDMFD	sp!, {r4 - r12}			; Load r4-12 registers again
+\end{lstlisting}
 
-Tendo o número dos processos atual e próximo, podemos calcular o endereço do PCB de ambos. Para isso, realizamos a simples equação $PCB_{id} = (id - 1) * 68 + base$ para os dois processos e armazenamos os resultados nas variáveis handler\_currenttaskid\_str e handler\_nexttask\_str, que serão usadas na etapa da troca de processos.
+Os registradores r0 a r3 não precisam ser salvos ou recuperados, pois no início da rotina de tratamento eles já foram empilhados para recuperação futura.
 
-Caso o próximo processo a ser executado venha a ser o mesmo que está atualmente sendo executado, a rotina de tratamento de interrupção ignora a etapa de troca de processos e retorna à execução da rotina que estava sendo executada anteriormente sem qualquer alteração, já que o valor dos registradores antes da interrupção estavam sendo armazenados na pilha.
+\subsection{Identificação da próxima thread}
+
+O método de escolha da próxima thread que será posta em execução é escolhida pelo método \emph{round-robin}, ou seja, a próxima thread é escolhida por ordem numérica. O código para tal tarefa é apresentado abaixo:
+
+\begin{lstlisting}
+	CMP 	r0, #9 					; r0 == 9? (it is the last thread?)
+	BEQ		last_thread				; If yes, branch last_thread
+	ADD		r1, r0, #1				; If not, r1 = r0 + 1
+	B		next_thread				; and branch to next_thread
+last_thread
+	MOV		r1, #1					; r1 = 1
+next_thread
+	SUB		r2, r1, #1				; r2 = r1 - 1
+	MOV		r3, #4					; r3 = 4
+	MUL		r2, r3, r2				; r2 = r2 * r3
+	LDR		r3, =thread_array		; r3 = thread_array bottom address
+	ADD		r2, r2, r3				; r2 = r3 + r2
+	LDR		r2, [r2]				; r2 = thread array content
+	CMP		r2, #1					; thread array content = 1?
+	BEQ		set_addresses			; If yes, branch to set_addresses
+									; Send to the next step the next active
+									; thread in r1
+	MOV		r0, r1					; If not, r0 = r1
+	B		get_next_taskid_loop	; and loop to get_next_taskid_loop
+\end{lstlisting}
+
+Nele, r0 inicia com o número da thread atual. Caso ele seja igual a 9, a última thread da lista, deve-se iniciar novamente a procura desde a thread 1. Caso contrário, inicia-se com o próximo número. O resultado é armazenado em r1, onde se encontra o número da próxima thread. O valor em r1 é incrementado sucessivamente até encontrar um ponto no vetor de threads que tenha o valor 0, indicando que a thread não está ativa. O cálculo da posição de memória é dado a partir da seguinte função: $(r1 - 1) * 4 + bottom$ = posição relativa à thread r1, onde bottom é o endereço do início do vetor e 4 é o tamanho de cada espaço dentro do vetor.
+
+\subsection{Localização dos PCBs}
+
+A rotina de troca de processos tem como entrada duas variáveis: o PCB da thread atual e o PCB do próxima thread. Para obter tais dados, é necessário o número da thread atual e da thread que será colocada em execução. Como visto nos itens anteriores, estes dados já foram obtidos. Pode-se então aplicar o seguinte algoritmo:
+
+\begin{lstlisting}
+	LDR		r2, =current_thread_id		; r2 = current thread id address
+	LDR		r2, [r2]					; r2 = current thread id
+	CMP		r2, r1						; Is r2 = current thread id ==
+										; next thread id
+	BEQ		no_thread_switch			; If yes, branch to no_thread_switch
+; Setting current_task_addr
+	MOV		r0, #68						; Else start thread switch. r0 = 68
+	MUL		r0,	r2, r0					; r0 = current thread id * 68
+	LDR		r2, =process_control_block	; r2 = PCB bottom
+	ADD		r0, r0, r2					; r0 = PCB bottom + id * 68
+	LDR		r2, =current_task_addr		; r2 = current task addr addr
+	STR		r0, [r2]					; current_task_addr = r0
+; Setting next_task_addr
+	MOV		r0, #68						; r0 = 68
+	MUL		r0,	r1, r0					; r0 = next thread id * 68
+	LDR		r2, =process_control_block	; r2 = PCB_bottom
+	ADD		r0, r2, r0					; r0 = PCB bottom + next id * 68
+	LDR		r2, =next_task_addr			; r2 = next_task_addr addr
+	STR		r0, [r2]					; next_task_addr = r0
+\end{lstlisting}
+
+O primeiro ponto checado é se a thread atual é igual à thread que vai ser substituída. Caso isso se confirme, o chaveamento se encerra e nada ocorre. Caso contrário, o cálculo dos endereços dos PCBs é iniciado. A fórmula utilizada é: $PCB_{id} = (id - 1) * 68 + base$, onde id é o número da thread e base é o endereço do início dos PCBs. Ao fim do cálculo, estes dados são armazenados nas variáveis \verb|current_task_addr| e \verb|next_task_addr|, que serão utilizadas na próxima etapa do processo.
 
 \subsection{A troca de processos}
 
-A troca de processos se dá em poucos passos usando-se instruções especiais que permmitem que haja um grande número de dados empilhados/desempilhados com apenas uma instrução. Inicialmente zera-se a pilha do modo IRQ e restabelece-se os registradores como estavam antes di início da troca de processos. Depois disso, muda-se o endereço do ponteiro de pilha para o PCB do processo atual. O grande truque vem no próximo passo: empilha-se todos os registradores. Como a estrutura do PCB foi feito tendo este processo em mente, a posição dos dados dos registradores cai exatamente como foi descrito na figura \ref{pcb}. Após o armazenamento do estado atual, muda-se novamente o endereço do ponteiro de pilha para o PCB da próxima instrução. Do mesmo modo que o armazenamento, desempilha-se os o valor dos registradores, que são exatamente como estava empilhado este processo quando foi armazenado. Com isso, falta apenas restaurar o process counter para o ponto que o processo estava executando, o que vai ser descrito em seguida.
+A troca de processos se dá em poucos passos usando-se instruções especiais que permitem que haja um grande número de dados empilhados/desempilhados com apenas uma instrução. Inicialmente zera-se a pilha do modo de interrupção e restabelece-se os registradores r0 a r3, que estavam empilhados desde o do início da rotina de tratamento. Nota-se que o ponteiro não é totalmente zerado, ele é colocado em uma posição 20 bytes acima do esperado. Isto se dá porque há empilhadas 5 palavras (r0 a r3 e o link register) que logo em seguida virão a ser desempilhadas.
 
-\subsection{Um caso especial}
+Depois disso, muda-se o endereço do ponteiro de pilha para o PCB do processo atual. Um truque vem no próximo passo: empilha-se todos os registradores com o ponteiro de pilha apontando para a posição (base - 60) do PCB. Deste modo, em uma única instrução todos os registradores são colocados em suas respectivas posições. Como a estrutura do PCB foi feita tendo este processo em mente, a posição dos dados dos registradores cai exatamente como foi descrito na figura \ref{pcb}. Após o armazenamento do estado atual, muda-se novamente o endereço do ponteiro de pilha para o PCB da próxima instrução. Do mesmo modo que o armazenamento, desempilha-se os o valor dos registradores, que são exatamente como estava empilhado este processo quando foi armazenado. 
 
-Como descrito acima, caso se confirme que há apenas uma instrução ativa na tabela de processos, não é feita a troca de processos. Porém, antes de se retornar ao processo anterior, não podemos nos esquecer que devemos zerar a pilha do modo IRQ já não há mais dados relevantes nela e assim prevenimos que ela estoure seu tamanho. Outra ação importante é a restauração dos registradores que foram utilizados durante a rotina de tratamento.
+\begin{lstlisting}
+; Reset and save IRQ stack
+	LDR		r0, =irq_stack_pointer		; r0 = irq_stack_pointer addr
+	MOV		r1, sp						; r1 = irq stack pointer
+	ADD		r1, r1, #5*4				; r1 = irq stack pointer + 5 (# of data in
+										; the stack, r0-r3, lr) * 4 (size of a word)
+	STR		r1, [r0]					; irq_stack_pointer = irq stack pointer
+										; without the data that will be removed next
+	LDMFD		sp!,{r0-r3,lr}			; Restore the remaining registers
+; Load and position r13 to point into current PCB
+	LDR		r13, =current_task_addr		; r13 = current task PCB bottom address address 
+	LDR		r13, [r13]					; r13 = current task PCB bottom address
+	SUB		r13, r13,#60				; r13 = current task PCB bottom address - 60
+										; to point to the right place for the stacking
+										; (next step)
+; Store the current user registers in current PCB
+	STMIA 	r13, {r0-r14}^				; Stacks the r0-r14 registers in the PCB
+	MRS		r0, SPSR					; r0 = status register
+	STMDB	r13, {r0,r14}				; Stacks r0 and r14
+;Load and position r13 to point into next PCB
+	LDR 	r13, =next_task_addr		; r13 = next task PCB bottom address address 
+	LDR		r13, [r13]					; r13 = next task PCB bottom address 
+	SUB		r13, r13,#60				; r13 = next task PCB bottom address - 60
+										; to point to the right place for the stacking
+										; (next step)
+; Load the next task and setup PSR
+	LDMNEDB	r13, {r0,r14}				; Restore r0 and r14 (IRQ mode)
+	MSRNE 	spsr_cxsf, r0				; Restore status register
+	LDMNEIA	r13, {r0-r14}^				; Restore r0-r14 for the user mode
+	NOP									; NOP! (required for the above instruction)
+; Load the IRQ stack into r13_irq
+	LDR		r13, =irq_stack_pointer		; r13 = stack pointer address address
+	LDR		r13,[r13]					; Restore previous stack pointer
+	B		return						; Go to the end
+\end{lstlisting}
 
 \subsection{Retorno à execução da nova rotina}
 
-Como os registradores, o ponteiro de pilha, o endereço de retorno e o registrador de estados já estão com os dados do próximo processo, devemos agora apenas fazer com que o a instrução imediatamente posterior à aquela executada antes da interrupção seja executada. Porém, não podemos nos esquecer que o pipeline do processador fez com que o endereço da instrução duas vezes à frente tivesse sido armazenada. Para compensar isso, devemos subtrair o tamanho de uma instrução (quatro bytes) do endereço que vai ser colocado no process counter.
+Como os registradores, o ponteiro de pilha, o endereço de retorno e o registrador de estados já estão com os dados do próximo processo, deve-se apenas fazer com que o a instrução imediatamente posterior à aquela executada antes da interrupção seja executada. Porém, o pipeline do processador fez com que o endereço da instrução duas vezes à frente tivesse sido armazenado. Para compensar isso, deve-se subtrair o tamanho de uma instrução (4 bytes) do endereço que vai ser colocado no process counter. Todo este processo é feito com apenas uma instrução: \verb|SUBS 		pc, r14, #4|, que simultaneamente decrementa do endereço de retorno 4 e coloca o resultado no process counter.
 
 \section{System calls}
 
-Uma system call nada mais é do que uma interrupção de software causada pelo kernel. Como uma interrupção de hardware, uma vez que é causada, ela executa a instrução apontada no vetor de interrupções, que foi instalada anteriormente na inicialização do sistema. A rotina de tratamento também está localizada no arquivo handler.s e é executada em modo SVC, que é privilegiado. As únicas instruções que chamam tais system calls são as rotinas fork, exec e exit.
+Uma system call é uma interrupção de software causada pelo kernel para a execução de código que necessita de privilégios para ser executado. Como uma interrupção de hardware, uma vez que é causada, ela executa a instrução apontada no vetor de interrupções, que foi instalada anteriormente na inicialização do sistema. A rotina de tratamento está localizada no arquivo handler\_swi.s e é executada em modo SVC. As únicas instruções que chamam tais system calls são as rotinas fork, exec e exit.
 
-\subsection{Propriedades gerais das system calls}
+\subsection{Propriedades gerais}
 
-Escrever quando terminar de juntar as system calls\ldots
+Uma vez que uma system call é chamada, umas das funções encontradas em \verb|swi.c| é invocada. O motivo para este passo intermediário é que todas as chamadas de sistema do kernel devem ter a mesma identificação junto à rotina de tratamento. Neste caso, todas são passadas com o primeiro parâmetro como 0. Além disso, todas devem passar o mesmo número de parâmetros, pois todas estão invocando a mesma função, chamada de \verb|syscall| que também é realizado nesta etapa.
+
+Uma vez que a chamada \verb|syscall| é feita, ocorre uma interrupção de software. O procedimento que se passa neste caso é muito parecido com o de uma interrupção de hardware.
+
+\begin{lstlisting}
+STMFD 	sp!,{r0-r12,lr}			; Stack registers r0-12 and link register
+LDR		r0,[lr,#-4]				; Calculate address of SWI instruction (r0 = lr-4)
+BIC		r0,r0,#0xff000000		; Mask off top 8 bits of instruction to give SWI 
+								; number
+LDR		r1, Angel_SWI_Number	; r1 = Angel SWI Number
+CMP		r0, r1					; Compare SWI number to angel interrupt number 
+BEQ		goto_angel				; If it is angel interrupt, branch to goto_angel
+MOV		r1, #0					; r1 = 0
+CMP		r0, r1					; Compare SWI number to r1
+BEQ		os_swi					; If it is OS SWI, branch to os_swi
+\end{lstlisting}
+
+Novamente há uma rotina de identificação da fonte de interrupção, que pode vir a ser uma do sistema operacional, ou do Angel. O primeiro passo desta rotina é o empilhamento de todos os registradores, para poder futuramente restaurar o estado atual. Em seguida, ocorre a identificação em si, onde uma máscara de bits é aplicada para se obter o identificador da interrupção. Caso ela seja Angel\_SWI\_Number, o estado do processador é restaurado e há um desvio para a instrução previamente armazenada durante a instalação. Caso ela seja 0, o valor estabelecido para o sistema, há um desvio para outro código que identifica quais das chamadas de sistema foi ativada.
+
+Esta nova identificação pode ser observada abaixo. O primeiro passo é restaurar e armazenar novamente os valores dos registradores, já que na arquitetura ARM os valores passados pelos parâmetros de uma função são passados pelos primeiros registradores. Neste caso, r1 contém o tipo da chamada. Dependendo de qual for o valor, há desvios para \verb\pre_routine_fork\, \verb\pre_routine_exec\ e \verb\pre_routine_exit\
+
+\begin{lstlisting}
+LDMFD	sp!,{r0-r12,lr}		; Restore r0-r12 registers and link registers
+STMFD 	sp!,{r0-r12,lr}		; and stores them again (in order to clean the registers)
+MOV		r1,	#0				; r1 = 0
+CMP		r0, r1				; Compare the first parameter to 0
+BEQ		pre_routine_fork	; If it is equal, branch to the fork
+MOV		r1,	#1				; r1 = 1
+CMP		r0, r1				; Compare the first parameter to 1
+BEQ		pre_routine_exec	; If it is equal, branch to the exec
+MOV		r1,	#2				; r1 = 2
+CMP		r0, r1				; Compare the first parameter to 2
+BEQ		pre_routine_exit	; If it is equal, branch to the exit
+LDMFD	sp!,{r0-r12,pc}^	; If it is an unidentified syscall, go back to the program,
+							; restoring the registers and putting the return address in
+							; the process counter
+\end{lstlisting}
 
 \subsection{fork}
+
+TODO \ldots
 
 Em um sistema operacional, a system call fork é responsável pela criação de novos processos. Para tal, ela duplica o processo que a criou, onde o único meio de se identificar qual o processo pai é pelo número de retorno. Caso o número de retorno seja 0, significa que este é o processo filho, e caso seja qualquer outro número, é o processo pai que retornou o identificador do processo filho. 
 
 Nosso fork teve de ser ligeiramente alterado por causa de uma simplificação que fizemos em nosso kernel. Como dito anteriormente, temos uma área de dados única para todos os processos. Com isso, fica impossível de se duplicar a área de dados de um processo, o que não fazemos.
 
 O processo de duplicação de um processo se inicia com o empilhamento dos registradores de dados (r0 a r12) e do endereço de retorno (link register) por duas vezes. O motivo é que o primeiro empilhamento serve para a restauração do estado ao fim do processo de duplicação e a segunda para o processo que vai a ser duplicado. Então, tentamos encontrar qual o primeiro espaço disponível dentro da tabela de processos. Uma vez encontrado o espaço, temos de encontrar o espaço do PCB reservado para este processo, onde iremos popular com os dados do estado em execução. Porém, além disso, temos também de duplicar a pilha, que é um processo um pouco mais complexo. Para tal, primeiro temos de descobrir o tamanho da pilha atual. Então, começamos a copiar os dados de uma pilha para a outra. Finalmente, colocamos no ponteiro de pilha do PCB do novo processo o topo da pilha recém copiada. Uma vez resolvido o problema da cópia de pilha, apenas duplicamos os dados do registrador de estados, do link register, do process counter e de todos os registradores de dados. Finalmente, quando o processo está totalmente copiado, devemos habilitar o processo na tabela de processos e restaurar todos os registradores empilhados de volta ao seus lugares, onde o link register entrará no lugar do process counter.
-
-
-
-
 
 %-------------------------------------------
 % System call EXEC
@@ -393,3 +538,15 @@ Para isso a rotina \emph{exit} recebe como parâmetro o id da \emph{thread} a ser
 % Shell
 %-------------------------------------------
 \section{Shell}
+
+TODO\ldots
+
+\section{Semáforos}
+
+TODO\ldots
+
+\section{Inspiração}
+
+Grande parte do código foi retirada do código presente nos exemplos incluídos no CD de demonstração da placa. O principal deles, é o código \emph{mutex}, desenvolvido por Andrew N. Sloss, de onde foi baseado o chaveamento de processos, a função de semáforo e as rotinas de manipulação de hardware.
+
+TODO \ldots
