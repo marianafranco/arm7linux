@@ -5,6 +5,12 @@
 \providecommand{\abntbstabout}[1]{}
 \abntbstabout{1.40 }
 
+\bibitem[ 2007]{Kinoshita}
+\abntrefinfo{nada}{NADA}{2007}
+{KS32C50100 RISC MicroController User Manual.
+[S.l.], 2007. Dispon{\'\i}vel em:
+  $<$http://www.pcs.usp.br/~jkinoshi/2007/tomas5.doc$>$.}
+
 \bibitem[Abdelrazek 2006]{Abdelrazek2006}
 \abntrefinfo{Abdelrazek}{ABDELRAZEK}{2006}
 {ABDELRAZEK, A. F.~M. \emph{Exception and Interrupt Handling in ARM}.
@@ -23,6 +29,13 @@
   DAI 0025E)}.
 [S.l.], Setembro 1996. Dispon{\'\i}vel em:
   $<$http://www.imit.kth.se/courses/2B1445/0304/material/Apps25vE.pdf$>$.}
+
+\bibitem[ARM Limited 2000]{E7TUserGuide}
+\abntrefinfo{ARM Limited}{ARM LIMITED}{2000}
+{ARM LIMITED. \emph{ARM Evaluator-7T Board User Guide}.
+[S.l.], Agosto 2000. Dispon{\'\i}vel em:
+  $<$http://infocenter.arm.com/help/topic/com.arm.doc.dui0134a/DUI0134A\_evalu%
+ator7t\_ug.pdf$>$.}
 
 \bibitem[ARM Limited 2001]{TechManual}
 \abntrefinfo{ARM Limited}{ARM LIMITED}{2001}
@@ -62,6 +75,14 @@ eference.pdf$>$.}
 Junho 2006.
 Dispon{\'\i}vel em:
   $<$http://www.cse.unsw.edu.au/~cs9244/06/seminars/08-leonidr.pdf$>$.}
+
+\bibitem[Samsung Electronics 2000]{uControllerUserManual}
+\abntrefinfo{Samsung Electronics}{SAMSUNG ELECTRONICS}{2000}
+{SAMSUNG ELECTRONICS. \emph{KS32C50100 RISC MicroController User Manual}.
+[S.l.], Agosto 2000. Dispon{\'\i}vel em:
+  $<$http://www.samsung.com/global/system/business/semiconductor/product/2007/%
+6/11/SystemLSI/Networks/PersonalNTASSP/CommunicationProcessor/KS32C50100/UM\_K%
+S32C50100.zip$>$.}
 
 \bibitem[Sloss 2001]{Sloss2001}
 \abntrefinfo{Sloss}{SLOSS}{2001}
