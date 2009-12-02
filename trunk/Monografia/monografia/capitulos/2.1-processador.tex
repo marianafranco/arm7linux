@@ -2,7 +2,7 @@
 \section{O Processador ARM7TDMI} \label{sec:conceitos_processador}
 \index{conceitos!processador} 
 
-O ARM7TDMI faz parte da família de processadores ARM7 32 bits conhecida por oferecer bom desempenho aliado a um baixo consumo de energia. Essas características fazem com que o ARM7TDMI seja bastante utilizado em media players, vídeo games e, principalmente, em sistemas embarcados e num grande número de aparelhos celulares \cite{Sloss2004}.
+O ARM7TDMI faz parte da família de processadores ARM7 32 bits conhecida por oferecer bom desempenho aliado a um baixo consumo de energia. Essas características fazem com que o ARM7TDMI seja bastante utilizado em media players, videogames e, principalmente, em sistemas embarcados e num grande número de aparelhos celulares \cite{Sloss2004}.
 
 
 
@@ -380,7 +380,7 @@ alta 	& Reset \\ % inserting body of the table
  		& FIQ \\
  		& IRQ \\
  		& \emph{Prefetch abort} \\
-baixa 	& Instrução indefinida e interrupção de software (swi) \\ 
+baixa 	& Instrução indefinida e interrupção de software (SWI) \\ 
 \hline %inserts single line
 \end{tabular}
 \caption{Ordem de prioridade das interrupções \cite{TechManual}} 
@@ -390,7 +390,7 @@ baixa 	& Instrução indefinida e interrupção de software (swi) \\
 
 \subsubsection{Entrada de interrupção}
 
-Executar uma interrupção necessita que o processador preserve o estado atual: em geral, o conteúdo de todos os registradores (especialmente PC e CPSR) devem ser o mesmo depois de uma interrupção.
+Executar uma interrupção necessita que o processador preserve o estado atual. Em geral, o conteúdo de todos os registradores (especialmente PC e CPSR) devem ser o mesmo depois de uma interrupção.
 
 O processador ARM usa os registradores adicionais de cada modo para ajudar a salvar o estado do processador. Quando uma interrupção acontece, o R14 e o SPSR são usados para guardar o estado atual da seguinte maneira \cite{TechManual}:
 
@@ -479,14 +479,14 @@ MOVS PC,LR
 
 Interrupções de hardware são mecanismos que permitem que um sinal externo (pedido de interrupção) interrompa a execução normal do programa corrente e desvie a execução para um bloco de código chamado de rotina de interrupção \cite{Kinoshita}.
 
-Interrupções são úteis, pois permitem que o processador manuseie periféricos de uma maneira mais eficiente. Sem interrupções o processador teria que verificar periodicamente a entrada/saída de um dispositivo para ver se esse necessita de atenção.  Com interrupções, por outro lado, a entrada/saída do dispositivo pode indicar diretamente a ocorrência de um dado evento externo, que será tratado com maior facilidade e rapidez, de modo que o microprocessador não necessite consumir tempo de processamento para pesquisar a ocorrência de eventos externos.
+Interrupções são úteis, pois permitem que o processador manuseie periféricos de uma maneira mais eficiente. Sem elas, o processador teria que verificar periodicamente a entrada/saída de um dispositivo para ver se esse necessita de tratamento.  Com elas, por outro lado, a entrada/saída do dispositivo pode indicar diretamente a ocorrência de um dado evento externo, que será tratado com maior facilidade e rapidez, de modo que o microprocessador não necessite consumir tempo de processamento para pesquisar a ocorrência de eventos externos.
 
-O processador ARM fornece dois sinais que são usados pelos periféricos para pedir uma interrupção: o sinal de interrupção nIRQ e o sinal de interrupção rápida nFIQ. Ambos são ativados em nível baixo, ou seja, colocando o sinal em nível baixo geramos a interrupção correspondente, se a interrupção não tiver sido desabilitada no CPSR \cite{Zaitseff2003}.
+O processador ARM fornece dois sinais que são usados pelos periféricos para pedir uma interrupção: o sinal de interrupção nIRQ e o sinal de interrupção rápida nFIQ. Ambos são ativados em nível baixo, ou seja, colocando o sinal em nível baixo gera-se a interrupção correspondente, se a interrupção não tiver sido desabilitada no CPSR \cite{Zaitseff2003}.
 
 Quando uma interrupção de \emph{hardware} IRQ (ou FIQ) é detectada, as seguintes ações são realizadas \cite{ArchManual}:
 
 \begin{enumerate}
-\item Copia o endereço da próxima instrução à ser executada + 4 no registrador LR\textunderscore irq (R14\textunderscore irq). Isso significa que o LR\textunderscore irq irá apontar para a segunda instrução à partir do ponto de pedido da interrupção.
+\item Copia o endereço da próxima instrução a ser executada + 4 no registrador LR\textunderscore irq (R14\textunderscore irq). Isso significa que o LR\textunderscore irq irá apontar para a segunda instrução a partir do ponto de pedido da interrupção.
 
 \begin{lstlisting}
 R14_irq = endereço da próxima instrução + 4
@@ -504,7 +504,7 @@ SPSR_irq = CPSR
 CPSR[4:0] = 0b10010 /* modo IRQ */
 \end{lstlisting}
 
-\item Reforça o estado ARM colocando o bit T do CPSR à zero.
+\item Reforça o estado ARM colocando o bit T do CPSR a zero.
 
 \begin{lstlisting}
 CPSR[5] = 0 /* estado ARM */
@@ -531,7 +531,7 @@ Assim que a rotina de interrupção é terminada, o processador retorna ao que esta
 \item Copia SPSR\textunderscore irq de volta para CPSR.
 \end{enumerate}
 
-A seguinte instrução executa os passos mostrados a cima:
+A seguinte instrução executa os passos mostrados acima:
 
 \begin{lstlisting}
 SUBS PC, R14,#4

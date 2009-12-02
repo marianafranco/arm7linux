@@ -36,7 +36,7 @@ A figura \ref{arch_e7t} mostra a organização desses elementos na placa experimen
 \begin{figure}[!ht]
 \centering 
 \includegraphics[height=12cm]{figuras/board_arch.png}
-\caption{Arquitetura da placa Evaluator-7T. Fonte: \label{arch_e7t}} % \cite{aaa}
+\caption{Arquitetura da placa Evaluator-7T. \cite{E7TUserGuide} \label{arch_e7t}}
 \end{figure}
 
 
@@ -81,6 +81,45 @@ O BSL é o primeiro programa a ser executado pelo microcontrolador quando esta é 
 
 \end{itemize}
 
+\subsubsection{Comunicação com o PC}
+
+Neste projeto, foi usado um PC com o sistema operacional Windows XP para fazer a comunicação com o BSL da placa Evaluator-7T. Essa comunicação é feita através de um cabo serial conectado à porta COM1 (Debug) da placa. Estando a placa conectada à porta serial e energizada com uma fonte de alimentação própria, pode-se estabelecer a comunicação com o BSL por meio do programa HyperTerminal. As configurações de comunicação utilizadas foram:
+
+\begin{itemize}
+
+\item Velocidade de transferência de 9600 bauds
+
+\item 8 bits de dados
+
+\item Sem paridade
+
+\item 1 bit de parada
+
+\item Sem controle de fluxo
+
+\end{itemize}
+
+Após a configuração adequada da placa, é preciso reiniciá-la, pressionando o botão SW1 (SYS RESET). Então, a placa envia a seguinte mensagem ao terminal:
+
+\begin{lstlisting}
+ARM Evaluator7T Boot Monitor Release 1.01
+Press ENTER within 2 seconds to stop autoboot
+\end{lstlisting}
+
+Pressionando a tecla \emph{Enter} em até dois segundos da exibição da mensagem acima, nenhum outro módulo da memória é executado, além do BSL. Desse momento em diante, o BSL exibe seu editor de linha de comando, a partir do qual é possível gerenciar, embarcar e executar programas na placa. A figura \ref{bsl_ht} mostra o HyperTerminal com o BSL carregado e aguardando um comando.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=8cm]{figuras/bsl_ht.png}
+\caption{Editor de linha de comando do BSL via HyperTerminal \label{bsl_ht}}
+\end{figure}
+
+\subsubsection{Carregando e executando programas via BSL}
+
+Após a compilação de um projeto, o ambiente de desenvolvimento cria uma imagem de memória em formato binário (extensão \emph{.bin}). Essa imagem, no entanto, não pode ser carregada diretamente na placa através do BSL. Ela deve ser convertida para o formato UUE (Unix-to-Unix Encoding), o qual é uma representação em arquivo texto do arquivo binário original. Neste projeto, foi utilizado para essa conversão o programa \emph{uuencode} fornecido no CD-ROM que acompanha a placa Evaluator-7T.
+
+Uma vez convertido o arquivo para o formato adequado, ele está pronto para ser enviado à Evaluator-7T. Continua...
+
 %Angel
 \subsection{Angel Debug Monitor}
 
@@ -100,4 +139,4 @@ Há duas maneiras pelas quais o Angel se comunica com o ambiente de desenvolvimen
 
 A primeira é através da biblioteca de interfaces chamada "Remote\_A". Por ela, os depuradores se comunicam com um alvo do Angel quando fazem depuração ou execução de código.
 
-A segunda é por meio de interrupções de software (SWI). O código do programa faz uma SWI para solicitar serviços dos Angel diretamente ou através da biblioteca C dod toolkit.
+A segunda é por meio de interrupções de software (SWI). O código do programa faz uma SWI para solicitar serviços dos Angel diretamente ou através da biblioteca C do toolkit.
