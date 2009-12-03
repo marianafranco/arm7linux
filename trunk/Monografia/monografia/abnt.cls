@@ -1416,10 +1416,10 @@ Para mais informacoes, leia o manual da classe.\MessageBreak%
 \renewcommand{\appendix}{
   \setcounter{chapter}{0}
   \resetsubcounters{chapter}
-  %\gdef\thechapter{\Alph{chapter}} % comentado por jomi
-  \gdef\thechapter{\Roman{chapter}} % incluido por jomi
+  \gdef\thechapter{\Alph{chapter}} % comentado por jomi
+  %\gdef\thechapter{\Roman{chapter}} % incluido por jomi
   \gdef\@chapapp{Apendice}
-  \cleardoublepage\ABNTaddcontentsline{toc}{part}{Apêndices} % incluído por jomi
+  %\cleardoublepage\ABNTaddcontentsline{toc}{part}{Apêndices} % incluído por jomi
   \renewcommand{\anapchaptername}{\appendixname}
   \global\let\@chapter\@anapchapter}
 
