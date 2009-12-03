@@ -32,7 +32,6 @@ Os principais elementos presentes na arquitetura da placa Evaluator-7T são os se
 
 A figura \ref{arch_e7t} mostra a organização desses elementos na placa experimental.
 
-%Não esquecer de colocar a fonte!
 \begin{figure}[!ht]
 \centering 
 \includegraphics[height=12cm]{figuras/board_arch.png}
@@ -102,7 +101,7 @@ Neste projeto, foi usado um PC com o sistema operacional Windows XP para fazer a
 Após a configuração adequada da placa, é preciso reiniciá-la, pressionando o botão SW1 (SYS RESET). Então, a placa envia a seguinte mensagem ao terminal:
 
 \begin{lstlisting}
-ARM Evaluator7T Boot Monitor Release 1.01
+ARM Evaluator7T Boot Strap Loader Release 1.01
 Press ENTER within 2 seconds to stop autoboot
 \end{lstlisting}
 
@@ -118,7 +117,53 @@ Pressionando a tecla \emph{Enter} em até dois segundos da exibição da mensagem a
 
 Após a compilação de um projeto, o ambiente de desenvolvimento cria uma imagem de memória em formato binário (extensão \emph{.bin}). Essa imagem, no entanto, não pode ser carregada diretamente na placa através do BSL. Ela deve ser convertida para o formato UUE (Unix-to-Unix Encoding), o qual é uma representação em arquivo texto do arquivo binário original. Neste projeto, foi utilizado para essa conversão o programa \emph{uuencode} fornecido no CD-ROM que acompanha a placa Evaluator-7T.
 
-Uma vez convertido o arquivo para o formato adequado, ele está pronto para ser enviado à Evaluator-7T. Continua...
+Uma vez convertido o arquivo para o formato adequado, ele está pronto para ser enviado à Evaluator-7T. Para isso, pode-se usar dois diferentes comandos do BSL: \emph{Download} ou \emph{FlashLoad}.
+
+O comando \emph{Download} carrega uma imagem na memória RAM da placa. A sintaxe desse comando é:
+
+\begin{lstlisting}
+download [<endereço>]
+\end{lstlisting}
+
+O parâmetro \emph{<endereço>}, que é um número em base hexadecimal, indica em qual endereço da RAM a imagem será carregada. Se esse endereço não for especificado, a imagem é carregada na posição 0x8000.
+
+Assim que o comando é executado, o BSL espera a transferência de um arquivo texto com a imagem de memória desejada. No HyperTerminal, isso é feito pelo comando ``Enviar arquivo texto'' e apontando para o arquivo desejado, no formato UUE. Terminada a transferência, o BSL informa quantos bytes foram recebidos e a posição de memória a partir da qual eles foram gravados.
+
+Já o comando \emph{FlashLoad} carrega uma imagem na placa e a salva diretamente na memória flash da mesma. Sua sintaxe é a seguinte:
+
+\begin{lstlisting}
+flashload <endereço>
+\end{lstlisting}
+
+Neste comando, o parâmetro \emph{<endereço>} é obrigatório, também é um número em base hexadecimal e especifica o endereço da memória flash no qual a imagem será gravada. O envio do arquivo é feito da mesma maneira que o comando \emph{Download}. Como não há restrições quanto ao valor que o usuário pode inserir nesse comando, cabe a ele mesmo tomar cuidado para não escrever dentro da faixa de endereços de 0x01800000 a 0x0180FFFF, uma vez que é nessa área da flash que estão os módulos BSL e de teste de produção.
+
+O comando \emph{FlashLoad} não é o único que manipula a memória flash da placa no BSL. Existem também os comandos \emph{FlashWrite} e \emph{FlashErase}. O primeiro escreve na memória flash uma determinada área da RAM, enquanto que o segundo sobrescreve uma uma faixa de endereços da flash com 0xFF. As sintaxes desses comandos são:
+
+\begin{lstlisting}
+flashwrite <endereço> <fonte> <comprimento>
+
+flasherase <endereço> <comprimento>
+\end{lstlisting}
+
+Mais uma vez, é preciso exercer cautela durante a utilização desses comandos para não comprometer a área de memória onde se encontram os módulos BSL e de teste de produção.
+
+Carregada a imagem na memória RAM ou na memória flash, ela está pronta para execução. Para executá-la, deve-se, primeiramente, verificar se o Program Counter (PC) do BSL está apontando para a posição de memória onde foi gravada a imagem. Isso é feito através do comando \emph{PC}, cuja sintaxe está abaixo.
+
+\begin{lstlisting}
+pc [<endereço>]
+\end{lstlisting}
+
+Esse comando permite verificar a posição a partir da qual o BSL iniciará a execução, se o parâmetro \emph{<endereço>} não for especificado. Quando esse comando é feito com um argumento, o valor do PC é alterado para o valor do argumento inserido. Por exemplo, \emph{pc 10000} coloca o PC na posição de memória 0x10000. Quando os comandos \emph{Download} e \emph{FlashLoad} são executados, o PC é atualizado automaticamente para o valor inserido no parâmetro \emph{<endereço>} desses comandos.
+
+O próximo passo para a execução da imagem pode ser feito com dois comandos diferentes: \emph{Go} ou \emph{GoS}. Ambos iniciam a execução de um programa a partir da posição de memória definida no PC. Enquanto o primeiro executa o programa em Modo Usuário, o segundo o faz em Modo Supervisor (SVC). Opcionalmente, pode-se inserir argumentos de entrada do programa quando esses comandos são chamados. A sintaxe deles é:
+
+\begin{lstlisting}
+go [<argumentos do programa>]
+
+gos [<argumentos do programa>] 
+\end{lstlisting}
+
+Assim, o programa começa a executar na placa. Caso seja necessário retornar ao BSL, deve-se reiniciar a placa, pressionando-se o botão SYS RESET. Qualquer imagem que tenha sido carregada apenas na RAM será perdida.
 
 %Angel
 \subsection{Angel Debug Monitor}

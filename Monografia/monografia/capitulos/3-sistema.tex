@@ -539,7 +539,21 @@ Para isso a rotina \emph{exit} recebe como parâmetro o id da \emph{thread} a ser
 %-------------------------------------------
 \section{Shell}
 
-TODO\ldots
+Com o desenvolvimento do microkernel e de suas system calls, torna-se necessário o desenvolvimento de outro ramo do projeto, destinado a permitir a interação do usuário com o Sistema Operacional. Essa interação é feita por um editor de linha de comando, também conhecida por Shell.
+
+Na inicialização do microkernel, o Shell é o primeiro processo criado no sistema. Desse momento em diante, cabe ao usuário solicitar a execução ou o término de outros processos. Além disso, o Shell permite a visualização dos diferentes processos em execução no sistema.
+
+\subsection{Comunicação via terminal}
+
+O Shell, para fazer a interação com o usuário, utiliza a porta serial COM0 (de uso geral) conectada a uma segunda porta serial da máquina host. A porta COM1 (Debug) deve permanecer conectada, pois o Angel mantém comunicações através dela com o AXD (descrito na seção \ref{axd}) durante a execução do KinOS, como ilustrado na figura \ref{e7t_comm}.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=8cm]{figuras/e7t_comm.png}
+\caption{Comunicação da Evaluator-7T em cada porta serial.\label{e7t_comm}}
+\end{figure}
+
+% Configuracao e comunicacao da COM0
 
 \section{Semáforos}
 
