@@ -541,4 +541,37 @@ Note que a instrução é SUBS, e não SUB: a instrução SUBS copia automaticamente S
 
 O processamento das \emph{Fast Interrupt} (FIQ) é praticamente igual ao de uma interrupção normal (IRQ). As diferenças são que um conjunto diferente de registradores é usado (i.e. R14\textunderscore fiq no lugar de R14\textunderscore irq), que tanto as interrupções IRQ quanto as FIQ são desativadas (ou seja, os bits I e F do CPSR são ativados), e que o endereço do vetor de interrupção é 0x0000001C \cite{Zaitseff2003}.
 
+
+
+
+%-------------------------------------------
+% Programando em C pra o ARM7TDMI
+%-------------------------------------------
+\subsection{Programando em C pra o ARM7TDMI} \label{sub:programandoC}
+
+Neste item são apresentados alguns pontos importantes a serem considerados quando se esta programando em C para o processador ARM7.
+
+
+\subsubsection{Alocação de Registradores}
+
+O compilador tenta alocar um registrador do processador para cada variável local que encontra em uma função C. Ele tenta usar o mesmo registrador para diferentes variáveis locais se a utilização das variáveis não se sobrepõem. Quando há mais variáveis locais que registradores disponíveis, o compilador armazena as variáveis em excesso na pilha do processador \cite{Sloss2004}.
+
+
+\subsubsection{Chamadas de Função}
+
+A \textit{ARM Procedure Call Standard} (APCS) define como passar argumentos de função e obter valores de retorno.
+
+Os primeiros quatro argumentos inteiros são passadas nos quatro primeiros registradores ARM: R0, R1, R2 e R3. Argumentos inteiros posteriores são colocados na pilha, como na figura \ref{fig:functionregisters}. Se o valor de retorno for inteiro, este é obtido através do registrador R0 \cite{Sloss2004}.
+
+Esta descrição abrange apenas os argumentos de tipo inteiro ou ponteiro. Argumentos que ocupam o espaço de duas palavras, como \textit{long long} e \textit{double}, são passados em um par de registradores consecutivos e retornam em R0, R1.
+
+\begin{figure}[ht]
+	\begin{center}
+		\includegraphics[scale=0.15]{figuras/functionregisters.png}
+		\caption{Passagem de argumentos \cite{Sloss2004}}
+		\label{fig:functionregisters}
+	\end{center}
+\end{figure}
+
+
 \paragraph{}
