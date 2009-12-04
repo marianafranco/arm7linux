@@ -12,7 +12,7 @@
 #define IRQVector	(unsigned *) 0x18
 /* Time set for the timer */
 //#define COUNTDOWN	0x00effff0
-#define COUNTDOWN	0x000ffff0
+#define COUNTDOWN	0x00fffff0
 
 /********* EMULATOR VARIABLES *********/
 /* Timer interrupt ID */
