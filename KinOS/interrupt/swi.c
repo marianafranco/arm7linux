@@ -1,8 +1,5 @@
 #include "swi.h"
 
-extern void routine_fork(void);
-extern void routine_exec(void);
-extern void routine_exit(void);
 
 int fork(){
 	int pid = 0;
