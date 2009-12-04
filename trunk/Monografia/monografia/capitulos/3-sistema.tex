@@ -9,23 +9,34 @@
 
 O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e da arquitetura ARM nas disciplinas de Sistemas Operacionais e Laboratório de Microprocessadores. Para tal, foi desenvolvido um microkernel, apelidado de KinOS, cujas funções básicas são o chaveamento de threads através de interrupção de timer, as chamadas de sistema, as rotinas de manipulação de hardware, funções de semáforo e um shell.
 
-%Lembretes:
-% se todos os slots estiverem ocupados, ao se iniciar o 10o processo, o programa trava
-%-timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset, link register, process counter
-%escrever sobre os processos-exemplo
-% escrever sobre o software utilizado
-% perspectivas
-%\item{Colocar como o programa foi desenvolvido}
-%\item{Colocar Mutex}
-%\item{Colocar a referencia das seções}
-%\item{Variáveis em assembly}
-%\item{Explicar que o código foi baseado na experiencia do mutex}
-%\item{Na descricao do fork poderia dizer que ao duplicar a pilha estah copiando as variaveis locais; isto eh, embora as variaveis globais sejam comuns a todos os processos (e por isso eles talvez devessem ser chamados de threads), as variaveis locais sao copiadas.}
-%\item{Daria para fazer uns testes com variaveis locais, mostrando que depois de se criar dois processos; os dois estao com variaveis locais diferentes?}
-%\item{Colocar pesquisa inicial (ver tambem as referencias e documentos de acompanhamento iniciais)}
-%\item [MARI] Dar uma olhado no artigo sobre interrupções: Exception and Interrupt Handling in ARM. Tem figurinhas legais lá :)
-%revisar portugues e fazer leitura cruzada
-%Colocar mais bibliografias
+% No codigo:
+% Se todos os slots estiverem ocupados, ao se iniciar o 10o processo, o programa trava
+% Fazer processos-exemplo
+% -Exemplo de teste de segurança
+% -Exemplo do mutex
+
+
+% Na monografia:
+% Pré término --------------------------
+% Colocar a referencia das seções
+% Escrever sobre os exemplos
+% Exception and Interrupt Handling in ARM
+% Terminar:
+% -Fork
+% -Mutex
+% -Inspiração
+
+% Pós término --------------------------
+% Emphasize essas variaveis: timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset, link register, process counter
+% Revisar portugues no word
+% Fazer revisao cruzada
+
+
+
+% Fork: Ao duplicar a pilha copia-se as variaveis locais; isto eh, embora as variaveis globais sejam comuns a todos os processos (e por isso eles talvez devessem ser chamados de threads), as variaveis locais sao copiadas
+% Daria para fazer uns testes com variaveis locais, mostrando que depois de se criar dois processos; os dois estao com variaveis locais diferentes?
+% Colocar pesquisa inicial (ver tambem as referencias e documentos de acompanhamento iniciais)
+
 
 \section{Organização do código}
 
@@ -555,7 +566,7 @@ O Shell, para fazer a interação com o usuário, utiliza a porta serial COM0 (de u
 
 % Configuracao e comunicacao da COM0
 
-\section{Semáforos}
+\section{Mutex}
 
 TODO\ldots
 
