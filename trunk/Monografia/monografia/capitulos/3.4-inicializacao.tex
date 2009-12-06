@@ -1,6 +1,6 @@
 \section{Inicialização}
 
-O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas as operações que não podem ser feitas no código em C, como a inicialização das pilhas ou a criação da tabela de threads. Após esta etapa, há a inicialização em C, feita no arquivo cinit.c, que inicializa periféricos, instala rotinas de tratamento e inicia a primeira thread em modo usuário. A rotina completa de inicialização pode ser vista no esquema da figura \ref{inicializacao}.
+O início do programa se dá no arquivo statup.s. Nele, são feitas todas as operações que têm de ser em \emph{assembly}, como a inicialização das pilhas ou a criação da tabela de \emph{threads}. Após esta etapa, há a inicialização em C, feita no arquivo cinit.c, que inicializa periféricos, instala rotinas de tratamento e inicia a primeira \emph{thread} em modo usuário. A rotina completa de inicialização pode ser vista no esquema da figura \ref{inicializacao}.
 
 \begin{figure}[!ht]
 \centering 
@@ -10,11 +10,11 @@ O início do programa se dá no arquivo assembly statup.s. Nele, são feitas todas 
 
 \subsection{Ponto de entrada e tipo de código}
 
-O ponto de entrada do código é indicado pela instrução \verb|ENTRY|. Por padrão, o compilador assume que o código de entrada é ARM. Como descrito anteriormente, há dois tipos de assembly, o ARM e o THUMB. No microkernel, é utilizado apenas código ARM, já que ele fornece mais instruções e favorece a legibilidade. Um ponto negativo deste tipo de código é seu maior espaço ocupado na memória, mas isso não vem a ser um grande problema, pois temos espaço suficiente.
+O ponto de entrada do código é indicado pela instrução \verb|ENTRY|. Por padrão, o compilador assume que o código de entrada é ARM. Como descrito no item \ref{sub:estados}, há dois tipos de \emph{assembly}, o ARM e o THUMB, onde o ARM é favorecido pelo número de instruções e pela legibilidade. Neste caso, será utilizado apenas código ARM.
 
 \subsection{Pilhas}
 
-Antes de poder utilizar as pilhas é preciso que elas sejam inicializadas em cada um dos modos que virão a ser utilizados. Neste microkernel, são utilizados os modos de serviço, usuário/sistema e de interrupção. O modo como isto é feito é descrito abaixo:
+Antes de poder utilizar as pilhas é preciso que elas sejam inicializadas em cada um dos modos que virão a ser utilizados. Neste \emph{microkernel}, são utilizados os modos SVC, \emph{user}/\emph{system} e IRQ. O modo como isto é feito é descrito abaixo:
 
 \begin{lstlisting}
 	MOV		r0,	#0xC0|0x12		; r0 = 0xC0 or 0x12 (0xC0 = IRQ disabled, 0x12 = IRQ mode)
@@ -22,11 +22,11 @@ Antes de poder utilizar as pilhas é preciso que elas sejam inicializadas em cada
 	MOV		sp, #0x8000			; stack pointer = 0x8000
 \end{lstlisting}
 
-A primeira instrução copia para r0 o que será substituído no registrador de estado. Neste exemplo, está se desabilitando as interrupções e mudando o modo do processador para o modo de interrupção. Em seguida, os dados do registrador r0 são colocados no registrador de estado. Uma vez que o estado foi alterado, pode-se mudar o ponteiro de pilha, que neste caso aponta para o endereço 0x8000. Uma operação semelhante pode ser feita tanto no modo de serviço quanto no modo de usuário, usando os endereços de pilha indicados anteriormente. Porém, se o estado for alterado para o modo de usuário fica impossível de se alterar o estado novamente. Para se resolver este problema, ao invés de se mudar para o estado de usuário, muda-se para o estado de sistema. Este é o mesmo modo que o de usuário (usa a mesma pilha e registradores), mas permite que o modo seja alterado novamente.
+A primeira instrução copia para r0 o que será substituído no registrador de estado. Neste exemplo, está se desabilitando as interrupções e mudando o modo do processador para o modo IRQ. Em seguida, os dados do registrador r0 são colocados no registrador de estado. Uma vez que o estado foi alterado, pode-se mudar o ponteiro de pilha, que neste caso aponta para o endereço 0x8000. Uma operação semelhante pode ser feita tanto no modo SVC quanto no modo \emph{user}, usando os endereços de pilha indicados na figura \ref{memoria}. Porém, se o estado for alterado para o modo \emph{user} fica impossível de se alterar o estado novamente. Para se resolver este problema, ao invés de se mudar para esse estado, muda-se para o estado de SYS. Este é o mesmo modo que o \emph{user} (usa a mesma pilha e registradores), mas permite que o modo seja alterado novamente por ser privilegiado.
 
-\subsection{Vetor de threads e número da thread}
+\subsection{Vetor de \emph{threads} e número da \emph{thread}}
 
-O outro ponto importante da inicialização do código em assembly é a criação do vetor de threads. Para tal, temos de definir que todos os processos exceto o primeiro são inicializados desabilitados. Isto é feito com o código apresentado a seguir:
+O outro ponto importante da inicialização do código em \emph{assembly} é a criação do vetor de \emph{threads}. Para tal, tem de se definir que todos as \emph{threads} exceto a primeira são inicializadas desabilitadas. Isto é feito com o código apresentado a seguir:
 
 \begin{lstlisting}
 	; Initializes the thread array with zeros (0 = thread disabled,
@@ -45,9 +45,9 @@ init_thread_array_loop
 	B		init_thread_array_loop	; return to init_thread_array_2
 \end{lstlisting}
 
-Nele, r0 armazena a base do vetor, que coincide com o espaço relativo à primeira thread. r1 contém o dado que será colocado na posição de memória. Na posição este valor é 1, e nos demais 0. r2 contém o offset que será somado à base para o cálculo do endereço absoluto, armazenado em r3. O algoritmo funciona inicialmente colocando 1 na base. Após isso, entra em um loop que aumenta o offset de 4 em 4 e coloca 0 em todos os outros espaços.
+Nele, r0 armazena a base do vetor, que coincide com o espaço relativo à primeira \emph{thread}. r1 contém o dado que será colocado na posição de memória. Na posição 1 este valor é 1, e nos demais 0. r2 contém o offset que será somado à base para o cálculo do endereço absoluto, armazenado em r3. O algoritmo funciona inicialmente colocando 1 na base. Após isso, entra em um \emph{loop} que aumenta o \emph{offset} de 4 em 4 e coloca 0 em todos os outros espaços.
 
-Ainda na inicialização em assembly, deve-se definir o número da thread que está sendo executada. Este dado é armazenado na variável current\_thread\_id. Pode-se ver abaixo como é definido o id do primeiro processo para 1:
+Ainda na inicialização em \emph{assembly}, deve-se definir o número da \emph{thread} que está sendo executada. Este dado é armazenado na variável current\_thread\_id. Pode-se ver abaixo como é definido o id da primeira thread para 1:
 
 \begin{lstlisting}
 LDR		r0, =current_thread_id	; r0 = current thread id address
@@ -55,7 +55,7 @@ MOV		r1, #1					; r1 = 1
 STR		r1, [r0]				; current thread id = 1
 \end{lstlisting}
 
-Finalmente, a inicialização em C pode ser iniciada. A chamada é feita definindo como endereço de retorno a função C\_entry e colocando este mesmo endereço no process counter.
+Finalmente, a inicialização em C pode ser iniciada. A chamada é feita definindo como endereço de retorno a função C\_entry e colocando este mesmo endereço no \emph{process counter}.
 
 \begin{lstlisting}
 LDR 	lr, =C_Entry			; link register = C entry
@@ -63,16 +63,16 @@ MOV 	pc, lr					; process counter = C entry
 \end{lstlisting}
 
 \subsection{Periféricos}
-
-Para alguns periférico da placa, como o display de sete segmentos, o timer e os botões, há uma rotina de inicialização que os habilita e define suas configurações. Suas chamadas são \verb|segment_init()|, \verb|timer_init()| e \verb|button_init()| respectivamente. Estas funções se encontram nos arquivos de cada um dos periféricos e são executadas logo no início da etapa C do processo de inicialização da placa.
+\label{init:perif}
+Para alguns periférico da placa, como o display de sete segmentos, o \emph{timer} e os botões, há uma rotina de inicialização que os habilita e define suas configurações. Suas chamadas são \verb|segment_init()|, \verb|timer_init()| e \verb|button_init()| respectivamente. Estas funções se encontram nos arquivos de cada um dos periféricos e são executadas logo no início da etapa C do processo de inicialização da placa.
 
 \subsection{Instalação do tratamento de interrupção}
 \label{init:install}
-Como descrito anteriormente, caso uma interrupção de hardware ocorra, a instrução no endereço 0x18 é executada e caso seja uma interrupção de software, a instrução no endereço 0x08. Toda vez que se reinicia a placa, são colocados nestes endereços uma instrução que realiza um desvio para a rotina Angel, descrita anteriormente. 
+Como descrito anteriormente na seção \ref{sub:interrupcoes}, caso uma interrupção de \emph{hardware} ocorra, a instrução no endereço 0x18 é executada e caso seja uma interrupção de \emph{software}, a instrução no endereço 0x08. Toda vez que se reinicia a placa, são colocados nestes endereços uma instrução que realiza um desvio para a rotina Angel (vide seção \ref{config:angel}). 
 
-Porém, se algum dos periféricos vai ser utilizado, a interrupção gerada por esse periférico não deve desviada para o Angel, e sim para uma rotina adequada. Para poder identificar qual a origem da interrupção e desviar para a rotina correta, devemos instalar uma nova rotina no vetor de interrupções, substituindo o desvio para o Angel. A instalação da rotina se dá através do desvio para a tal rotina. Todavia, não se pode apenas descartar o endereço do Angel, já que caso não se identifique a origem da interrupção, ainda deve-se desviar para ele. Este processo pode ser observado na figura \ref{chain}. Nele, \emph{Handler2} é a rotina de tratamento de interrupções, e \emph{Handler1} é o Angel.
+Porém, se algum dos periféricos vai ser utilizado, a interrupção gerada por esse periférico não deve desviada para o Angel, e sim para uma rotina adequada que trate tal periférico. Para poder identificar qual a origem da interrupção e desviar para a rotina correta, deve-se instalar uma nova rotina no vetor de interrupções, substituindo o desvio para o Angel. A instalação da rotina dá-se através do desvio para a tal rotina. Todavia, não se pode apenas descartar o endereço do Angel, já que caso não se identifique a origem da interrupção, ainda deve-se desviar para ele. Este processo pode ser observado na figura \ref{chain}. Nele, \verb|Handler2| é a rotina de tratamento de interrupções, e \verb|Handler1| é o Angel.
 
-A instalação da rotina de tratamento de interrupção é a mesma para interrupções de hardware e de software se dá abaixo:
+A instalação da rotina de tratamento de interrupção é a mesma para interrupções de \emph{hardware} e de \emph{software} se dá abaixo:
 
 \begin{lstlisting}
 /* Angel branch instruction */
@@ -96,9 +96,9 @@ else {
 *Angel_address = handler_routine_address;
 \end{lstlisting}
 
-Os parâmetros de entrada desta função são \verb|handler_routine_address|, o endereço da rotina de tratamento de interrupção e \verb|vector_address|, um ponteiro para a posição no vetor de interrupções onde será instalada a rotina. Sucintamente, o que esta rotina realiza é obter a instrução que está em \verb|vector_address|, aplica uma máscara à rotina para obter apenas o endereço e o salva em uma das variáveis: \verb|Angel_IRQ_Address| caso se esteja instalando a rotina de interrupção de hardware ou \verb|Angel_SWI_Address| caso seja a de software, além de colocar a nova instrução no vetor de interrupções. 
+Os parâmetros de entrada desta função são \verb|handler_routine_address|, o endereço da rotina de tratamento de interrupção e \verb|vector_address|, um ponteiro para a posição no vetor de interrupções onde será instalada a rotina. Sucintamente, o que esta rotina realiza é obter a instrução que está em \verb|vector_address|, aplica uma máscara à rotina para obter apenas o endereço e o salva em uma das variáveis: \verb|Angel_IRQ_Address| caso se esteja instalando a rotina de interrupção de \emph{hardware} ou \verb|Angel_SWI_Address| caso seja a de \emph{software}, além de colocar a nova instrução no vetor de interrupções. 
 
-Um fator importante que deve ser ressaltado a importância do Angel quando se está usando a placa. Como já descrito anteriormente, o Angel se utiliza das interrupções de hardware e software para se comunicar com a placa. Portanto, se apenas modificarmos o código e substituirmos a instrução que está contida no vetor de interrupção, essa comunicação não se realiza e tanto a placa quanto o programa de debugger travam. Para solucionarmos este problema, devemos passar para a rotina de tratamento de interrupção os endereços que estavam anteriormente no vetor de interrupção, para o caso da interrupção ser do Angel, a rotina correta ser executada. Já no caso em que o código é apenas simulado no emulador, não é preciso armazenar o endereço do Angel.
+Um fator importante que deve ser ressaltado a importância do Angel quando se está usando a placa. Como já descrito anteriormente, o Angel se utiliza das interrupções de \emph{hardware} e \emph{software} para se comunicar com a placa. Portanto, se o código for apenas modificado e a instrução que está contida no vetor de interrupção for substituída, essa comunicação não se realiza e tanto a placa quanto o programa de \emph{debugger} travam. Para se solucionar este problema, deve-se passar para a rotina de tratamento de interrupção os endereços que estavam anteriormente no vetor de interrupção, para o caso da interrupção ser do Angel, a rotina correta ser executada. Já no caso em que o código é apenas simulado no emulador, não é preciso armazenar o endereço do Angel.
 
 \begin{figure}[!ht]
 \centering 
@@ -106,13 +106,13 @@ Um fator importante que deve ser ressaltado a importância do Angel quando se est
 \caption{Encadeamento de interrupções. Fonte: \cite{Sloss2001} \label{chain}}
 \end{figure}
 
-\subsection{Interrupção de timer}
+\subsection{Interrupção de \emph{timer}}
 
-A interrupção de timer é utilizada neste projeto para realizar o chaveamento entre as threads. Uma vez que haja a interrupção, o estado da thread atual é salva e a próxima thread é colocada em processamento. Para utilizá-la, devemos tanto habilitar quanto iniciar o timer. Essas tarefas são executadas com duas rotinas, sendo que a primeira já foi descrita anteriormente. Já o início do timer é dado pela função \verb|timer_start()|.
+A interrupção de \emph{timer} é utilizada neste projeto para realizar o chaveamento entre as \emph{threads}. Uma vez que haja a interrupção, o estado da \emph{thread} atual é salva e a próxima é colocada em processamento. Para utilizá-la, deve-se tanto habilitar quanto iniciar o \emph{timer}. Essas tarefas são executadas com duas rotinas, sendo que a primeira já foi descrita no item \ref{init:perif}. Já o início do \emph{timer} é dado pela função \verb|timer_start()|.
 
 \subsection{Habilitando interrupções}
 
-O último passo antes de se começar a executar o código do primeiro programa é habilitar simultaneamente o modo de usuário e as interrupções. Como isso só pode ser feito por código assembly, temos de usar a instrução especial de C \_\_asm, conforme o exemplo abaixo
+O último passo antes de se começar a executar o código do primeiro programa é habilitar simultaneamente o modo de usuário e as interrupções. Como isso só pode ser feito por código \emph{assembly}, tem de se usar a instrução especial de C \_\_asm, conforme o exemplo abaixo
 
 \begin{lstlisting}
 __asm {
@@ -121,4 +121,4 @@ __asm {
 }
 \end{lstlisting}
 
-O registrador r1 recebe 0x40, que indica a habilitação das interrupções e 0x10 que altera para o modo de usuário. Logo em seguida, o conteúdo deste registrador é passado para o registrador de estado. Finalmente, o primeiro programa é chamado com a função \verb\shell()\.
+O registrador r1 recebe 0x40, que indica a habilitação das interrupções e 0x10 que altera para o modo \emph{user}. Logo em seguida, o conteúdo deste registrador é passado para o registrador de estado. Finalmente, o primeiro programa é chamado com a função \verb\shell()\.
