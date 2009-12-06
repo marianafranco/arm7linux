@@ -1,0 +1,23 @@
+\section{Estruturas de dados}
+
+A fim de se facilitar a programação e o entendimento do projeto, foram criadas duas estruturas de dados que são acessadas em assembly. A primeira, o Process Control Block é responsável pelo armazenamento do estado de um processo. Já a Lista de Threads realiza o controle de quais threads estão ativas.
+
+\subsection{Process Control Block} \label{sub:PCB}
+
+O Process Control Block (ou simplesmente PCB) é um estrutura de dados que guarda todas as informações de uma thread que aguarda para ser executada enquanto outras estão ativas. Há um PCB para cada uma das nove threads e cada uma ocupa 68 bytes. Ou seja, o espaço total ocupado pelos PCBs é de 9 $\cdot$ 68 = 612 bytes. Estes 68 bytes estão estruturados como explicitado na figura \ref{pcb}. Cada posição da tabela ocupa uma palavra (4 bytes). A primeira posição é em (base do PCB - 4), a segunda em (base do PCB - 8) e assim por diante. Como podemos observar pela figura, as posições 1 a 15 ((base do PCB - 4) a (base do PCB - 60)) armazenam o conteúdo dos registradores r0 a r14 do modo user em ordem inversa. A posição 16 (base do PCB - 64) armazena o link register do modo IRQ, ou seja, o endereço de retorno da interrupção. Finalmente, a posição 17 armazena o registrador de estado do modo user. Estes registradores armazenados permitem estabelecer um retrato preciso do estado do processo quando houve o chaveamento e permite também que este estado seja restabelecido quando for o turno deste processo voltar a ser executado. A estrutura tem seu espaço reservado no arquivo handler\_irq.s, e é nomeado com a variável process\_control\_block, que indica a base da estrutura. Cada um dos PCBs está logo a seguir do anterior. Por exemplo, a base do primeiro PCB está em (process\_control\_block - 68), do segundo em (process\_control\_block - 2 $\cdot$ 68) e assim por diante.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=10cm]{figuras/pcb.pdf}
+\caption{Estrutura de dados do PCB. Fonte: \cite{Sloss2001} \label{pcb}}
+\end{figure}
+
+\subsection{Vetor de threads}
+
+O vetor de threads é uma lista que armazena quais das threads estão ativas e quais não estão, a fim de se identificar quais devem ser colocadas em execução. Cada identificador ocupa 4 bytes, e pode ter os valores 0 (inativo) ou 1 (ativo). Como há 9 processos, o tamanho deste vetor é de 4 $\cdot$ 9 = 36 bytes. Seu espaço é reservado no arquivo handler\_irq.s, com o nome de thread\_array. No exemplo na figura \ref{vetor} podemos ver que as threads 1, 2 e 4 estão ativas, enquanto que as outras não estão.\\
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[width=7.5cm]{figuras/vetorThreads.pdf}
+\caption{Vetor de threads. \label{vetor}}
+\end{figure}

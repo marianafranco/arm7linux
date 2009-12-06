@@ -1,0 +1,25 @@
+\section{Configuração de hardware e software}
+
+Nesta seção são apresentados os modos como o hardware e o software descritos anteriormente são utilizados. Será indicado como foi feito o particionamento da memória, a utilização dos modos do processador e os modos de teste do código. 
+
+\subsection{Memória}
+
+A memória volátil da placa foi estruturada como indicado na figura \ref{memoria}. Para todo espaço das pilhas, programas, código, vetor de interrupções e área de dados, o espaço disponível é de 128KB (de 0x0 a 0x20000). Como pôde ser visto anteriormente, a memória entre 0x0 e 0x20 contém o vetor de interrupções e deve ser reservado. A pilha do modo SVC começa no endereço 0x7F80, cresce para baixo e não deve invadir a área reservada para o vetor de interrupção. Já a pilha do modo IRQ, começa no endereço 0x8000, também cresce para baixo e não deve invadir o espaço reservado para a pilha do modo SVC. O código do kernel e dos programas começa no endereço 0x8000, mas ao contrário da pilha do modo SVC, cresce para cima. Logo após o código, temos uma área reservada para os dados globais. Finalmente, as pilhas de usuário começam no endereço 0x20000 e crescem para baixo. Cada uma tem um offset relativo à anterior de 4048 bytes.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=13cm]{figuras/memoria.pdf}
+\caption{Estrutura da memória. Fonte: \cite{Sloss2001} \label{memoria}}
+\end{figure}
+
+\subsection{Modos do processador}
+
+Dentre os sete modos disponíveis na placa, apenas quatro deles são utilizados: o modo d usuário (user), o modo de serviço (SVC), o modo de sistema (SYS) e o modo de interrupção (IRQ). O primeiro é o modo não privilegiado no qual os processos são executados. O segundo, é o modo de inicialização do kernel e de execução das system calls, que é privilegiado. Já o terceiro, é idêntico ao modo de usuário, mas com privilégios. Ele é utilizado na inicialização do sistema para definir a pilha do modo de usuário. Finalmente, o quarto é um modo que também é privilegiado, mas que é usado quando há interrupções de hardware e portanto, é usado quando há o chaveamento de processos (interrupção de timer) ou qualquer outra interrupção que não a de software. É importante ressaltar que os modos privilegiados quando chamados por interrupção desabilitam outras interrupções. Isso não permite que ocorra interrupções aninhadas, essencial para o funcionamento do código.
+
+\subsection{Modos de teste}
+
+Depurar o código com a placa não é possível em todas as situações. Quando o código que está sendo executado está dentro de uma região onde as interrupções estão desabilitadas, como no código de tratamento de interrupção, não se pode fazê-lo. Para contornar tal problema, foi utilizado o emulador disponível na IDE CodeWarrior, o ARMulator. Como ele foi desenvolvido para vários modelos de placa, utiliza endereços de periféricos diferentes da placa Evaluator 7-T, e além disso, não têm o módulo Angel de debug. Para manter a compatibilidade entre o emulador e a placa, nas partes onde o código se diferencia, como na inicialização do timer, foram colocados ambos códigos. A seleção de qual dos dois será executado depende de uma variável global emulator, que é declarada no arquivo constants.h. Caso seja 1, o código executado é o do emulador, caso seja 0, é o código da placa com Angel e caso seja 2 é o código para a placa com o Angel desabilitado. Uma outra vantagem do código no emulador é que ele permite com que ele possa ser testado sem a presença da placa.
+
+\subsection{Angel}
+
+O Angel é um programa contido na ROM da placa que realiza a comunicação entre a mesma e o computador que efetuou o upload do código. Além de permitir com que o código seja carregado na placa, o Angel realiza o processo de debug do código durante a execução. Para isso, deve haver uma comunicação constante entre a placa e o computador, que é feita através de interrupções. Uma vez que a placa é iniciada, o endereço do vetor de interrupções responsável pelas interrupções de hardware e se software apontam para um endereço pré-estabelecido do Angel. Caso se queira adicionar alguma outra rotina de tratamento de interrupções, deve-se encadear a rotina do Angel para que a comunicação com a placa não seja perdida.
