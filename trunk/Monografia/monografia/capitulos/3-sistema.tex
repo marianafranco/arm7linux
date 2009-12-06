@@ -7,18 +7,18 @@
 \chapter{O Sistema Operacional KinOS} \label{chap:sistema}
 \index{sistema}
 
-O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e da arquitetura ARM nas disciplinas de Sistemas Operacionais e Laboratório de Microprocessadores. Para tal, foi desenvolvido um microkernel, apelidado de KinOS, cujas funções básicas são o chaveamento de threads através de interrupção de timer, as chamadas de sistema, as rotinas de manipulação de hardware, funções de semáforo e um shell.
+O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e da arquitetura ARM nas disciplinas de Sistemas Operacionais e Laboratório de Microprocessadores. Para tal, foi desenvolvido um \emph{microkernel}, apelidado de KinOS, cujas funções básicas são o chaveamento de \emph{threads} através de interrupção de \emph{timer}, as chamadas de sistema, as rotinas de manipulação de \emph{hardware}, funções de \emph{mutex} e um \emph{shell}.
 
 % No codigo:
 % Se todos os slots estiverem ocupados, ao se iniciar o 10o processo, o programa trava
 % Fazer processos-exemplo
 % -Exemplo de teste de segurança
 % -Exemplo do mutex
-
+% -Colocar teste onde fork retorna valores diferentes
+% -Mostrar que depois de se criar dois processos; os dois estao com variaveis locais diferentes (duas threads rodando em cima de um mesmo aplicativo)
 
 % Na monografia:
 % Pré término --------------------------
-% Colocar a referencia das seções
 % Escrever sobre os exemplos
 % Exception and Interrupt Handling in ARM
 % Terminar:
@@ -27,16 +27,14 @@ O principal objetivo do projeto é auxiliar o ensino de sistemas operacionais e d
 % -Inspiração
 
 % Pós término --------------------------
-% Emphasize essas variaveis: timer, microkernel, KinOK, hardware, shell, ARM, coderwarrior, assembly, nome dos arquivos, threads, fork, exec, exit, user, thread_array, offset, link register, process counter
+% Colocar a referencia das seções
+% Emphasize essas variaveis: timer, microkernel, hardware, software, shell, assembly, threads, user, offset, link register, process counter
 % Revisar portugues no word
 % Fazer revisao cruzada
 
-
-
-% Fork: Ao duplicar a pilha copia-se as variaveis locais; isto eh, embora as variaveis globais sejam comuns a todos os processos (e por isso eles talvez devessem ser chamados de threads), as variaveis locais sao copiadas
-% Daria para fazer uns testes com variaveis locais, mostrando que depois de se criar dois processos; os dois estao com variaveis locais diferentes?
+% Delegar: 
 % Colocar pesquisa inicial (ver tambem as referencias e documentos de acompanhamento iniciais)
-
+% Kinoshita queria a parte da SWI bem documentada
 
 \input{capitulos/3.1-organizacao.tex}
 

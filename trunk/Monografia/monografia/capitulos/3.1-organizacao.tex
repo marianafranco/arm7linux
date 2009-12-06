@@ -9,36 +9,36 @@ A estrutura de arquivos do projeto pode ser vista na figura \ref{arquivos}. Pode
 \end{figure}
 
 \begin{itemize}
-\item{\textbf{Raiz} Contém os arquivos de inicialização da placa}
-\item{\textbf{Pasta ``apps''} Contém os programas que serão executados pelo microkernel}
-\item{\textbf{Pasta ``interrupt''} Contém as rotinas de tratamento de interrupção}
-\item{\textbf{Pasta ``peripherals''} Contém rotinas de manipulação de hardware}
-\item{\textbf{Pasta ``syscalls''} Contém as chamadadas de sistema}
-\item{\textbf{Pasta ``mutex''} Contém rotinas de semáforo}
+\item{\textbf{Raiz} Arquivos de inicialização da placa}
+\item{\textbf{Pasta ``apps''} Programas que serão executados pelo \emph{microkernel}}
+\item{\textbf{Pasta ``interrupt''} Rotinas de tratamento de interrupção}
+\item{\textbf{Pasta ``peripherals''} Rotinas de manipulação de \emph{hardware}}
+\item{\textbf{Pasta ``syscalls''} Chamadas de sistema}
+\item{\textbf{Pasta ``mutex''} Rotinas do \emph{mutex}}
 \end{itemize}
 
-A pasta \emph{KinOS\_Data} não é considerada parte do projeto pois é utilizada pelo CodeWarrior para o armazenamento do código compilado.
+A pasta KinOS\_Data não é considerada parte do projeto pois é utilizada pelo CodeWarrior para o armazenamento do código compilado.
 
 \subsection{Raiz}
 
-Os arquivos encontrados na raiz do projeto são responsáveis pela inicialização da placa e pela declaração de constantes globais.  O arquivo startup.s contém a chamada inicial do microkernel, onde toda parte de inicialização em assembly é feita. Já o arquivo cinit.c também contém a parte de inicialização, porém, a parte que deve ser executada em C. Finalmente, o arquivo constants.h é responsável por armazenar as constantes que são utilizadas em todo o projeto.
+Os arquivos encontrados na raiz do projeto são responsáveis pela inicialização da placa e pela declaração de constantes globais.  O arquivo startup.s contém a chamada inicial do \emph{microkernel}, onde toda parte de inicialização em \emph{assembly} é feita. Já o arquivo cinit.c também contém a parte de inicialização, porém, o código está escrito em C. Finalmente, o arquivo constants.h é responsável por armazenar as constantes que são utilizadas em todo o projeto.
 
 \subsection{Pasta ``apps''}
 
-Há apenas um arquivo e seu cabeçalho nesta pasta. Nele, várias funções são declaradas, onde cada declaração é considerada uma thread pelo microkernel. 
+No arquivo tasks.c, várias funções são declaradas, onde cada declaração é considerada uma \emph{thread} pelo \emph{microkernel}. Mais à frente, na seção \ref{cap:processos}, os programas exemplo serão descritos com mais detalhe. Já no arquivo terminal.c, há o \emph{shell} do sistema.
 
 \subsection{Pasta ``interrupt''}
 
-Todas as rotinas que tratam e instalam interrupções -- tanto de hardware quanto de software -- estão localizadas nesta pasta. O arquivo handler\_irq.s contém a rotina em assembly que trata das interrupções de hardware, as encaminha para a rotina específica de acordo com a sua fonte e faz o chaveamento de threads. O arquivo irq.c contém uma única rotina, que realiza a instalação da rotina de tratamento de interrupção tanto de hardware quanto de software. A rotina de tratamento de interrupção de software é feita no arquivo handler\_swi.s, que identifica o tipo de interrupção e encaminha para alguma das chamadas de sistema, encontradas em swi.c.
+Todas as rotinas que tratam e instalam interrupções -- tanto de \emph{hardware} quanto de \emph{software} -- estão localizadas nesta pasta. O arquivo handler\_irq.s contém a rotina em \emph{assembly} que trata das interrupções de \emph{hardware}, as encaminha para a rotina específica de acordo com a sua fonte e faz o chaveamento de \emph{threads}. O arquivo irq.c contém uma única rotina, que realiza a instalação da rotina de tratamento de interrupção tanto de \emph{hardware} quanto de \emph{software}. A rotina de tratamento de interrupção de \emph{software} é feita no arquivo handler\_swi.s, que identifica o tipo de interrupção e encaminha para alguma das chamadas de sistema, encontradas em swi.c.
 
 \subsection{Pasta ``peripherals''}
 
-As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button, da chave DIP no arquivo dips, do display de sete segmentos em segment, dos LEDs em led e do timer em timer.
+As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button, da chave DIP no arquivo dips, do display de sete segmentos em segment, dos LEDs em led e do \emph{timer} em timer.
 
 \subsection{Pasta ``syscalls''}
 
-As chamadas de sistema estão escritas em assembly e se encontram em três arquivos, uma para cada chamada. São elas as chamadas fork, exec e exit.
+As chamadas de sistema estão escritas em \emph{assembly} e se encontram em três arquivos, uma para cada chamada. São elas as chamadas fork, exec e exit.
 
 \subsection{Pasta ``mutex''}
 
-No arquivo mutex há apenas as funções que permitem a exclusão mútua de código.
+No arquivo mutex há apenas as funções que permitem a exclusão mútua de código por espera ativa, feita através de um \emph{mutex}.
