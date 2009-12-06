@@ -1,0 +1,141 @@
+\section{Chaveamento de processos}
+
+O chaveamento de processos é realizado inteiramente com o assembly escrito no arquivo handler\_irq.s. Ele consiste em sete passos, indicados na figura \ref{chaveamento}.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[width=15.5cm]{figuras/chaveamento.pdf}
+\caption{Chaveamento de processos. \label{chaveamento}}
+\end{figure}
+
+\subsection{Identificação da interrupção}
+
+\begin{lstlisting}
+STMFD	sp!, {r0 - r3, lr}		; Stacking r0 to r3 and the link register
+LDR 	r0, IRQStatus	 		; r0 = irq type address
+LDR 	r0, [r0]				; r0 = irq type
+TST 	r0, #0x0400				; irq type == 0x0400?
+BNE		handler_timer 			; If yes, go to handler_timer
+TST		r0, #0x0001				; irq type = 0x0001?
+BNE		handler_button			; If yes, go to handler_button
+LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
+LDR 	pc, Angel_IRQ_Address	; and branch to the Angel routine
+\end{lstlisting}
+
+Uma vez que há a interrupção de timer, a chamada de interrupção de hardware que se encontra no vetor de interrupção é executada. Durante a instalação da rotina de tratamento de interrupção de hardware, colocou-se nesta posição a rotina handler\_board\_angel caso se estivesse usando a placa com o Angel, a rotina handler\_board\_no\_angel caso se estivesse usando a placa sem o Angel ou a rotina handler\_emulator caso estivesse usando o emulador. A direrença é que enquanto a primeira e a segunda tentam identificar qual a fonte de interrupção, a terceira já assume que a fonte é o timer, já que não há outros periféricos no emulador. Deve-se armazenar toda informação contida nos registradores que sao alterados durante o processo de tratamento de interrupção. Para tal, empilhamos os valores dos registradores r0 a r3, usados durante a rotina de chaveamento, a fim de que nenhum dado se perca durante o processo.
+
+No caso do uso da placa, a fonte da interrupção se encontra no endereço 0x03ff4004, identificado com a variável \verb|INTPND|. Se o valor contido neste endereço é 0x0400, a fonte foi uma interrupção de timer, caso seja 0x0001, a fonte foi o botão da placa e caso contrário, a fonte foi o Angel. No primeiro caso, há um desvio para a rotina \verb|handler_timer|, no segundo para a rotina \verb|handler_button| e na terceira, para o endereço salvo durante a instalação de rotina de tratamento.
+
+\subsection{Limpeza da interrupção de timer}
+
+Quando é identificada a interrupção de timer, deve-se limpar a interrupção de timer, a fim de que ele possa interromper novamente no futuro. Para tal, executa-se a rotina timer\_irq, encontrada no arquivo timer.c. Como não podemos garantir que a rotina em C manterá intactos os registradores, temos de salvar todos e recupera-los após a chamada. Abaixo podemos observar o código que realiza o salvamento e a recuperação destes registradores.
+
+\begin{lstlisting}
+STMFD	sp!, {r4 - r12}			; Stack the rest of the registers (r4-r12)
+BL		timer_irq				; Clear timer interruption
+LDMFD	sp!, {r4 - r12}			; Load r4-12 registers again
+\end{lstlisting}
+
+Os registradores r0 a r3 não precisam ser salvos ou recuperados, pois no início da rotina de tratamento eles já foram empilhados para recuperação futura.
+
+\subsection{Identificação da próxima thread}
+
+O método de escolha da próxima thread que será posta em execução é escolhida pelo método \emph{round-robin}, ou seja, a próxima thread é escolhida por ordem numérica. O código para tal tarefa é apresentado abaixo:
+
+\begin{lstlisting}
+	CMP 	r0, #9 					; r0 == 9? (it is the last thread?)
+	BEQ		last_thread				; If yes, branch last_thread
+	ADD		r1, r0, #1				; If not, r1 = r0 + 1
+	B		next_thread				; and branch to next_thread
+last_thread
+	MOV		r1, #1					; r1 = 1
+next_thread
+	SUB		r2, r1, #1				; r2 = r1 - 1
+	MOV		r3, #4					; r3 = 4
+	MUL		r2, r3, r2				; r2 = r2 * r3
+	LDR		r3, =thread_array		; r3 = thread_array bottom address
+	ADD		r2, r2, r3				; r2 = r3 + r2
+	LDR		r2, [r2]				; r2 = thread array content
+	CMP		r2, #1					; thread array content = 1?
+	BEQ		set_addresses			; If yes, branch to set_addresses
+									; Send to the next step the next active
+									; thread in r1
+	MOV		r0, r1					; If not, r0 = r1
+	B		get_next_taskid_loop	; and loop to get_next_taskid_loop
+\end{lstlisting}
+
+Nele, r0 inicia com o número da thread atual. Caso ele seja igual a 9, a última thread da lista, deve-se iniciar novamente a procura desde a thread 1. Caso contrário, inicia-se com o próximo número. O resultado é armazenado em r1, onde se encontra o número da próxima thread. O valor em r1 é incrementado sucessivamente até encontrar um ponto no vetor de threads que tenha o valor 0, indicando que a thread não está ativa. O cálculo da posição de memória é dado a partir da seguinte função: $(r1 - 1) * 4 + bottom$ = posição relativa à thread r1, onde bottom é o endereço do início do vetor e 4 é o tamanho de cada espaço dentro do vetor.
+
+\subsection{Localização dos PCBs}
+
+A rotina de troca de processos tem como entrada duas variáveis: o PCB da thread atual e o PCB do próxima thread. Para obter tais dados, é necessário o número da thread atual e da thread que será colocada em execução. Como visto nos itens anteriores, estes dados já foram obtidos. Pode-se então aplicar o seguinte algoritmo:
+
+\begin{lstlisting}
+	LDR		r2, =current_thread_id		; r2 = current thread id address
+	LDR		r2, [r2]					; r2 = current thread id
+	CMP		r2, r1						; Is r2 = current thread id ==
+										; next thread id
+	BEQ		no_thread_switch			; If yes, branch to no_thread_switch
+; Setting current_task_addr
+	MOV		r0, #68						; Else start thread switch. r0 = 68
+	MUL		r0,	r2, r0					; r0 = current thread id * 68
+	LDR		r2, =process_control_block	; r2 = PCB bottom
+	ADD		r0, r0, r2					; r0 = PCB bottom + id * 68
+	LDR		r2, =current_task_addr		; r2 = current task addr addr
+	STR		r0, [r2]					; current_task_addr = r0
+; Setting next_task_addr
+	MOV		r0, #68						; r0 = 68
+	MUL		r0,	r1, r0					; r0 = next thread id * 68
+	LDR		r2, =process_control_block	; r2 = PCB_bottom
+	ADD		r0, r2, r0					; r0 = PCB bottom + next id * 68
+	LDR		r2, =next_task_addr			; r2 = next_task_addr addr
+	STR		r0, [r2]					; next_task_addr = r0
+\end{lstlisting}
+
+O primeiro ponto checado é se a thread atual é igual à thread que vai ser substituída. Caso isso se confirme, o chaveamento se encerra e nada ocorre. Caso contrário, o cálculo dos endereços dos PCBs é iniciado. A fórmula utilizada é: $PCB_{id} = (id - 1) * 68 + base$, onde id é o número da thread e base é o endereço do início dos PCBs. Ao fim do cálculo, estes dados são armazenados nas variáveis \verb|current_task_addr| e \verb|next_task_addr|, que serão utilizadas na próxima etapa do processo.
+
+\subsection{A troca de processos}
+
+A troca de processos se dá em poucos passos usando-se instruções especiais que permitem que haja um grande número de dados empilhados/desempilhados com apenas uma instrução. Inicialmente zera-se a pilha do modo de interrupção e restabelece-se os registradores r0 a r3, que estavam empilhados desde o do início da rotina de tratamento. Nota-se que o ponteiro não é totalmente zerado, ele é colocado em uma posição 20 bytes acima do esperado. Isto se dá porque há empilhadas 5 palavras (r0 a r3 e o link register) que logo em seguida virão a ser desempilhadas.
+
+Depois disso, muda-se o endereço do ponteiro de pilha para o PCB do processo atual. Um truque vem no próximo passo: empilha-se todos os registradores com o ponteiro de pilha apontando para a posição (base - 60) do PCB. Deste modo, em uma única instrução todos os registradores são colocados em suas respectivas posições. Como a estrutura do PCB foi feita tendo este processo em mente, a posição dos dados dos registradores cai exatamente como foi descrito na figura \ref{pcb}. Após o armazenamento do estado atual, muda-se novamente o endereço do ponteiro de pilha para o PCB da próxima instrução. Do mesmo modo que o armazenamento, desempilha-se os o valor dos registradores, que são exatamente como estava empilhado este processo quando foi armazenado. 
+
+\begin{lstlisting}
+; Reset and save IRQ stack
+	LDR		r0, =irq_stack_pointer		; r0 = irq_stack_pointer addr
+	MOV		r1, sp						; r1 = irq stack pointer
+	ADD		r1, r1, #5*4				; r1 = irq stack pointer + 5 (# of data in
+										; the stack, r0-r3, lr) * 4 (size of a word)
+	STR		r1, [r0]					; irq_stack_pointer = irq stack pointer
+										; without the data that will be removed next
+	LDMFD		sp!,{r0-r3,lr}			; Restore the remaining registers
+; Load and position r13 to point into current PCB
+	LDR		r13, =current_task_addr		; r13 = current task PCB bottom address address 
+	LDR		r13, [r13]					; r13 = current task PCB bottom address
+	SUB		r13, r13,#60				; r13 = current task PCB bottom address - 60
+										; to point to the right place for the stacking
+										; (next step)
+; Store the current user registers in current PCB
+	STMIA 	r13, {r0-r14}^				; Stacks the r0-r14 registers in the PCB
+	MRS		r0, SPSR					; r0 = status register
+	STMDB	r13, {r0,r14}				; Stacks r0 and r14
+;Load and position r13 to point into next PCB
+	LDR 	r13, =next_task_addr		; r13 = next task PCB bottom address address 
+	LDR		r13, [r13]					; r13 = next task PCB bottom address 
+	SUB		r13, r13,#60				; r13 = next task PCB bottom address - 60
+										; to point to the right place for the stacking
+										; (next step)
+; Load the next task and setup PSR
+	LDMNEDB	r13, {r0,r14}				; Restore r0 and r14 (IRQ mode)
+	MSRNE 	spsr_cxsf, r0				; Restore status register
+	LDMNEIA	r13, {r0-r14}^				; Restore r0-r14 for the user mode
+	NOP									; NOP! (required for the above instruction)
+; Load the IRQ stack into r13_irq
+	LDR		r13, =irq_stack_pointer		; r13 = stack pointer address address
+	LDR		r13,[r13]					; Restore previous stack pointer
+	B		return						; Go to the end
+\end{lstlisting}
+
+\subsection{Retorno à execução da nova rotina}
+
+Como os registradores, o ponteiro de pilha, o endereço de retorno e o registrador de estados já estão com os dados do próximo processo, deve-se apenas fazer com que o a instrução imediatamente posterior à aquela executada antes da interrupção seja executada. Porém, o pipeline do processador fez com que o endereço da instrução duas vezes à frente tivesse sido armazenado. Para compensar isso, deve-se subtrair o tamanho de uma instrução (4 bytes) do endereço que vai ser colocado no process counter. Todo este processo é feito com apenas uma instrução: \verb|SUBS 		pc, r14, #4|, que simultaneamente decrementa do endereço de retorno 4 e coloca o resultado no process counter.

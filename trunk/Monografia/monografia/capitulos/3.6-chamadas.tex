@@ -1,0 +1,134 @@
+\section{Chamadas de sistema}
+
+Uma system call é uma interrupção de software causada pelo kernel para a execução de código que necessita de privilégios para ser executado. Como uma interrupção de hardware, uma vez que é causada, ela executa a instrução apontada no vetor de interrupções, que foi instalada anteriormente na inicialização do sistema. A rotina de tratamento está localizada no arquivo handler\_swi.s e é executada em modo SVC. As únicas instruções que chamam tais system calls são as rotinas fork, exec e exit.
+
+\subsection{Propriedades gerais}
+
+Uma vez que uma system call é chamada, umas das funções encontradas em \verb|swi.c| é invocada. O motivo para este passo intermediário é que todas as chamadas de sistema do kernel devem ter a mesma identificação junto à rotina de tratamento. Neste caso, todas são passadas com o primeiro parâmetro como 0. Além disso, todas devem passar o mesmo número de parâmetros, pois todas estão invocando a mesma função, chamada de \verb|syscall| que também é realizado nesta etapa.
+
+Uma vez que a chamada \verb|syscall| é feita, ocorre uma interrupção de software. O procedimento que se passa neste caso é muito parecido com o de uma interrupção de hardware.
+
+\begin{lstlisting}
+STMFD 	sp!,{r0-r12,lr}			; Stack registers r0-12 and link register
+LDR		r0,[lr,#-4]				; Calculate address of SWI instruction (r0 = lr-4)
+BIC		r0,r0,#0xff000000		; Mask off top 8 bits of instruction to give SWI 
+								; number
+LDR		r1, Angel_SWI_Number	; r1 = Angel SWI Number
+CMP		r0, r1					; Compare SWI number to angel interrupt number 
+BEQ		goto_angel				; If it is angel interrupt, branch to goto_angel
+MOV		r1, #0					; r1 = 0
+CMP		r0, r1					; Compare SWI number to r1
+BEQ		os_swi					; If it is OS SWI, branch to os_swi
+\end{lstlisting}
+
+Novamente há uma rotina de identificação da fonte de interrupção, que pode vir a ser uma do sistema operacional, ou do Angel. O primeiro passo desta rotina é o empilhamento de todos os registradores, para poder futuramente restaurar o estado atual. Em seguida, ocorre a identificação em si, onde uma máscara de bits é aplicada para se obter o identificador da interrupção. Caso ela seja Angel\_SWI\_Number, o estado do processador é restaurado e há um desvio para a instrução previamente armazenada durante a instalação. Caso ela seja 0, o valor estabelecido para o sistema, há um desvio para outro código que identifica quais das chamadas de sistema foi ativada.
+
+Esta nova identificação pode ser observada abaixo. O primeiro passo é restaurar e armazenar novamente os valores dos registradores, já que na arquitetura ARM os valores passados pelos parâmetros de uma função são passados pelos primeiros registradores. Neste caso, r1 contém o tipo da chamada. Dependendo de qual for o valor, há desvios para \verb\pre_routine_fork\, \verb\pre_routine_exec\ e \verb\pre_routine_exit\
+
+\begin{lstlisting}
+LDMFD	sp!,{r0-r12,lr}		; Restore r0-r12 registers and link registers
+STMFD 	sp!,{r0-r12,lr}		; and stores them again (in order to clean the registers)
+MOV		r1,	#0				; r1 = 0
+CMP		r0, r1				; Compare the first parameter to 0
+BEQ		pre_routine_fork	; If it is equal, branch to the fork
+MOV		r1,	#1				; r1 = 1
+CMP		r0, r1				; Compare the first parameter to 1
+BEQ		pre_routine_exec	; If it is equal, branch to the exec
+MOV		r1,	#2				; r1 = 2
+CMP		r0, r1				; Compare the first parameter to 2
+BEQ		pre_routine_exit	; If it is equal, branch to the exit
+LDMFD	sp!,{r0-r12,pc}^	; If it is an unidentified syscall, go back to the program,
+							; restoring the registers and putting the return address in
+							; the process counter
+\end{lstlisting}
+
+\subsection{fork}
+
+TODO \ldots
+
+Em um sistema operacional, a system call fork é responsável pela criação de novos processos. Para tal, ela duplica o processo que a criou, onde o único meio de se identificar qual o processo pai é pelo número de retorno. Caso o número de retorno seja 0, significa que este é o processo filho, e caso seja qualquer outro número, é o processo pai que retornou o identificador do processo filho. 
+
+Nosso fork teve de ser ligeiramente alterado por causa de uma simplificação que fizemos em nosso kernel. Como dito anteriormente, temos uma área de dados única para todos os processos. Com isso, fica impossível de se duplicar a área de dados de um processo, o que não fazemos.
+
+O processo de duplicação de um processo se inicia com o empilhamento dos registradores de dados (r0 a r12) e do endereço de retorno (link register) por duas vezes. O motivo é que o primeiro empilhamento serve para a restauração do estado ao fim do processo de duplicação e a segunda para o processo que vai a ser duplicado. Então, tentamos encontrar qual o primeiro espaço disponível dentro da tabela de processos. Uma vez encontrado o espaço, temos de encontrar o espaço do PCB reservado para este processo, onde iremos popular com os dados do estado em execução. Porém, além disso, temos também de duplicar a pilha, que é um processo um pouco mais complexo. Para tal, primeiro temos de descobrir o tamanho da pilha atual. Então, começamos a copiar os dados de uma pilha para a outra. Finalmente, colocamos no ponteiro de pilha do PCB do novo processo o topo da pilha recém copiada. Uma vez resolvido o problema da cópia de pilha, apenas duplicamos os dados do registrador de estados, do link register, do process counter e de todos os registradores de dados. Finalmente, quando o processo está totalmente copiado, devemos habilitar o processo na tabela de processos e restaurar todos os registradores empilhados de volta ao seus lugares, onde o link register entrará no lugar do process counter.
+
+%-------------------------------------------
+% System call EXEC
+%-------------------------------------------
+\subsection{exec}
+
+A chamada de sistema \emph{exec} é responsável por substituir a imagem núcleo de um processo pela imagem do programa passado como argumento \cite{Tanenbaum2000}.
+
+Nos sistemas operacionais tradicionais, como o Linux ou o Minix, o \emph{exec} é utilizado para iniciar um novo programa no mesmo ambiente do programa que executa a chamada de sistema. Normalmente o \emph{exec} é utilizado na criação de um novo processo da seguinte maneira: um processo já existente se duplica através da chamada de sistema \emph{fork}. O processo filho tem, então, seu código substituído pelo código que deve ser executado através da chamada de sistema \emph{exec}, que permite ao processo filho assumir seu próprio conteúdo, apagando de si o conteúdo do processo pai.
+
+No KinOS, para que um \emph{thread} passe a executar outro programa, é necessário reinicializar o seu PCB, isso é feito pela chamada de sistema \emph{exec}.
+
+Existem 4 principais entradas do PCB que necessitam ser reinicializadas: 
+
+\begin{itemize}
+\item o \emph{program counter} (PC - R13);
+\item o \emph{link register} (LR - R14);
+\item o \emph{stack pointer} (SP - R15);
+\item e o \emph{saved processor status register} (SPSR).
+\end{itemize}
+
+Para reinicializar essas entradas, de forma que a \emph{thread} passe à executar um novo programa, primeiro é necessário calcular o início do PCB da \emph{thread} correspondente.
+
+A rotina \emph{exec}, recebe como parâmetros o id da \emph{thread} que será alterada e o ponteiro para a função/programa que pretende-se executar, como mostrado a seguir:
+
+
+\begin{lstlisting}
+	void exec(int process_id, pt2Task process_addr);
+\end{lstlisting}
+
+Assim para calcular o endereço inicial do PCB, obtêm-se o endereço inicial da área reservada para armazenar todos os PCBs, a \textbf{process\_control\_block}, e adiciona-se à esta o valor de 68 multiplicado por \textbf{process\_id}, visto que cada PCB ocupa um espaço de 68 endereços de memória como mencionado na sessão \ref{sub:PCB}. O código responsável por calcular o PCB é apresentado a baixo:
+
+\begin{lstlisting}
+  LDR r3, =process_control_block  ; r3 = the start address of the PCB area
+  MOV r4,#68         ; r4 = 68 (space for each process in the PCB)
+  MUL r5,r1,r4       ; r5 = (task id) * 68
+  ADD r3,r3,r5       ; r3 = PCB start address + r5
+\end{lstlisting}
+
+Em seguida, calculado o endereço inicial do PCB, altera-se suas entradas da seguinte maneira:
+
+\begin{itemize}
+\item LR (PCB[-4]) e PC (PCB[-64]) recebem o endereço da primeira instrução do novo programa (\textbf{process\_addr}).
+
+\begin{lstlisting}
+PCB[-4] = process_addr;
+PCB[-64] = process_addr;
+\end{lstlisting}
+
+\item SP (PCB[-8]) recebe o endereço de início da pilha da \emph{thread}, fazendo com que esta seja zerada. Para cada pilha de \emph{thread}, 4048 bytes são reservados. 
+
+\begin{lstlisting}
+PCB[-8] =  início da pilha do modo usuário - (4048 * thread id);
+\end{lstlisting}
+
+\item SPSR (PCB[-68]) recebe 0x10, pois os programas devem rodar no modo usuário.
+
+\begin{lstlisting}
+PCB[-68] = 0x10;
+\end{lstlisting}
+
+\end{itemize}
+
+Finalmente, após alterar as entradas mostradas a cima, a \emph{thread} começa a executar o novo programa.
+
+
+
+%-------------------------------------------
+% System call EXIT
+%-------------------------------------------
+\subsection{exit}
+
+A chamada de sistema \emph{exit} é responsável por finalizar um processo, liberando espaço de memória para a execução de um novo processo \cite{Tanenbaum2000}.
+
+No KinOS isso é realizado apenas colocando como desativado (igual à 0) o byte na lista de processos que  corresponde a \emph{thread} que se deseja finalizar. 
+
+Para isso a rotina \emph{exit} recebe como parâmetro o id da \emph{thread} a ser terminada.
+
+\begin{lstlisting}
+	void exit(int process_id);
+\end{lstlisting}
