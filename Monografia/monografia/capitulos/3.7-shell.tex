@@ -3,7 +3,7 @@
 %-------------------------------------------
 \section{Shell}
 
-Com o desenvolvimento do microkernel e de suas system calls, torna-se necessário o desenvolvimento de outro ramo do projeto, destinado a permitir a interação do usuário com o Sistema Operacional. Essa interação é feita por um editor de linha de comando, também conhecida por Shell.
+Com o desenvolvimento do microkernel e de suas system calls, torna-se necessário o desenvolvimento de outro ramo do projeto, destinado a permitir a interação do usuário com o Sistema Operacional. Essa interação é feita por um editor de linha de comando, também conhecido por Shell.
 
 Na inicialização do microkernel, o Shell é o primeiro processo criado no sistema. Desse momento em diante, cabe ao usuário solicitar a execução ou o término de outros processos. Além disso, o Shell permite a visualização dos diferentes processos em execução no sistema.
 
@@ -18,3 +18,61 @@ O Shell, para fazer a interação com o usuário, utiliza a porta serial COM0 (de u
 \end{figure}
 
 % Configuracao e comunicacao da COM0
+\subsection{Configuração e uso da COM0}
+
+Para utilizar a porta COM0 da Evaluator-7T, é preciso configurar um conjunto de registradores mapeados em memória relativos à UART0 do microcontrolador. A tabela \ref{table:regscom0} lista os registradores usados no projeto e suas respectivas funções.
+
+\begin{table}[!ht]
+\caption{Registradores mapeados em memória da UART0 \cite{uControllerUserManual} }
+\centering
+\begin{tabular}{| c | c | c | c |}
+\hline  \textbf{Registrador} & \textbf{Offset} & \textbf{R/W} & \textbf{Descrição}  \\ 
+\hline  ULCON0 & 0xD000 & R/W & Registrador de controle de linha \\ 
+\hline  UCON0 & 0xD004 & R/W & Registrador de controle \\ 
+\hline  USTAT0 & 0xD008 & R & Registrador de status \\ 
+\hline  UTXBUF0 & 0xD00C & W & Registrador de buffer de transmissão \\ 
+\hline  URXBUF0 & 0xD010 & R & Registrador de buffer de recepção \\ 
+\hline  UBRDIV0 & 0xD014 & R/W & Registrador de divisor de taxa de transmissão \\ 
+\hline 
+\end{tabular}
+\label{table:regscom0}
+\end{table}
+
+A coluna \emph{offset} da tabela \ref{table:regscom0} indica o endereço de memória do registrador a partir do endereço inicial, que é 0x03FF0000. Esse endereço é o do registrador SYSCFG, de configuração de sistema.
+
+Na inicialização da COM0, escreve-se nos registradores ULCON0, UCON0 e UBRDIV0. Os valores a serem colocados em cada um seus respectivos significados estão descritos na tabela \ref{table:regscom0init}.
+
+\begin{table}[!ht]
+\caption{Registradores mapeados em memória da UART0 \cite{uControllerUserManual} }
+\centering
+\begin{tabular}{| c | c | p{7cm} |}
+\hline  \textbf{Registrador} & \textbf{Valor} & \textbf{Significado} \\ 
+\hline  ULCON0 & 0x03 & 8 bits de dados, 1 bit de parada, sem paridade, fonte de clock interna e modo de operação normal. \\ 
+\hline  UCON0 & 0x09 & Rx e Tx por requisição de interrupção, sem geração de interrupção por status de recepção, sem loop-back. \\ 
+\hline  UBRDIV0 & 0xA20 & Define a taxa de transmissão em 9600 bauds. \\ 
+\hline 
+\end{tabular}
+\label{table:regscom0init}
+\end{table}
+
+Inicializada a COM0, a transmissão de um caractere por ela é feita da seguinte maneira: observa-se o conteúdo do bit 6 de USTAT0. Quando este é igual a 1, significa que UTXBUF0 não contém dados válidos e, portanto, pode-se escrever nele o caractere que pretende-se enviar. Em seguida, coloca-se o caractere desejado em UTXBUF0. A lógica do controlador UART do microcontrolador se encarrega de enviar o dado para o terminal.
+
+A recepção de caracteres é feita de forma parecida: dessa vez, a verificação é feita no bit 5 de USTAT0, o qual é igual a 1 quando contém dados válidos recebidos pela porta serial. Quando isso acontece, copia-se o conteúdo de URXBUF0 para uma variável no programa do tipo \emph{char}.
+
+\subsection{Funcionalidades do Shell}
+
+O editor de linha de comando do KinOS possui três funcionalidades básicas: listar processos ativos (\emph{ps}), inicializar novos processos (\emph{start}) e encerrar processos ativos (\emph{end}). As sintaxes de cada comando são, respectivamente:
+
+\begin{lstlisting}
+ps
+
+start <nome do processo>
+
+end <nome do processo>
+\end{lstlisting}
+
+O comando \emph{ps} utiliza o vetor de threads do sistema operacional para saber quais processos estão ativos. A partir daí, buscam-se as informações sobre cada processo ativo em seu respectivo PCB. Essas informações são, então, listadas ao usuário.
+
+O comando \emph{start} utiliza as system calls \emph{fork} e \emph{exec} para iniciar novos processos no sistema. O usuário deve fornecer o nome do processo como parâmetro do comando. Cada processo que pode ser disparado dentro do KinOS já está definido dentro do código-fonte, e cada um de seus nomes também já está definido.
+
+O comando \emph{end} é similar ao \emph{start}. Dessa vez, o comando recebe o nome de um processo ativo no sistema e utiliza a system call \emph{exit} para encerrá-lo.
