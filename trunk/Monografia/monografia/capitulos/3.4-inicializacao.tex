@@ -67,7 +67,7 @@ MOV 	pc, lr					; process counter = C entry
 Para alguns periférico da placa, como o display de sete segmentos, o timer e os botões, há uma rotina de inicialização que os habilita e define suas configurações. Suas chamadas são \verb|segment_init()|, \verb|timer_init()| e \verb|button_init()| respectivamente. Estas funções se encontram nos arquivos de cada um dos periféricos e são executadas logo no início da etapa C do processo de inicialização da placa.
 
 \subsection{Instalação do tratamento de interrupção}
-
+\label{init:install}
 Como descrito anteriormente, caso uma interrupção de hardware ocorra, a instrução no endereço 0x18 é executada e caso seja uma interrupção de software, a instrução no endereço 0x08. Toda vez que se reinicia a placa, são colocados nestes endereços uma instrução que realiza um desvio para a rotina Angel, descrita anteriormente. 
 
 Porém, se algum dos periféricos vai ser utilizado, a interrupção gerada por esse periférico não deve desviada para o Angel, e sim para uma rotina adequada. Para poder identificar qual a origem da interrupção e desviar para a rotina correta, devemos instalar uma nova rotina no vetor de interrupções, substituindo o desvio para o Angel. A instalação da rotina se dá através do desvio para a tal rotina. Todavia, não se pode apenas descartar o endereço do Angel, já que caso não se identifique a origem da interrupção, ainda deve-se desviar para ele. Este processo pode ser observado na figura \ref{chain}. Nele, \emph{Handler2} é a rotina de tratamento de interrupções, e \emph{Handler1} é o Angel.
