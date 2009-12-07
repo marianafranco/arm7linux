@@ -1,5 +1,19 @@
 \section{Inspiração}
 
-Grande parte do código foi retirada do código presente nos exemplos incluídos no CD de demonstração da placa. O principal deles, é o código \emph{mutex}, desenvolvido por Andrew N. Sloss, de onde foi baseado o chaveamento de processos, a função de semáforo e as rotinas de manipulação de hardware.
+Grande parte do código foi baseada do código presente nos exemplos incluídos no CD de demonstração da placa, desenvolvido por Andrew N. Sloss. O principal deles, é o código \emph{mutex}, de onde foi baseado o chaveamento de processos, a função de mutex e as rotinas de manipulação de hardware. Eis a inspiração de cada uma das partes do projeto:
 
-TODO \ldots
+\paragraph{Chaveamento de processos} O chaveamento de processos original, contido no projeto mutex era de apenas duas threads. Modificações foram realizadas para fazer com que o número de processos passasse de duas para nove.
+
+\paragraph{Inicialização} A inicialização foi baseada no código do mutex, mas grandes alterações foram feitas e pouquíssimas coisas ainda restam do código original
+
+\paragraph{Shell} O código foi baseado no exemplo da porta serial e também no Sistema Operacional ISOS \cite{ISOSPage}.
+
+\paragraph{Interrupção de hardware} O código foi baseado no exemplo do mutex, mas grandes alterações foram realizadas
+
+\paragraph{Interrupção de software} Foi baseado no exemplo SWI, também contido no CD da placa
+
+\paragraph{Rotinas de manipulação de periféricos} As rotinas foram praticamente copiadas do código do mutex, que utiliza todas elas
+
+\paragraph{Chamadas de sistema} Todas as chamadas de sistema foram inteiramente desenvolvidas durante o projeto
+
+\paragraph{Mutex} O código do mutex foi inteiramente copiado do exemplo com o mesmo nome
