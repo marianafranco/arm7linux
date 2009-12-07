@@ -1,3 +1,41 @@
-\section{Mutex}
+\section{\emph{Mutex}}
 
-TODO\ldots
+O \emph{mutex} ou exclusão mútua, é uma técnica usada para evitar que dois processos tenham acesso a um mesmo espaço de memória. Seu funcionamento é baseado em uma variável que pode ter apenas dois valores, 0 ou 1. Caso ela seja 0, ela indica que a área crítica pode ser acessada e 1 caso contrário. No caso de um processo não obter acesso, ele fica em espera ativa, até que o processo que o bloqueou o desfaça.
+
+No exemplo que é dado no KinOS, tem-se duas funções que realizam o travamento e o destravamento do \emph{mutex} e a variável semaphore, que guarda o valor do \emph{mutex}. A primeira função se chama \verb|mutex_gatelock|, que pode ser observada abaixo.
+
+\begin{lstlisting}
+void mutex_gatelock (void) {
+	__asm {
+		spin:
+		mov		r1, &semaphore
+		mov		r2, #1
+		swp		r3,r2,[r1]
+		cmp		r3,#1
+		beq		spin
+	}
+}
+\end{lstlisting}
+
+r1 recebe o endereço da variável semaphore, e r2 recebe 1. A função atômica swp é que permite o correto funcionamento do \emph{mutex}: em uma instrução indivisível, o conteúdo de semaphore é colocado em r3, e 1 é colocado em semaphore. Com isso, é impossível que haja uma interrupção entre estas duas ações, o que poderia arruinar uma rotina de \emph{mutex}. Finalmente, caso semaphore já estivesse ativo quando chamado, a rotina seria executada novamente.
+
+\begin{lstlisting}
+void mutex_gateunlock (void)  {
+	__asm  {
+		mov		r1, &semaphore
+		mov		r2, #0
+		swp		r0,r2,[r1]
+	}
+}
+\end{lstlisting}
+
+O destravamento é feito de modo similar, com a mesma instrução. Só que neste caso, o valor 0 é colocado em semaphore.
+
+Porém, as rotinas apresentadas não são chamadas diretamente. Usa-se as chamadas abaixo.
+
+\begin{lstlisting}
+#define WAIT 		while (semaphore==1) {} mutex_gatelock(); 
+#define SIGNAL 		mutex_gateunlock(); 	
+\end{lstlisting}
+
+O motivo é que ao se usar o \verb|WAIT| quando o \emph{mutex} está ativo, faz com que o programa entre em uma espera ativa.
