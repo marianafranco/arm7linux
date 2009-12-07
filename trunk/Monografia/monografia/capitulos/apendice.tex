@@ -1,4 +1,4 @@
-\chapter{Pesquisas iniciais}
+\chapter{Pesquisas iniciais} \label{chap:pesquisas}
 
 Antes da decisão pela implementação de um \emph{microkernel} próprio, foram feitas uma série de pesquisas sobre Sistemas Operacionais já existentes para sistemas embarcados, categoria da qual o processador ARM7TDMI e a placa Evaluator-7T fazem parte. Dentre os resultados encontrados, dois Sistemas Operacionais chamaram mais a atenção do grupo: o \emph{eCos} e o \emph{uCLinux}. Esses dois sistemas estão descritos nas seções seguintes.
 
@@ -7,14 +7,24 @@ Além disso, cogitou-se o uso de um ambiente de desenvolvimento baseado no Sistem
 \section{O Sistema Operacional \emph{eCos}}
 \index{apendice!ecos}
 
-Este sistema operacional para sistemas embarcados é de código aberto, e portanto, e não cobra royalties pelo seu uso. Porém, trata-se de um sistema não relacionado ao Linux. Um ponto pelo qual ele se destaca, é seu sistema de configuração. Esse sistema permite a imposição de requisitos bem definidos dos componentes de tempo de execução. Essas ferramentas são distribuídas conjuntamente com o código-fonte do eCos. Dessa forma, dadas as restrições de hardware da Evaluator-7T, o porte dessa sistema operacional é simples de ser feito.
+Este sistema operacional para sistemas embarcados é de código aberto, e portanto, e não cobra royalties pelo seu uso \cite{eCosPage}. Porém, trata-se de um sistema não relacionado ao Linux. Um ponto pelo qual ele se destaca, é seu sistema de configuração. Esse sistema permite a imposição de requisitos bem definidos dos componentes de tempo de execução. Essas ferramentas são distribuídas conjuntamente com o código-fonte do eCos. Dessa forma, dadas as restrições de hardware da Evaluator-7T, o porte dessa sistema operacional é simples de ser feito.
 
 Existem versões desse SO para diversas arquiteturas, inclusive a ARM. O trabalho residiria na adaptação à placa Evaluator-7T.
+
+Com o avanço das pesquisas sobre o eCos, descobriu-se que já havia um porte para a placa Evaluator-7T. Com isso, o esforço do projeto seria concentrado apenas em realizar a instalação correta do código já existente para placa. Essa abordagem, porém, não era a idealizada pelo projeto, tendo em vista, principalmente, seus objetivos didáticos. A simples instalação de um projeto já pronto não agregaria tanto valor educacional ao projeto quanto a realização das próprias funções básicas de um sistema operacional.
+
+Por esses motivos, então, decidiu-se que o eCos não seria utilizado no projeto, pois não cumpriria um dos objetivos que motivaram a escolha do tema deste projeto: o estudo aprofundado e o consequente aprendizado avançado sobre Sistemas Operacionais.
 
 \section{O Sistema Operacional \emph{uCLinux}}
 \index{apendice!uclinux}
 
-Este sistema operacional é um porte do Linux para sistemas sem uma unidade de gerenciamento de memória (MMU), que é o caso da placa Evaluator-7T. Assim como o eCos, há portes dele para diversas arquiteturas, assim como diversas ferramentas que, assim como o Linux, são softwares livres. Tal fato torna interessante para tornar a placa independente de licenças. O que torna este sistema interessante é a existência de uma comunidade entusiasta com este sistema, fazendo com que exista muito material para estudo e assim reduzir a complexidade do porte pretendido.
+Este sistema operacional é um porte do Linux para sistemas sem uma unidade de gerenciamento de memória (MMU) \cite{uCLinuxPage}, que é o caso da placa Evaluator-7T. Assim como o eCos, há portes dele para diversas arquiteturas, assim como diversas ferramentas que, assim como o Linux, são softwares livres. Tal fato torna interessante para tornar a placa independente de licenças. O que torna este sistema interessante é a existência de uma comunidade entusiasta com este sistema, fazendo com que exista muito material para estudo e assim reduzir a complexidade do porte pretendido.
+
+Assim como o eCos, as pesquisas para se obter mais detalhes sobre este sistema operacional e sobre a viabilidade de utilizá-lo na placa Evaluator-7T prosseguiram. Embora existisse na página do projeto guias básicos para a compilação do código, estes se mostraram insuficientes para a total compreensão do que deveria ser feito. Além disso, não havia instruções sobre como proceder em caso de erros, sendo necessário recorrer às listas de discussão sobre o projeto. Nessas listas, já que a informação é proveniente de uma quantidade muito grande de fontes, a busca pela solução dos eventuais erros encontrados se torna excessivamente lenta, consumindo muito tempo para um problema que, aparentemente, seria de simples resolução.
+
+Além disso, o uCLinux necessita da ferramenta GNUARM para a compilação e embarque do código na placa, a qual requer um ambiente GNU/Linux para sua utilização. Como mencionado anteriormente, a falta de familiaridade do grupo com esses ambientes fez com que o tempo gasto para a realização de tarefas simples e para a resolução de pequenos problemas fosse muito grande. Dessa forma, decidiu-se também por não realizar o porte do uCLinux para a Evaluator-7T.
+
+A decisão final para o projeto foi, então, a criação de um \emph{microkernel} próprio, baseado nos conceitos básicos aprendidos na disciplina de Sistemas Operacionais.
 
 \chapter{Arquivos Fonte} \label{chap:code}
 
