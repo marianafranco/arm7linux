@@ -4,7 +4,7 @@ Uma chamada de sistema é uma interrupção de \emph{software} causada pelo \emph{k
 
 \subsection{Propriedades gerais}
 
-Uma vez que uma chamada de sistema é chamada, umas das funções encontradas em \verb|swi.c| é invocada. O motivo para este passo intermediário é que todas as chamadas de sistema do \emph{kernel} devem ter a mesma identificação junto à rotina de tratamento. Neste caso, todas são passadas com o primeiro parâmetro como 0. Além disso, todas devem passar o mesmo número de parâmetros, pois todas estão invocando a mesma função, chamada de \verb|syscall| que também é realizado nesta etapa.
+Uma vez que uma chamada de sistema é chamada, umas das funções encontradas em \verb|swi.c| é invocada. O motivo para este passo intermediário é que todas as chamadas de sistema do \emph{kernel} devem ter a mesma identificação junto à rotina de tratamento. Neste caso, todas são passadas com o primeiro parâmetro com o valor 0. Além disso, todas devem passar o mesmo número de parâmetros, pois todas estão invocando a mesma função, chamada de \verb|syscall| que também é realizado nesta etapa.
 
 Uma vez que a chamada \verb|syscall| é feita, ocorre uma interrupção de \emph{software}. O procedimento que se passa neste caso é muito parecido com o de uma interrupção de \emph{hardware}.
 
@@ -21,9 +21,9 @@ CMP		r0, r1					; Compare SWI number to r1
 BEQ		os_swi					; If it is OS SWI, branch to os_swi
 \end{lstlisting}
 
-Novamente há uma rotina de identificação da fonte de interrupção, que pode vir a ser uma do sistema operacional, ou do Angel. O primeiro passo desta rotina é o empilhamento de todos os registradores, para poder futuramente restaurar o estado atual. Em seguida, ocorre a identificação em si, onde uma máscara de bits é aplicada para se obter o identificador da interrupção. Caso ela seja Angel\_SWI\_Number (0x0123456), o estado do processador é restaurado e há um desvio para a instrução previamente armazenada durante a instalação. Caso ela seja 0, o valor estabelecido para o sistema, há um desvio para outro código que identifica quais das chamadas de sistema foi ativada.
+Novamente há uma rotina de identificação da fonte de interrupção, que pode vir a ser uma do sistema operacional, ou do Angel. O primeiro passo desta rotina é o empilhamento de todos os registradores, para poder futuramente restaurar o estado atual. Em seguida, ocorre a identificação em si, onde uma máscara de bits é aplicada para se obter o identificador da interrupção. Caso ela seja Angel\_SWI\_Number (0x0123456), o estado do processador é restaurado e há um desvio para a instrução previamente armazenada durante a instalação. Caso seja 0, o valor estabelecido para o sistema, há um desvio para outro código que identifica quais das chamadas de sistema foi ativada.
 
-Esta nova identificação pode ser observada abaixo. O primeiro passo é restaurar e armazenar novamente os valores dos registradores, já que na arquitetura ARM os valores passados pelos parâmetros de uma função são passados pelos primeiros registradores. Neste caso, r1 contém o tipo da chamada. Dependendo de qual for o valor, há desvios para \verb\pre_routine_fork\, \verb\pre_routine_exec\ e \verb\pre_routine_exit\
+Esta nova identificação pode ser observada abaixo. O primeiro passo é restaurar e armazenar novamente os valores dos registradores, já que na arquitetura ARM os valores passados pelos parâmetros de uma função são passados nos primeiros registradores. Neste caso, r1 contém o tipo da chamada. Dependendo de qual for o valor, há desvios para \verb\pre_routine_fork\, \verb\pre_routine_exec\ e \verb\pre_routine_exit\
 
 \begin{lstlisting}
 LDMFD	sp!,{r0-r12,lr}		; Restore r0-r12 registers and link registers
@@ -61,7 +61,7 @@ STMFD 	sp!,{lr} 			; Stacks the link register (In a separate instruction
 							; to stack it in the top)
 \end{lstlisting}
 
-Em segundo lugar, procura-se o primeiro espaço disponível no vetor de \emph{threads}, o que indica qual dos PCBs está livre. Na rotina apresentada abaixo, r0 contém o id da posição sendo procurada e r1 seu endereço. O loop é feito verificando de posição em posição, um ponto onde o valor seja 0. Caso se encontre, passa-se ao próximo passo, ao contrário, soma-se 1 ao número da \emph{thread} e 4 no endereço do vetor.
+Em segundo lugar, procura-se o primeiro espaço disponível no vetor de \emph{threads}, o que indica qual dos PCBs está livre. Na rotina apresentada abaixo, r0 contém o id da posição sendo procurada e r1 seu endereço. O \emph{loop} é feito verificando de posição em posição, um ponto onde o valor seja 0. Caso se encontre, passa-se ao próximo passo, ao contrário, soma-se 1 ao número da \emph{thread} e 4 no endereço do vetor.
 
 \begin{lstlisting}
 	LDR		r1, =thread_array	; r1 = bottom of the thread array address
@@ -95,7 +95,7 @@ B		loop_stack_copy		; restart sequence (go to loop_stack_copy)
 
 O registrador r6 serve como memória intermediária para a cópia. r4 contém o endereço que está sendo copiado, e é incrementado de 4 em 4 até chegar ao seu topo, enquanto r5 guarda o endereço equivalente da nova pilha, que também é incrementado de 4 em 4.
 
-Finalmente, se começa a construir o novo PCB. Na posição que guarda o registrador de estado, guarda-se o valor 0x10, que indica que a \emph{thread} deve ser iniciada em modo \emph{user}. O ponteiro de pilha foi obtido no passo anterior, vindo no registrador r5. Tanto o endereço de retorno do modo \emph{user} quanto o do modo \emph{IRQ} são o mesmo, e coloca-se o endereço inicial da rotina que se quer executar. A cópia dos valores dos registradores r0 a r12 se dá através de um loop, como pode-se observar abaixo.
+Finalmente, se começa a construir o novo PCB. Na posição que guarda o registrador de estado, guarda-se o valor 0x10, que indica que a \emph{thread} deve ser iniciada em modo \emph{user}. O ponteiro de pilha foi obtido no passo anterior, vindo no registrador r5. Tanto o endereço de retorno do modo \emph{user} quanto o do modo \emph{IRQ} são o mesmo, e coloca-se o endereço inicial da rotina que se quer executar. A cópia dos valores dos registradores r0 a r12 se dá através de um \emph{loop}, como pode-se observar abaixo.
 
 \begin{lstlisting}
 ; Copy registers
