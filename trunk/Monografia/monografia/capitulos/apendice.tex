@@ -1,3 +1,21 @@
+\chapter{Pesquisas iniciais}
+
+Antes da decisão pela implementação de um \emph{microkernel} próprio, foram feitas uma série de pesquisas sobre Sistemas Operacionais já existentes para sistemas embarcados, categoria da qual o processador ARM7TDMI e a placa Evaluator-7T fazem parte. Dentre os resultados encontrados, dois Sistemas Operacionais chamaram mais a atenção do grupo: o \emph{eCos} e o \emph{uCLinux}. Esses dois sistemas estão descritos nas seções seguintes.
+
+Além disso, cogitou-se o uso de um ambiente de desenvolvimento baseado no Sistema Operacional GNU/Linux e na ferramenta GNUARM, uma \emph{toolchain} para compilação, embarque e depuração de código em processadores ARM. No entanto, a falta de familiaridade do grupo com ambas as ferramentas e as dificuldades encontradas para configurá-las e executá-las de maneira adequada resultou na escolha do ambiente Windows com desenvolvimento pelo CodeWarrior, uma vez que, para o primeiro, o grupo já possuía conhecimentos avançados e, para o segundo, a existência de uma documentação mais precisa fez com que a curva de aprendizado da ferramenta diminuísse consideravelmente.
+
+\section{O Sistema Operacional \emph{eCos}}
+\index{apendice!ecos}
+
+Este sistema operacional para sistemas embarcados é de código aberto, e portanto, e não cobra royalties pelo seu uso. Porém, trata-se de um sistema não relacionado ao Linux. Um ponto pelo qual ele se destaca, é seu sistema de configuração. Esse sistema permite a imposição de requisitos bem definidos dos componentes de tempo de execução. Essas ferramentas são distribuídas conjuntamente com o código-fonte do eCos. Dessa forma, dadas as restrições de hardware da Evaluator-7T, o porte dessa sistema operacional é simples de ser feito.
+
+Existem versões desse SO para diversas arquiteturas, inclusive a ARM. O trabalho residiria na adaptação à placa Evaluator-7T.
+
+\section{O Sistema Operacional \emph{uCLinux}}
+\index{apendice!uclinux}
+
+Este sistema operacional é um porte do Linux para sistemas sem uma unidade de gerenciamento de memória (MMU), que é o caso da placa Evaluator-7T. Assim como o eCos, há portes dele para diversas arquiteturas, assim como diversas ferramentas que, assim como o Linux, são softwares livres. Tal fato torna interessante para tornar a placa independente de licenças. O que torna este sistema interessante é a existência de uma comunidade entusiasta com este sistema, fazendo com que exista muito material para estudo e assim reduzir a complexidade do porte pretendido.
+
 \chapter{Arquivos Fonte} \label{chap:code}
 
 \section{cinit.h} \label{sec:cinit.h}
