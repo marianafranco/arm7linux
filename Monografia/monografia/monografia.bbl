@@ -11,6 +11,12 @@
 [S.l.], Setembro 2006. Dispon{\'\i}vel em:
   $<$http://www.iti.uni-stuttgart.de/~radetzki/Seminar06/08\_report.pdf$>$.}
 
+\bibitem[Arcturus Networks Inc. 2008]{uCLinuxPage}
+\abntrefinfo{Arcturus Networks Inc.}{ARCTURUS NETWORKS INC.}{2008}
+{ARCTURUS NETWORKS INC. uclinux - embedded linux microcontroller project.
+2008.
+Dispon{\'\i}vel em: $<$http://www.uclinux.org/$>$.}
+
 \bibitem[ARM Limited 1995]{DataSheet1995}
 \abntrefinfo{ARM Limited}{ARM LIMITED}{1995}
 {ARM LIMITED. \emph{ARM7TDMI Data Sheet (ARM DDI 0029E)}.
@@ -62,12 +68,24 @@ ISBN 0-20167-519-6.}
 [S.l.], 2007. Dispon{\'\i}vel em:
   $<$http://www.pcs.usp.br/~jkinoshi/2007/tomas5.doc$>$.}
 
+\bibitem[Meignan 2003]{ISOSPage}
+\abntrefinfo{Meignan}{MEIGNAN}{2003}
+{MEIGNAN, W. Isos - simple multithreading os for the evaluator-7t board.
+2003.
+Dispon{\'\i}vel em: $<$http://wilhem.meignan.free.fr/$>$.}
+
 \bibitem[Morrow 2008]{Morrow2008}
 \abntrefinfo{Morrow}{MORROW}{2008}
 {MORROW, M.~G. \emph{ARM7TDMI Instruction Set Reference}.
 [S.l.], Setembro 2008. Dispon{\'\i}vel em:
   $<$http://eceserv0.ece.wisc.edu/~morrow/ECE353/arm7tdmi\_instruction\_set\_r%
 eference.pdf$>$.}
+
+\bibitem[Red Hat, Inc. 2009]{eCosPage}
+\abntrefinfo{Red Hat, Inc.}{RED HAT, INC.}{2009}
+{RED HAT, INC. ecos - embedded configurable operating system.
+2009.
+Dispon{\'\i}vel em: $<$http://ecos.sourceware.org/$>$.}
 
 \bibitem[Ryzhyk 2006]{Ryzhyk2006}
 \abntrefinfo{Ryzhyk}{RYZHYK}{2006}
