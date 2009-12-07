@@ -1,12 +1,12 @@
 \section{Chamadas de sistema}
 
-Uma system call é uma interrupção de software causada pelo kernel para a execução de código que necessita de privilégios para ser executado. Como uma interrupção de hardware, uma vez que é causada, ela executa a instrução apontada no vetor de interrupções, que foi instalada anteriormente na inicialização do sistema. A rotina de tratamento está localizada no arquivo handler\_swi.s e é executada em modo SVC. As únicas instruções que chamam tais system calls são as rotinas fork, exec e exit.
+Uma chamada de sistema é uma interrupção de \emph{software} causada pelo \emph{kernel} para a execução de código que necessita de privilégios para ser executado. Como uma interrupção de \emph{hardware}, uma vez que é causada,  executa a instrução apontada no vetor de interrupções, instalada anteriormente na inicialização do sistema. A rotina de tratamento está localizada no arquivo handler\_swi.s e é executada em modo SVC. As únicas instruções que chamam tais chamadas de sistema são as rotinas fork, exec e exit.
 
 \subsection{Propriedades gerais}
 
-Uma vez que uma system call é chamada, umas das funções encontradas em \verb|swi.c| é invocada. O motivo para este passo intermediário é que todas as chamadas de sistema do kernel devem ter a mesma identificação junto à rotina de tratamento. Neste caso, todas são passadas com o primeiro parâmetro como 0. Além disso, todas devem passar o mesmo número de parâmetros, pois todas estão invocando a mesma função, chamada de \verb|syscall| que também é realizado nesta etapa.
+Uma vez que uma chamada de sistema é chamada, umas das funções encontradas em \verb|swi.c| é invocada. O motivo para este passo intermediário é que todas as chamadas de sistema do \emph{kernel} devem ter a mesma identificação junto à rotina de tratamento. Neste caso, todas são passadas com o primeiro parâmetro como 0. Além disso, todas devem passar o mesmo número de parâmetros, pois todas estão invocando a mesma função, chamada de \verb|syscall| que também é realizado nesta etapa.
 
-Uma vez que a chamada \verb|syscall| é feita, ocorre uma interrupção de software. O procedimento que se passa neste caso é muito parecido com o de uma interrupção de hardware.
+Uma vez que a chamada \verb|syscall| é feita, ocorre uma interrupção de \emph{software}. O procedimento que se passa neste caso é muito parecido com o de uma interrupção de \emph{hardware}.
 
 \begin{lstlisting}
 STMFD 	sp!,{r0-r12,lr}			; Stack registers r0-12 and link register
@@ -21,7 +21,7 @@ CMP		r0, r1					; Compare SWI number to r1
 BEQ		os_swi					; If it is OS SWI, branch to os_swi
 \end{lstlisting}
 
-Novamente há uma rotina de identificação da fonte de interrupção, que pode vir a ser uma do sistema operacional, ou do Angel. O primeiro passo desta rotina é o empilhamento de todos os registradores, para poder futuramente restaurar o estado atual. Em seguida, ocorre a identificação em si, onde uma máscara de bits é aplicada para se obter o identificador da interrupção. Caso ela seja Angel\_SWI\_Number, o estado do processador é restaurado e há um desvio para a instrução previamente armazenada durante a instalação. Caso ela seja 0, o valor estabelecido para o sistema, há um desvio para outro código que identifica quais das chamadas de sistema foi ativada.
+Novamente há uma rotina de identificação da fonte de interrupção, que pode vir a ser uma do sistema operacional, ou do Angel. O primeiro passo desta rotina é o empilhamento de todos os registradores, para poder futuramente restaurar o estado atual. Em seguida, ocorre a identificação em si, onde uma máscara de bits é aplicada para se obter o identificador da interrupção. Caso ela seja Angel\_SWI\_Number (0x0123456), o estado do processador é restaurado e há um desvio para a instrução previamente armazenada durante a instalação. Caso ela seja 0, o valor estabelecido para o sistema, há um desvio para outro código que identifica quais das chamadas de sistema foi ativada.
 
 Esta nova identificação pode ser observada abaixo. O primeiro passo é restaurar e armazenar novamente os valores dos registradores, já que na arquitetura ARM os valores passados pelos parâmetros de uma função são passados pelos primeiros registradores. Neste caso, r1 contém o tipo da chamada. Dependendo de qual for o valor, há desvios para \verb\pre_routine_fork\, \verb\pre_routine_exec\ e \verb\pre_routine_exit\
 
@@ -44,13 +44,77 @@ LDMFD	sp!,{r0-r12,pc}^	; If it is an unidentified syscall, go back to the progra
 
 \subsection{fork}
 
-TODO \ldots
+Em um sistema operacional, a chamada de sistema fork é responsável pela criação de novos processos. Para tal, ela duplica o processo que a invocou, e retorna o identificador do processo. Este identificador é o único meio de se identificar qual o processo pai e qual é o filho. Caso o número de retorno seja 0, significa que este é o processo filho, e caso seja qualquer outro número, é o processo pai que retornou o identificador do processo filho. 
 
-Em um sistema operacional, a system call fork é responsável pela criação de novos processos. Para tal, ela duplica o processo que a criou, onde o único meio de se identificar qual o processo pai é pelo número de retorno. Caso o número de retorno seja 0, significa que este é o processo filho, e caso seja qualquer outro número, é o processo pai que retornou o identificador do processo filho. 
+\begin{figure}[!h]
+\centering 
+\includegraphics[width=12cm]{figuras/fork.pdf}
+\caption{Fluxo de funcionamento do fork. \label{fork}}
+\end{figure}
 
-Nosso fork teve de ser ligeiramente alterado por causa de uma simplificação que fizemos em nosso kernel. Como dito anteriormente, temos uma área de dados única para todos os processos. Com isso, fica impossível de se duplicar a área de dados de um processo, o que não fazemos.
+O processo de duplicação de uma \emph{thread} se inicia com o empilhamento dos registradores de dados (r0 a r12) e do endereço de retorno (\emph{link register}) por duas vezes, como pode ser visto abaixo. O motivo é que o primeiro empilhamento serve para a restauração do estado ao fim do processo de duplicação e a segunda para a nova cópia da \emph{thread}, como será visto mais à frente. 
 
-O processo de duplicação de um processo se inicia com o empilhamento dos registradores de dados (r0 a r12) e do endereço de retorno (link register) por duas vezes. O motivo é que o primeiro empilhamento serve para a restauração do estado ao fim do processo de duplicação e a segunda para o processo que vai a ser duplicado. Então, tentamos encontrar qual o primeiro espaço disponível dentro da tabela de processos. Uma vez encontrado o espaço, temos de encontrar o espaço do PCB reservado para este processo, onde iremos popular com os dados do estado em execução. Porém, além disso, temos também de duplicar a pilha, que é um processo um pouco mais complexo. Para tal, primeiro temos de descobrir o tamanho da pilha atual. Então, começamos a copiar os dados de uma pilha para a outra. Finalmente, colocamos no ponteiro de pilha do PCB do novo processo o topo da pilha recém copiada. Uma vez resolvido o problema da cópia de pilha, apenas duplicamos os dados do registrador de estados, do link register, do process counter e de todos os registradores de dados. Finalmente, quando o processo está totalmente copiado, devemos habilitar o processo na tabela de processos e restaurar todos os registradores empilhados de volta ao seus lugares, onde o link register entrará no lugar do process counter.
+\begin{lstlisting}
+STMFD 	sp!,{r1-r12,lr}		; Stacks the link register and r1-r12
+STMFD 	sp!,{r0-r12}		; Stacks r0-r12
+STMFD 	sp!,{lr} 			; Stacks the link register (In a separate instruction
+							; to stack it in the top)
+\end{lstlisting}
+
+Em segundo lugar, procura-se o primeiro espaço disponível no vetor de \emph{threads}, o que indica qual dos PCBs está livre. Na rotina apresentada abaixo, r0 contém o id da posição sendo procurada e r1 seu endereço. O loop é feito verificando de posição em posição, um ponto onde o valor seja 0. Caso se encontre, passa-se ao próximo passo, ao contrário, soma-se 1 ao número da \emph{thread} e 4 no endereço do vetor.
+
+\begin{lstlisting}
+	LDR		r1, =thread_array	; r1 = bottom of the thread array address
+	MOV		r0,	#1				; r0 = 1
+routine_fork_loop
+	LDR		r2, [r1]			; r2 = thread array position
+	CMP		r2,	#0				; r2 = 0?
+	BEQ		pcb_bottom			; If the position is availabe (r2 = 0), go to pcb_bottom
+	ADD		r0,	r0,	#1			; r0 = r0 + 1 (next id)
+	CMP		r0, #9				; Is this the last thread slot being checked?
+	BEQ		fork_fail			; if it is, there is no available slot, go to fork_fail
+	ADD		r1,	r1,	#4			; r1 = r1 + 4 (next address)
+	B		routine_fork_loop	; Check next slot (go to routine_fork_loop)
+\end{lstlisting}
+
+Calcula-se então o endereço do PCB da \emph{thread} encontrada. A fórmula, já vista anteriormente, é $PCB=id \cdot 68$ 
+
+Para se realizar a cópia da pilha de \emph{user}, há de se obter três informações: a base e o ponteiro da pilha original e a base da nova pilha. O ponteiro é obtido apenas copiando-se o valor do ponteiro de pilha do modo \emph{user}. As bases são calculadas a partir da equação $0x20000 - (id-1) * 4048$, onde 0x20000 é onde começa a área reservada às pilhas do modo \emph{user}, id é o número da \emph{thread} cuja base deseja-se obter e 4048 é o tamanho do espaço reservado para cada pilha.
+
+Com os dados obtidos no passo anterior, pode-se usar a rotina a seguir para se duplicar a pilha:
+
+\begin{lstlisting}
+LDR		r6,	[r4]			; r6 = original stack data
+STR		r6, [r5]			; Stores data in new stack (stack_top = r6)
+CMP		r4,	r3				; Is this the top of the stack? (r4 == r3?)
+BEQ		build_new_pcb		; if it is, branch to build_new_pcb 
+SUB		r5,	r5,	#4			; if not, go to next space in the new stack (r5 = r5 - 4)
+SUB		r4,	r4,	#4			; and next data in the original stack (r4 = r4 - 4)
+B		loop_stack_copy		; restart sequence (go to loop_stack_copy)
+\end{lstlisting}
+
+O registrador r6 serve como memória intermediária para a cópia. r4 contém o endereço que está sendo copiado, e é incrementado de 4 em 4 até chegar ao seu topo, enquanto r5 guarda o endereço equivalente da nova pilha, que também é incrementado de 4 em 4.
+
+Finalmente, se começa a construir o novo PCB. Na posição que guarda o registrador de estado, guarda-se o valor 0x10, que indica que a \emph{thread} deve ser iniciada em modo \emph{user}. O ponteiro de pilha foi obtido no passo anterior, vindo no registrador r5. Tanto o endereço de retorno do modo \emph{user} quanto o do modo \emph{IRQ} são o mesmo, e coloca-se o endereço inicial da rotina que se quer executar. A cópia dos valores dos registradores r0 a r12 se dá através de um loop, como pode-se observar abaixo.
+
+\begin{lstlisting}
+; Copy registers
+	MOV		r3,	#0		; r3 = 0
+	MOV		r4, #12		; r4 = 12
+registers_loop
+	ADD		r2,	r2,	#4		; r2 = r2 + 4 (Next PCB register space)
+	LDMFD	sp!, {r5}		; Restore register from the stack to r5
+	STR		r5, [r2]		; Store register in the PCB
+	CMP		r3,	r4			; r12 was copied? (r3 == r4?)
+	BEQ 	enable_thread	; If yes, go to enable_thread
+	ADD		r3,	r3,	#1		; r3 = r3 + 1 (Next register)
+	B		registers_loop	; Copy next register
+\end{lstlisting}
+
+r2 contém o endereço do PCB onde os dados serão colocados, r5 funciona como intermediária entre a pilha e a memória, r4 contém o valor final da iteração e r3 o \emph{id} do registrador sendo copiado.
+
+O último passo antes de se retornar à execução do programa é a habilitação do programa no vetor de \emph{threads}.
+
 
 %-------------------------------------------
 % System call EXEC
