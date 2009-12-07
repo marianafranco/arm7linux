@@ -25,7 +25,7 @@ Os arquivos encontrados na raiz do projeto são responsáveis pela inicialização d
 
 \subsection{Pasta ``apps''}
 
-No arquivo tasks.c, várias funções são declaradas, onde cada declaração é considerada uma \emph{thread} pelo \emph{microkernel}. Mais à frente, na seção \ref{cap:processos}, os programas exemplo serão descritos com mais detalhe. Já no arquivo terminal.c, há o \emph{shell} do sistema.
+No arquivo tasks.c, várias funções são declaradas, onde cada declaração é considerada uma \emph{thread} pelo \emph{microkernel}. Mais à frente, na seção \ref{cap:processos}, os programas exemplo serão descritos com mais detalhe. Já no arquivo terminal.c é responsável pela implementação do \emph{shell} do sistema.
 
 \subsection{Pasta ``interrupt''}
 
@@ -33,12 +33,12 @@ Todas as rotinas que tratam e instalam interrupções -- tanto de \emph{hardware} 
 
 \subsection{Pasta ``peripherals''}
 
-As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button, da chave DIP no arquivo dips, do display de sete segmentos em segment, dos LEDs em led e do \emph{timer} em timer.
+As rotinas de inicialização e controle dos periféricos se encontram todas nesta pasta. As do botão estão no arquivo button.c, da chave DIP no arquivo dips.c, do display de sete segmentos em segment.c, dos LEDs em led.c e do \emph{timer} em timer.c.
 
 \subsection{Pasta ``syscalls''}
 
-As chamadas de sistema estão escritas em \emph{assembly} e se encontram em três arquivos, uma para cada chamada. São elas as chamadas fork, exec e exit.
+As chamadas de sistema estão escritas em \emph{assembly} e se encontram em três arquivos, uma para cada chamada. São elas as chamadas \emph{fork}, \emph{exec} e \emph{exit}.
 
 \subsection{Pasta ``mutex''}
 
-No arquivo mutex há apenas as funções que permitem a exclusão mútua de código por espera ativa, feita através de um \emph{mutex}.
+No arquivo mutex.c há apenas as funções que permitem a exclusão mútua de código por espera ativa, feita através de um \emph{mutex}.
