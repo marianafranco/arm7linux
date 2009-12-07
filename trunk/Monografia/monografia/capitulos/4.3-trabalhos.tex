@@ -2,3 +2,12 @@
 \section{Trabalhos Futuros} \label{sec:trabalhos}
 \index{consideracoes!trabalhos}
 
+O conteúdo desenvolvido neste projeto, embora com um número apreciável de funcionalidades e com a implementação de vários conceitos relacionados aos Sistemas Operacionais modernos, ainda não é possível considerá-lo como completo. Devido a restrições de tempo para a realização do projeto, não foi possível implementar todas as funcionalidades desejadas no KinOS, nem otimizar algumas das funcionalidades já existentes.
+
+Uma possível melhoria é fazer com que o sistema seja capaz de ser executado como um módulo na memória flash da Evaluator-7T. Para fazer isso, no entanto, é preciso que o sistema inteiro torne-se independente do monitor de debug Angel. No sistema implementado, o Angel é responsável pelas interrupções de software (SWI) do sistema. Fazer a migração do Angel para rotinas próprias de SWI não é uma atividade trivial.
+
+Também é possível criar mais funcionalidades para o editor de linha de comando (Shell) do KinOS. No momento, ele faz apenas as atividades essencias para o gerenciamento de \emph{threads} e comunicação com usuário através de um terminal. Como extensão do shell, pensou-se em permitir a recepção de arquivos executáveis ARM (formato ELF) para serem executados como uma nova \emph{thread} dentro do KinOS.
+
+Adicionalmente, outra melhoria a ser feita no sistema é respeito da técnica usada para comunicação pela porta serial COM0. Atualmente, o envio e a recepção de caracteres é feita pela técnica de \emph{polling}, ou seja, o processador interroga uma variável até que ela contenha o valor desejado. Embora funcional, esse método consome muito tempo de processador. É desejável trocar esse método por interrupções, ou seja, o processador leria os caracteres dos \emph{buffers} de transmissão e de recepção apenas quando o canal serial sinalizasse a ele por meio de uma interrupção de \emph{hardware}.
+
+Por fim, é importante ressaltar que as possíveis melhorias aqui descritas não são as únicas que podem ser realizadas. Há várias outras passaram despercebidas pelos autores do projeto. Espera-se que, quando o projeto for revisitado, ele passe por uma grande evolução, a fim de torná-lo cada vez mais completo e eficiente.
