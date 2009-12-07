@@ -25,9 +25,44 @@ O CodeWarrior é um ambiente integrado de desenvolvimento, ou seja, é um software
 
 \end{itemize}
 
-TODO\ldots
+O CodeWarrior permite a criação de projetos, ou seja, conjuntos de arquivos de código-fonte conjuntamente com as configurações de compilação, (por exemplo, arquitetura para a qual o código-objeto será gerado) e ligação dos mesmos. Essa organização é fundamental para a criação de uma única imagem de memória quando a compilação do projeto é realizada, pois assim todo o trabalho se torna automatizado.
+
+A figura \ref{codewss} mostra a aparência da IDE durante sua utilização normal.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=9cm]{figuras/codew_ss.png}
+\caption{Screenshot da IDE CodeWarrior \label{codewss}}
+\end{figure} 
+
+Quando um projeto é compilado com sucesso no CodeWarrior, a imagem de memória gerada por ele pode ser aproveitada diretamente pelo debugger AXD, uma vez que ambas as ferramentas estão fortemente interligadas. Desse modo, é possível inicializar o AXD diretamente a partir do CodeWarrior através dos botões ``Run'' ou ``Debug''.
 
 \subsection{AXD Debugger}\label{axd}
 
-Escrever sobre o debugger aqui.
-% screenshot feita
+O AXD Debugger é um programa destinado à execução e depuração de código dentro do ambiente ADS. Suas principais funcionalidades são:
+
+\begin{itemize}
+
+\item Execução de código passo a passo e por pontos de parada (\emph{breakpoints})
+
+\item Inspeção de variáveis e de registradores do processador
+
+\item Suporte para alvos em \emph{hardware} e em \emph{software} (emuladores)
+
+\item Envio e gravação de imagens de memória na RAM do \emph{hardware}-alvo
+
+\item Suporte a diferentes arquiteturas ARM
+
+\item Persistência das configurações em múltiplas sessões de debug
+
+\end{itemize}
+
+A figura \ref{axdss} mostra a aparência do ambiente AXD em operação normal.
+
+\begin{figure}[!ht]
+\centering 
+\includegraphics[height=9cm]{figuras/axd_ss.png}
+\caption{Screenshot do AXD Debugger \label{axdss}}
+\end{figure}
+
+Durante o projeto, para a realização de testes dos programas desenvolvidos, utilizou-se frequentemente o ambiente emulado do processador ARM7TDMI fornecido pelo AXD, uma vez que nem sempre houve acesso à placa Evaluator-7T.
