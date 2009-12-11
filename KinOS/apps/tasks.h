@@ -12,7 +12,7 @@ void task5 (int);
 void set_segment(int);
 
 
-int strcmp (char* str1, char* str2);
+int strcmper (char* str1, char* str2);
 pt2Task  get_task_addr(char* name);
 int get_state(int pid);
 int get_task_name_size(void);
