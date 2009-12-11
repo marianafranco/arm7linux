@@ -1,4 +1,3 @@
-
 /*************************************************************
  *
  *	ARM Strategic Support Group
@@ -102,7 +101,9 @@ void serial_print (unsigned port, char *s);
 void serial_getkey (void);	
 
 
-char serial_getcmd (void);	
+char serial_getchar(void);
+
+void serial_irq(void);
 		
 /*****************************************************************
  * END OF serial.h 

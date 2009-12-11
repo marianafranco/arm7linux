@@ -158,16 +158,16 @@ void serial_initcom1debug (unsigned baudrate)
 
 void serial_print (unsigned port, char *s)
 {
-	while ( *s != 0 ) {
+	while ( *s != 0 || *s != '\0') {
 		switch (port) {
 		case	COM0_USER:
-		while ( TX_READY(GET_STATUS(UART0_BASE))==0);
-		PUT_CHAR(UART0_BASE,*s++);
-		break;
+			while ( TX_READY(GET_STATUS(UART0_BASE))==0);
+			PUT_CHAR(UART0_BASE,*s++);
+			break;
 		case 	COM1_DEBUG:
-		while ( TX_READY(GET_STATUS(UART1_BASE))==0);
-	    PUT_CHAR(UART1_BASE,*s++);
-		break;
+			while ( TX_READY(GET_STATUS(UART1_BASE))==0);
+		    PUT_CHAR(UART1_BASE,*s++);
+			break;
 		}
 	}	
 }		
@@ -180,7 +180,7 @@ void serial_print (unsigned port, char *s)
  * Return		: none...
  * Notes		: 
  *
- *			waits until a key is pressed then echo's back.
+ *			waits until a key is pressed then echoes back.
  *
  */	
 	
@@ -188,15 +188,12 @@ void serial_getkey (void)
 {
 	char c;
 
-	while ( (RX_DATA(GET_STATUS(UART0_BASE)))==0 )
-	{
-	
-	};
+	while ( (RX_DATA(GET_STATUS(UART0_BASE)))==0 );
 		
 	c = GET_CHAR(UART0_BASE);
 	
 	while ( TX_READY(GET_STATUS(UART0_BASE))==0);
-	PUT_CHAR(UART0_BASE,c);
+	PUT_CHAR(UART0_BASE, c);
 }
 
 
@@ -213,22 +210,26 @@ void serial_getkey (void)
  *
  */	
 	
-char serial_getcmd (void)
+char serial_getchar(void)
 {
 	char c;
 
-	while ( (RX_DATA(GET_STATUS(UART0_BASE)))==0 )
-	{
-	
-	};
+	while ( (RX_DATA(GET_STATUS(UART0_BASE)))==0 );
 		
 	c = GET_CHAR(UART0_BASE);
 	
 	while ( TX_READY(GET_STATUS(UART0_BASE))==0);
-		PUT_CHAR(UART0_BASE,c);
+		PUT_CHAR(UART0_BASE, c);
 	
 	return c;
-}		
+}
+
+
+void serial_irq(void) {
+	
+	//serial_print(COM0_USER, "Tratei a interrupcao\r\n");
+	
+}	
 		
 		
 /*****************************************************************
