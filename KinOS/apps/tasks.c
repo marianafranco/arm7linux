@@ -13,7 +13,7 @@ int displayNumber;
  ****************************************************************/
 
 
-#define tasks_name_size 5
+#define tasks_name_size 3
 
 struct name_address tasks_name[] = {
 	{"display_pid", &display_pid},
