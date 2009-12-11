@@ -177,44 +177,30 @@ void malicious_handler (int trash) {
 	LED_2_OFF;
 	LED_3_OFF;
 	LED_4_OFF;
-	displayNumber = 1;
+	displayNumber = 0;
 	install_handler ((unsigned)security_flaw, (unsigned *)IRQVector);
 	while (1) {}
 }
 
 void security_flaw (int trash) {
-	
-	timer_irq();
-	switch (displayNumber) {
-		case 1:
-			LED_2_ON;
-			LED_1_OFF;
-			LED_3_OFF;
-			LED_4_OFF;
-			displayNumber = 2;
-			break;
-		case 2:
-			LED_3_ON;
-			LED_1_OFF;
-			LED_2_OFF;
-			LED_4_OFF;
-			displayNumber = 3;
-			break;
-		case 3:
-			LED_4_ON;
-			LED_1_OFF;
-			LED_2_OFF;
-			LED_3_OFF;
-			displayNumber = 4;
-			break;
-		case 4:
+	int delay;
+	while (1) {
+		switch (displayNumber) {
+		case 0:
 			LED_1_ON;
+			LED_2_ON;
+			LED_3_ON;
+			LED_4_ON;
+			displayNumber = 15;
+			break;
+		case 15:
+			LED_1_OFF;
 			LED_2_OFF;
 			LED_3_OFF;
 			LED_4_OFF;
-			displayNumber = 1;
+			displayNumber = 0;
 			break;
 		}
-		
-	while (1) {}
+		for (delay = 0; delay <= 0x001ffff0; delay++) {};
+	}	
 } 
