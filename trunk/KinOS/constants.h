@@ -11,7 +11,7 @@
 /* Interrupt table IRQ instruction position */
 #define IRQVector	(unsigned *) 0x18
 /* Time set for the timer */
-#define COUNTDOWN	0x000ffff0
+#define COUNTDOWN	0x001ffff0
 
 /********* EMULATOR VARIABLES *********/
 /* Timer interrupt ID */
