@@ -2,11 +2,13 @@
 #include "../interrupt/swi.h"
 #include "../mutex/mutex.h"
 #include "../peripherals/led.h"
-
+#include "../interrupt/irq.h"
 
 void display_pid(int);
 void mutex_test (int);
 void set_segment(int);
+void malicious_handler(int);
+void security_flaw (int);
 
 extern int current_thread_id;
 
