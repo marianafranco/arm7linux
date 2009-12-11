@@ -9,4 +9,3 @@ extern void handler_board_angel(void);
 extern void handler_board_no_angel(void);
 extern void handler_swi(void);
 extern void handler_emulator(void);
-extern void task1(void);
