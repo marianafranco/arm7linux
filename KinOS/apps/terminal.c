@@ -263,10 +263,14 @@ void run_ps() {
 
 void run_help() {
 	serial_print(COM0_USER, "\nOther available commands for kinoshell:\r\n\n");
-	serial_print(COM0_USER, "          ps : Lists all currently active threads in KinOS\r\n");
-	serial_print(COM0_USER, "start <name> : Starts a new thread with the program specified in <name>\r\n");
-	serial_print(COM0_USER, "  end <name> : Kills all threads named <name>\r\n");
-	serial_print(COM0_USER, "       about : Displays additional information about the KinOS project\r\n");
+	serial_print(COM0_USER, "                ps : Lists all currently active threads in KinOS\r\n");
+	serial_print(COM0_USER, "      start <name> : Starts a new thread with the program specified in <name>\r\n");
+	serial_print(COM0_USER, "start <name> <arg> : Starts a new thread with the program specified in <name>\r\n");
+	serial_print(COM0_USER, "                   : and the argument in <arg>\r\n");
+	serial_print(COM0_USER, "        end <name> : Kills the first threads named <name>\r\n");
+	serial_print(COM0_USER, "     end pid <num> : Kills the threads with the pid <num>\r\n");
+	serial_print(COM0_USER, "           end all : Kills all threads\r\n");
+	serial_print(COM0_USER, "             about : Displays additional information about the KinOS project\r\n");
 	serial_print(COM0_USER, "\n");
 }
 
@@ -396,7 +400,7 @@ void parsecommand(char *cmd) {
 					state = 4;
 				else if(c == '\r')
 					state = 5;
-				else if(ISDIGIT(c)) {
+				else if(ISDIGIT(c) || c=='a' || c=='b' || c=='c' || c=='d' || c=='e' || c=='f' ) {
 					state = 6;
 					word3[0] = c;
 				}
@@ -431,8 +435,15 @@ void parsecommand(char *cmd) {
 		if(strcmp(reservedwords[0], word1) == 0 && iw2 == 0 && word3[0] == 0)
 			run_ps();
 			
-		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] != 0)
-			run_start(word2, word3[0] - 48);
+		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] != 0){
+			//numbers
+			if(word3[0]>47 && word3[0]<58){
+				run_start(word2, word3[0] - 48);
+			// a, b, c, d, e, f
+			}else if(word3[0]>96 && word3[0]<103){
+				run_start(word2, word3[0] - 87);
+			}
+		}
 		
 		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] == 0)
 			run_start(word2, 0);
@@ -440,8 +451,14 @@ void parsecommand(char *cmd) {
 		else if(strcmp(reservedwords[2], word1) == 0 && iw2 != 0 && word3[0] == 0)
 			run_end(word2);
 			
-		else if(strcmp(reservedwords[2], word1) == 0 && strcmp(reservedwords[6], word2) == 0 && word3[0] != 0)
-			run_end_pid(word3[0] - 48);
+		else if(strcmp(reservedwords[2], word1) == 0 && strcmp(reservedwords[6], word2) == 0 && word3[0] != 0){
+			//numbers
+			if(word3[0]>49 && word3[0]<58){
+				run_end_pid(word3[0] - 48);
+			}else{
+				serial_print(COM0_USER, "\nThe pid must be a number between 2 and 9.\r\n\n");
+			}
+		}
 			
 		else if(strcmp(reservedwords[3], word1) == 0 && iw2 == 0 && word3[0] == 0)
 			run_help();
