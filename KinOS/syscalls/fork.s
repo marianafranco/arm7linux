@@ -25,7 +25,7 @@ routine_fork_loop
 	CMP		r2,	#0				; r2 = 0?
 	BEQ		pcb_bottom			; If the position is availabe (r2 = 0), go to pcb_bottom
 	ADD		r0,	r0,	#1			; r0 = r0 + 1 (next id)
-	CMP		r0, #9				; Is this the last thread slot being checked?
+	CMP		r0, #10				; Is this the last thread slot being checked?
 	BEQ		fork_fail			; if it is, there is no available slot, go to fork_fail
 	ADD		r1,	r1,	#4			; r1 = r1 + 4 (next address)
 	B		routine_fork_loop	; Check next slot (go to routine_fork_loop)
