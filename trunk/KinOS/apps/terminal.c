@@ -24,6 +24,7 @@
 
  #include "serial.h"
  #include "tasks.h"
+ #include <string.h>
 
  
 /****************************************************************
@@ -38,16 +39,16 @@
 #define		ISDIGIT(c) ((c >= 48 && c <= 57))
 
 
-struct pid_name { int pid; char* name; int state;} tasks[] = {
-	{1, "shell", 1},
-	{2, "", 0},
-	{3, "", 0},
-	{4, "", 0},
-	{5, "", 0},
-	{6, "", 0},
-	{7, "", 0},
-	{8, "", 0},
-	{9, "", 0}
+struct pid_name {char* pid; char name[MAX_TASK_NAME]; int state;} tasks[] = {
+	{"1", "shell", 1},
+	{"2", "", 0},
+	{"3", "", 0},
+	{"4", "", 0},
+	{"5", "", 0},
+	{"6", "", 0},
+	{"7", "", 0},
+	{"8", "", 0},
+	{"9", "", 0}
 };
 
 
@@ -147,11 +148,18 @@ void clearstring(char *str, int length) {
 void run_start(char *arg, int num) {
 	int a = 0;
 	
-	a = fork();
-	if(a != -1 && a != 0){
-		exec(a ,get_task_addr(arg), 0);
-		tasks[a - 1].name = arg;
-		tasks[a - 1].state = 1;
+	if (get_task_addr(arg) == 0){
+		serial_print(COM0_USER, "\nProgram not found.\r\n\n");
+	
+	}else{
+	
+		a = fork();
+		if(a != -1 && a != 0){
+			exec(a ,get_task_addr(arg), num);
+			memcpy(tasks[a - 1].name, arg, sizeof(char)*MAX_TASK_NAME);
+			tasks[a - 1].state = 1;
+		}
+		serial_print(COM0_USER, "\nProgram started.\r\n\n");
 	}
 	
 }
@@ -178,41 +186,13 @@ void run_ps() {
 	serial_print(COM0_USER, "Name:\t\tPID:\r\n");
 	// implementacao do ps vai aqui
 	
-	run_start("task5", 0);
+	//run_start("task5", 0);
 	
 	for(i=0; i < 9; i++){
 		if(tasks[i].state == 1){
 			serial_print(COM0_USER, tasks[i].name);
 			serial_print(COM0_USER, "\t\t");
-			switch(tasks[i].pid){
-				case 1:
-					serial_print(COM0_USER,  "1");
-					break;
-				case 2:
-					serial_print(COM0_USER,  "2");
-					break;
-				case 3:
-					serial_print(COM0_USER,  "3");
-					break;
-				case 4:
-					serial_print(COM0_USER,  "4");
-					break;
-				case 5:
-					serial_print(COM0_USER,  "5");
-					break;
-				case 6:
-					serial_print(COM0_USER,  "6");
-					break;
-				case 7:
-					serial_print(COM0_USER,  "7");
-					break;
-				case 8:
-					serial_print(COM0_USER,  "8");
-					break;
-				case 9:
-					serial_print(COM0_USER,  "9");
-					break;
-			}
+			serial_print(COM0_USER,  tasks[i].pid);
 			serial_print(COM0_USER, "\r\n");		
 		}
 	}
@@ -266,6 +246,7 @@ void getcommand(char *cmd) {
 		}
 	}
 }
+
 
 /* -- getcommand -------------------------------------------------
  *

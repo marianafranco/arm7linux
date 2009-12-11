@@ -22,7 +22,7 @@ struct name_address tasks_name[] = {
 };
 
 
-int strcmp (char* str1, char* str2){
+int strcmper (char* str1, char* str2){
 	int i;
 	for (i = 0; str1[i] == str2[i]; i++){
 		if (str1[i] == '\0'){
@@ -35,8 +35,8 @@ int strcmp (char* str1, char* str2){
 
 pt2Task  get_task_addr(char* name){
 	int i;
-	for(i=0; i<sizeof(tasks_name); i++){
-		if(strcmp(tasks_name[i].name, name)==0){
+	for(i=0; i < tasks_name_size; i++){
+		if(strcmper(tasks_name[i].name, name)==0){
 			return tasks_name[i].task_ptr;
 		}
 	}
