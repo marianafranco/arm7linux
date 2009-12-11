@@ -168,6 +168,18 @@ void run_start(char *arg, int num) {
 
 
 void run_end(char *arg) {
+	int i;
+	for(i=0; i < 9; i++){
+		if(tasks[i].state == 1){
+			if(strcmper(tasks[i].name, arg) == 0){
+					exit(i+1);
+					tasks[i].state = 0;
+					serial_print(COM0_USER, "\nProgram finished.\r\n\n");
+					return;				
+			}
+		}
+	}
+	serial_print(COM0_USER, "\nProgram not started.\r\n\n");
 
 }
 
@@ -196,7 +208,7 @@ void run_ps() {
 			serial_print(COM0_USER, "\r\n");		
 		}
 	}
-
+	serial_print(COM0_USER, "\r\n");
 	
 }
 
