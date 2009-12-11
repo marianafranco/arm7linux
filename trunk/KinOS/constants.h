@@ -3,7 +3,7 @@
 /* 0 - Evaluator 7-T board with Angel */
 /* 1 - CodeWarrior ARMUlator */
 /* 2 - Evaluator 7-T board no Angel */
-#define emulator	1
+#define emulator	0
 /* The number of the operating system software interrupt */
 #define	OS_SWI		0
 /* Interrupt table SWI instruction position */
@@ -11,8 +11,7 @@
 /* Interrupt table IRQ instruction position */
 #define IRQVector	(unsigned *) 0x18
 /* Time set for the timer */
-//#define COUNTDOWN	0x00effff0
-#define COUNTDOWN	0x00fffff0
+#define COUNTDOWN	0x000ffff0
 
 /********* EMULATOR VARIABLES *********/
 /* Timer interrupt ID */

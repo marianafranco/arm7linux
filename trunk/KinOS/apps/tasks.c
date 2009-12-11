@@ -1,10 +1,23 @@
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+
 #include "tasks.h"
 
+extern int thread_array[];
+
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
+
+
+#define tasks_name_size 5
 
 struct name_address tasks_name[] = {
 	{"task2", &task2},
 	{"task3", &task3},
 	{"task4", &task4},
+	{"task5\0", &task5},
 	{"set_segment", &set_segment}
 };
 
@@ -19,6 +32,7 @@ int strcmp (char* str1, char* str2){
 	return str1[i] - str2[i];
 }
 
+
 pt2Task  get_task_addr(char* name){
 	int i;
 	for(i=0; i<sizeof(tasks_name); i++){
@@ -31,14 +45,44 @@ pt2Task  get_task_addr(char* name){
 
 
 
+int get_state(int pid){
+	if (pid > 9 || pid < 0){
+		return 0;
+	}else{
+		return thread_array[pid];
+	}
+}
+
+
+int get_task_name_size(){
+	return tasks_name_size;
+}
+
+char* get_task_name(int index){
+	return tasks_name[index].name;
+}
+
+
+
+/****************************************************************
+ * TASKS
+ ****************************************************************/
+
 
 void task1 (void) {
 
 	int a = 0;
 	int b = 0;
+	int c = 0;
+	
 	char* newTask = "set_segment";
 	
 	int j;
+	
+	int state1;
+	int state2;
+	
+	//j = getState(0) + getState(1) + getState(2);
 	
 	a = fork();
 	if(a != -1 && a != 0){
@@ -50,12 +94,19 @@ void task1 (void) {
 		exec(b ,get_task_addr("task4"), 0);
 	}
 	
+	
+	c = fork();
+	if(c != -1 && b != 0){
+		exec(c ,get_task_addr("task5"), 0);
+	}
+	
+	
 	while (1) {
 		segment_set(1);
-		/*if(j==1000000){
+		if(j==1000000){
 			exit(a);
 		}
-		j++;*/
+		j++;
 	}
 }
 
@@ -118,7 +169,7 @@ void task4 (int lixo) {
 	}
 }
 
-void task5 (void) {
+void task5 (int lixo) {
 	while (1) {
 		segment_set(5);
 	}

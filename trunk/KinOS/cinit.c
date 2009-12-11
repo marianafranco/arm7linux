@@ -46,8 +46,8 @@ int C_Entry (void) {
 		MSR 	CPSR_c, r1
 	}
 	/* Start with process 1 */
-	task1();
-	//shell();
+	//task1();
+	shell();
 	 /* The return below should not be reachable */
 	return 0;
 }
