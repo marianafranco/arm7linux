@@ -24,8 +24,6 @@
 
  #include "serial.h"
  #include "tasks.h"
-
- #include <string.h>
  
 /****************************************************************
  * MACROS
@@ -33,6 +31,9 @@
 
 #define		angel_SWI	0x123456
 #define	 	MAX_CMD_LENGTH	80
+
+#define		ISALPHA(c) ((c >= 65 && c <= 90) || (c >= 97 && c <= 192))
+#define		ISDIGIT(c) ((c >= 48 && c <= 57))
 
 
 struct { char* name; void (*task_ptr)(int); } tasks_name[] = {
@@ -57,7 +58,6 @@ __swi (angel_SWI) void _WriteC(unsigned op, const char *c);
  ****************************************************************/
 
 
-/*
 int strcmp (char* str1, char* str2){
 	int i;
 	for (i = 0; str1[i] == str2[i]; i++){
@@ -67,7 +67,7 @@ int strcmp (char* str1, char* str2){
 	}
 	return str1[i] - str2[i];
 }
-*/
+
 
 
 pt2Task  get_task_addr(char* name){
@@ -144,11 +144,11 @@ void comm_getkey (void)
 	serial_getkey(); 
 }
 
-void clearstring(char *str) {
+void clearstring(char *str, int length) {
 	
 	int i;
 	
-	for (i = 0; i < MAX_CMD_LENGTH; i++) {
+	for (i = 0; i < length; i++) {
 		str[i] = 0;
 	}
 	
@@ -160,12 +160,12 @@ void run_ps() {
 	serial_print(COM0_USER, "\n");
 }
 
-void run_start(char *arg) {
-
+void run_start(char *arg, int num) {
+	serial_print(COM0_USER, "\nStart command\r\n\n");
 }
 
 void run_end(char *arg) {
-
+	serial_print(COM0_USER, "\nEnd command\r\n\n");
 }
 
 void run_help() {
@@ -185,6 +185,10 @@ void run_about() {
 	serial_print(COM0_USER, "Project advisor: Prof. Dr. Jorge Kinoshita\r\n\n");
 }
 
+void run_listtasks() {
+	serial_print(COM0_USER, "\nList Tasks command\r\n\n");
+}
+
 
 /* -- getcommand -------------------------------------------------
  *
@@ -197,7 +201,7 @@ void getcommand(char *cmd) {
 	
 	c=0; i=0;
 	
-	clearstring(cmd);
+	clearstring(cmd, MAX_CMD_LENGTH);
 	
 	while (c != '\r' && i < MAX_CMD_LENGTH) {
 		c = serial_getchar();
@@ -217,140 +221,144 @@ void getcommand(char *cmd) {
  * Runs a finite state machine in order to parse user input (char *cmd)
  *
  */
-int parsecommand(char *cmd) {
+void parsecommand(char *cmd) {
 
-	int i, estado;
+	int i, state, iw1, iw2, error;
 	char c;
+	char *reservedwords[] = { "ps", "start", "end", "help", "about", "listtasks" };
+	char word1[MAX_CMD_LENGTH], word2[MAX_CMD_LENGTH], word3[2];
 	
-	estado = 0;
+	error = 0;
+	state = 0;
+	iw1 = 0;
+	iw2 = 0;
+	
+	clearstring(word1, MAX_CMD_LENGTH);
+	clearstring(word2, MAX_CMD_LENGTH);
+	clearstring(word3, 2);
 	
 	// sweeps the entire cmd string
 	for (i = 0; i < MAX_CMD_LENGTH; i++) {
 	
 		c = cmd[i];
 		
-		switch (estado) {
+		switch (state) {
 		
 			case 0:
 				if(c == ' ' || c == '\t')
-					estado = 0;
-				else if(cmd[i] == 'p') // ps
-					estado = 10;
-				else if(cmd[i] == 's') // start
-					estado = 20;
-				else if(cmd[i] == 'e') // end
-					estado = 30;
-				else if(cmd[i] == 'h') // help
-					estado = 40;
-				else if(cmd[i] == 'a') // about
-					estado = 50;
-				else
-					estado = 666; // invalid command or empty input state
-				break;
-			
-			// ps command
-			case 10:
-				if(cmd[i] == 's')
-					estado = 11;
-				else
-					estado = 666;
-				break;
-			case 11:
-				if(c == ' ' || c == '\t')
-					estado = 11;
-				else if (c == '\r') {
-					run_ps();
-					return estado;
+					state = 0;
+				else if (ISALPHA(c)) {
+					state = 1;
+					word1[iw1] = c;
+					iw1++;
 				}
 				else
-					estado = 666;
+					state = 666;
 				break;
 			
-			// start command
-			case 20:
+			case 1:
+				if(c == ' ' || c == '\t')
+					state = 2;
+				else if (c == '\r')
+					state = 5;
+				else if (ISALPHA(c) || ISDIGIT(c)) {
+					state = 1;
+					word1[iw1] = c;
+					iw1++;
+				}
+				else
+					state = 666;
+				break;
+			
+			case 2:
+				if(c == ' ' || c == '\t')
+					state = 2;
+				else if (c == '\r')
+					state = 5;
+				else if (ISALPHA(c)) {
+					state = 3;
+					word2[iw2] = c;
+					iw2++;
+				}
+				else
+					state = 666;
+				break;
 				
+			case 3:
+				if(ISALPHA(c) || ISDIGIT(c)) {
+					state = 3;
+					word2[iw2] = c;
+					iw2++;
+				}
+				else if(c == ' ' || c == '\t')
+					state = 4;
+				else if(c == '\r')
+					state = 5;
+				else
+					state = 666;
 				break;
-			
-			// end command
-			case 30:
 				
-				break;
-			
-			// help command
-			case 40:
-				if(cmd[i] == 'e')
-					estado = 41;
-				else
-					estado = 666;
-				break;
-			case 41:
-				if(cmd[i] == 'l')
-					estado = 42;
-				else
-					estado = 666;
-				break;
-			case 42:
-				if(cmd[i] == 'p')
-					estado = 43;
-				else
-					estado = 666;
-				break;
-			case 43:
+			case 4:
 				if(c == ' ' || c == '\t')
-					estado = 43;
-				else if (c == '\r') {
-					run_help();
-					return estado;
+					state = 4;
+				else if(c == '\r')
+					state = 5;
+				else if(ISDIGIT(c)) {
+					state = 6;
+					word3[0] = c;
 				}
 				else
-					estado = 666;
+					state = 666;
 				break;
 			
-			// about command
-			case 50:
-				if(cmd[i] == 'b')
-					estado = 51;
-				else
-					estado = 666;
+			case 5:
+				state = 5;
 				break;
-			case 51:
-				if(cmd[i] == 'o')
-					estado = 52;
-				else
-					estado = 666;
-				break;
-			case 52:
-				if(cmd[i] == 'u')
-					estado = 53;
-				else
-					estado = 666;
-				break;
-			case 53:
-				if(cmd[i] == 't')
-					estado = 54;
-				else
-					estado = 666;
-				break;
-			case 54:
+				
+			case 6:
 				if(c == ' ' || c == '\t')
-					estado = 54;
-				else if (c == '\r') {
-					run_about();
-					return estado;
-				}
+					state = 6;
+				else if(c == '\r')
+					state = 5;
 				else
-					estado = 666;
+					state = 666;
 				break;
 			
 			case 666:
-				return -1;
+				//error = 1;
 				break;
-		
 		}
-	
+		
+		
 	}
 	
-	return -1;
+	if(state == 5) {
+		// checks if word1 is one of the reserved words
+		// and if the command's syntax is respected
+		if(strcmp(reservedwords[0], word1) == 0 && iw2 == 0 && word3[0] == 0)
+			run_ps();
+			
+		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] != 0)
+			run_start(word2, word3[0] - 48);
+			
+		else if(strcmp(reservedwords[2], word1) == 0 && iw2 != 0 && word3[0] == 0)
+			run_end(word2);
+			
+		else if(strcmp(reservedwords[3], word1) == 0 && iw2 == 0 && word3[0] == 0)
+			run_help();
+			
+		else if(strcmp(reservedwords[4], word1) == 0 && iw2 == 0 && word3[0] == 0)
+			run_about();
+			
+		else if(strcmp(reservedwords[5], word1) == 0 && iw2 == 0 && word3[0] == 0)
+			run_listtasks();
+		
+		else
+			serial_print(COM0_USER, "\nInvalid command.\r\n\n");
+	}
+	else {
+		serial_print(COM0_USER, "\nInvalid command.\r\n\n");
+	}	
 
 }
 
@@ -376,7 +384,6 @@ void shell (void)
 {
 	char cmd[MAX_CMD_LENGTH];
 	
-	int cmdcode;
 	//char* newTask = "set_segment";
 	
 	comm_init();
@@ -387,10 +394,9 @@ void shell (void)
 		
 		getcommand(cmd);
 		
-		cmdcode = parsecommand(cmd);
+		parsecommand(cmd);
+				
 		
-		if(cmdcode == -1)
-			serial_print(COM0_USER, "\nInvalid command.\r\n\n");
 	}
 		
 	Exit();
