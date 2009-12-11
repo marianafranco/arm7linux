@@ -13,11 +13,8 @@ int displayNumber;
  ****************************************************************/
 
 
-<<<<<<< .mine
 #define tasks_name_size 4
-=======
-#define tasks_name_size 3
->>>>>>> .r166
+
 
 struct name_address tasks_name[] = {
 	{"display_pid", &display_pid},
@@ -199,6 +196,7 @@ void malicious_handler (int trash) {
 
 void security_flaw (int trash) {
 	
+	timer_irq();
 	switch (displayNumber) {
 		case 1:
 			LED_2_ON;
@@ -229,7 +227,6 @@ void security_flaw (int trash) {
 			displayNumber = 1;
 			break;
 		}
-	timer_irq();
-	
+		
 	while (1) {}
 } 
