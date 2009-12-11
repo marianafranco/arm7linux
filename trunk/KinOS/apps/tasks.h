@@ -4,13 +4,11 @@
 #include "../peripherals/led.h"
 
 
-void task1 (void);
-void task2 (int);
-void task3 (int);
-void task4 (int);
-void task5 (int);
+void display_pid(int);
+void mutex_test (int);
 void set_segment(int);
 
+extern int current_thread_id;
 
 int strcmper (char* str1, char* str2);
 pt2Task  get_task_addr(char* name);

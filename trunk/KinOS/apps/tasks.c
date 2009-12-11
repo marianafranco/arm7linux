@@ -6,6 +6,8 @@
 
 extern int thread_array[];
 
+int displayNumber;
+
 /****************************************************************
  * ROUTINES
  ****************************************************************/
@@ -14,10 +16,8 @@ extern int thread_array[];
 #define tasks_name_size 5
 
 struct name_address tasks_name[] = {
-	{"task2", &task2},
-	{"task3", &task3},
-	{"task4", &task4},
-	{"task5\0", &task5},
+	{"display_pid", &display_pid},
+	{"mutex_test", &mutex_test},
 	{"set_segment", &set_segment}
 };
 
@@ -69,7 +69,7 @@ char* get_task_name(int index){
  ****************************************************************/
 
 
-void task1 (void) {
+/*void task1 (void) {
 
 	int a = 0;
 	int b = 0;
@@ -108,13 +108,7 @@ void task1 (void) {
 		}
 		j++;
 	}
-}
-
-void task2 (int value) {
-	while (1) {
-		segment_set(2);		 
-	}
-}
+}*/
 
 
 void set_segment(int value){
@@ -123,78 +117,64 @@ void set_segment(int value){
 	}
 }
 
-
+void display_pid(int trash){
+	while (1) {
+		if (displayNumber != current_thread_id) {
+			segment_set(current_thread_id);
+			displayNumber = current_thread_id;
+		}
+	}
+}
 
 
 // Parte 1 do exemplo do mutex
-void task3 (int lixo) {
+void mutex_test (int led) {
 
 	while (1) {
 		int delay;
 		/* Set display as 3 */
-		segment_set(3);
+		if (displayNumber != current_thread_id) {
+			segment_set(current_thread_id);
+			displayNumber = current_thread_id;
+		}
 		/* Wait if mutex is on, if it is not, set it */
-		//WAIT;
+		WAIT;
 		/* Turn on LED 1 */
-		//LED_1_ON;
-		/* Wait */
-		//for (delay=0; delay<0x20ffff; delay++) {}
+		switch (led) {
+		case 1:
+			LED_1_ON;
+			break;
+		case 2:
+			LED_2_ON;
+			break;
+		case 3:
+			LED_3_ON;
+			break;
+		case 4:
+			LED_4_ON;
+			break;
+		}
+		
+		/* Wait 20ffff*/
+		for (delay=0; delay<0xffff; delay++) {}
 		/* Turn off LED 1 */
-		//LED_1_OFF;
+		switch (led) {
+		case 1:
+			LED_1_OFF;;
+			break;
+		case 2:
+			LED_2_OFF;
+			break;
+		case 3:
+			LED_3_OFF;
+			break;
+		case 4:
+			LED_4_OFF;
+			break;
+		}
 		/* Turn mutex off */ 
-		//SIGNAL;
+		SIGNAL;
 		/* Wait */
-		//for (delay=0; delay<0x20ffff; delay++) {} 
-	}
-}
-
-// Parte 2 do exemplo do mutex
-void task4 (int lixo) {
-	while (1) {
-		int delay;
-		/* Set display as 3 */
-		segment_set(4);
-		/* Wait if mutex is on, if it is not, set it */
-		//WAIT;
-		/* Turn on LED 1 */
-		//LED_2_ON;
-		/* Turn mutex off */ 
-		//SIGNAL;
-		/* Turn off LED 1 */
-		//LED_2_OFF;
-		/* Wait */
-		//for (delay=0; delay<0x20ffff; delay++) {}
-		/* Wait */
-		//for (delay=0; delay<0x20ffff; delay++) {} 
-	}
-}
-
-void task5 (int lixo) {
-	while (1) {
-		segment_set(5);
-	}
-}
-
-void task6 (void) {
-	while (1) {
-		segment_set(6);
-	}
-}
-
-void task7 (void) {
-	while (1) {
-		segment_set(7);
-	}
-}
-
-void task8 (void) {
-	while (1) {
-		segment_set(8);
-	}
-}
-
-void task9 (void) {
-	while (1) {
-		segment_set(9);
+		for (delay=0; delay<0xffff; delay++) {} 
 	}
 }
