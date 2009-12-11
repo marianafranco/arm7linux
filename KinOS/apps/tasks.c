@@ -13,13 +13,14 @@ int displayNumber;
  ****************************************************************/
 
 
-#define tasks_name_size 4
+#define tasks_name_size 5
 
 
 struct name_address tasks_name[] = {
 	{"display_pid", &display_pid},
 	{"set_segment", &set_segment},
 	{"mutex_test", &mutex_test},
+	{"fork_test", &fork_test},
 	{"malicious_handler", &malicious_handler}
 };
 
@@ -71,47 +72,6 @@ char* get_task_name(int index){
  ****************************************************************/
 
 
-/*void task1 (void) {
-
-	int a = 0;
-	int b = 0;
-	int c = 0;
-	
-	char* newTask = "set_segment";
-	
-	int j;
-	
-	int state1;
-	int state2;
-	
-	//j = getState(0) + getState(1) + getState(2);
-	
-	a = fork();
-	if(a != -1 && a != 0){
-		exec(a ,get_task_addr("task3"), 0);
-	}
-	
-	b = fork();
-	if(b != -1 && b != 0){
-		exec(b ,get_task_addr("task4"), 0);
-	}
-	
-	
-	c = fork();
-	if(c != -1 && b != 0){
-		exec(c ,get_task_addr("task5"), 0);
-	}
-	
-	
-	while (1) {
-		segment_set(1);
-		if(j==1000000){
-			exit(a);
-		}
-		j++;
-	}
-}*/
-
 
 void set_segment(int value){
 	while (1) {
@@ -122,6 +82,8 @@ void set_segment(int value){
 	}
 }
 
+
+
 void display_pid(int trash){
 	while (1) {
 		if (displayNumber != current_thread_id) {
@@ -130,6 +92,32 @@ void display_pid(int trash){
 		}
 	}
 }
+
+
+
+void fork_test(int trash){
+	int a = 0;
+	char pid[1];
+	
+	pid[0] = current_thread_id + 48;
+	serial_print(COM0_USER, "\r\nparent = ");
+	serial_print(COM0_USER, pid);
+	serial_print(COM0_USER, ".\r\n");
+	
+	a = fork();
+	if(a != -1 && a != 0){
+		pid[0] = a + 48;
+		serial_print(COM0_USER, "child = ");
+		serial_print(COM0_USER, pid);
+		serial_print(COM0_USER, ".\r\n");
+		exit(a);
+	}
+	
+	while(1){
+		
+	}
+}
+
 
 
 // Parte 1 do exemplo do mutex
