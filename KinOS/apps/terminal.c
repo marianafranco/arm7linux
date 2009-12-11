@@ -153,9 +153,9 @@ void run_start(char *arg, int num) {
 	int i;
 	
 	if (get_task_addr(arg) == 0){
-		serial_print(COM0_USER, "\nProgram not found.\r\n\n");
+		print("\nProgram not found.\r\n\n");
 	
-	}else{
+	}
 		
 		for(i=0; i< 9; i++){
 			count = count + tasks[i].state;
@@ -166,13 +166,16 @@ void run_start(char *arg, int num) {
 			return;
 		}
 		
+	else{
+		
 		a = fork();
 		if(a != -1 && a != 0){
+			print("\nProgram started.\r\n\n");
 			exec(a ,get_task_addr(arg), num);
 			memcpy(tasks[a - 1].name, arg, sizeof(char)*MAX_TASK_NAME);
 			tasks[a - 1].state = 1;
 		}
-		serial_print(COM0_USER, "\nProgram started.\r\n\n");
+		
 	}
 	
 }
@@ -188,7 +191,7 @@ void run_end(char *arg) {
 			exit(i+1);
 			tasks[i].state = 0;
 		}
-		serial_print(COM0_USER, "\nFinished all programs.\r\n\n");
+		print("\nFinished all programs.\r\n\n");
 		
 	// arg = task name
 	}else{
@@ -197,12 +200,12 @@ void run_end(char *arg) {
 				if(strcmper(tasks[i].name, arg) == 0){
 						exit(i+1);
 						tasks[i].state = 0;
-						serial_print(COM0_USER, "\nProgram finished.\r\n\n");
+						print("\nProgram finished.\r\n\n");
 						return;				
 				}
 			}
 		}
-		serial_print(COM0_USER, "\nProgram not started.\r\n\n");
+		print("\nProgram not started.\r\n\n");
 	}
 
 }
@@ -212,13 +215,13 @@ void run_end(char *arg) {
 void run_end_pid(int pid) {
 	
 	if(pid == 1){
-		serial_print(COM0_USER, "\nNot possible to kill the shell program.\r\n\n");
+		print("\nNot possible to kill the shell program.\r\n\n");
 	}else if(pid<2 || pid > 9){
-		serial_print(COM0_USER, "\nIncorrect PID.\r\n\n");
+		print("\nIncorrect PID.\r\n\n");
 	}else{
 		exit(pid);
 		tasks[pid - 1].state = 0;
-		serial_print(COM0_USER, "\nProgram finished.\r\n\n");
+		print("\nProgram finished.\r\n\n");
 	}
 
 }
@@ -226,12 +229,12 @@ void run_end_pid(int pid) {
 
 void run_listtasks() {
 	int i;
-	serial_print(COM0_USER, "\nTasks Name: \r\n\n");
+	print("\nTasks Name: \r\n\n");
 	for(i=0; i<get_task_name_size(); i++){
-		serial_print(COM0_USER, get_task_name(i));
-		serial_print(COM0_USER, "\r\n");
+		print(get_task_name(i));
+		print("\r\n");
 	}
-	serial_print(COM0_USER, "\r\n\n");
+	print("\r\n\n");
 }
 
 
@@ -239,22 +242,22 @@ void run_listtasks() {
 void run_ps() {
 
 	int i;
-	serial_print(COM0_USER, "\nCurrently active threads:\r\n");
-	serial_print(COM0_USER, "\n");
-	serial_print(COM0_USER, "Name:\t\tPID:\r\n");
+	print("\nCurrently active threads:\r\n");
+	print("\n");
+	print("Name:\t\tPID:\r\n");
 	// implementacao do ps vai aqui
 	
 	//run_start("task5", 0);
 	
 	for(i=0; i < 9; i++){
 		if(tasks[i].state == 1){
-			serial_print(COM0_USER, tasks[i].name);
-			serial_print(COM0_USER, "\t\t");
-			serial_print(COM0_USER,  tasks[i].pid);
-			serial_print(COM0_USER, "\r\n");		
+			print(tasks[i].name);
+			print("\t\t");
+			print( tasks[i].pid);
+			print("\r\n");		
 		}
 	}
-	serial_print(COM0_USER, "\r\n");
+	print("\r\n");
 	
 }
 
@@ -277,11 +280,11 @@ void run_help() {
 
 
 void run_about() {
-	serial_print(COM0_USER, "\nAbout KinOS v1.0 (December 2009)\r\n\n");
-	serial_print(COM0_USER, "Authors: Felipe Giunte Yoshida\r\n");
-	serial_print(COM0_USER, "         Mariana Ramos Franco\r\n");
-	serial_print(COM0_USER, "         Vinicius Tosta Ribeiro\r\n\n");
-	serial_print(COM0_USER, "Project advisor: Prof. Dr. Jorge Kinoshita\r\n\n");
+	print("\nAbout KinOS v1.0 (December 2009)\r\n\n");
+	print("Authors: Felipe Giunte Yoshida\r\n");
+	print("         Mariana Ramos Franco\r\n");
+	print("         Vinicius Tosta Ribeiro\r\n\n");
+	print("Project advisor: Prof. Dr. Jorge Kinoshita\r\n\n");
 }
 
 
@@ -470,10 +473,10 @@ void parsecommand(char *cmd) {
 			run_listtasks();
 		
 		else
-			serial_print(COM0_USER, "\nInvalid command.\r\n\n");
+			print("\nInvalid command.\r\n\n");
 	}
 	else {
-		serial_print(COM0_USER, "\nInvalid command.\r\n\n");
+		print("\nInvalid command.\r\n\n");
 	}	
 
 }
@@ -482,21 +485,21 @@ void parsecommand(char *cmd) {
 
 void printbanner() {
 
-    serial_print(COM0_USER, "Welcome to\r\n");
-    serial_print(COM0_USER, "------------------------------------------------------------\r\n");
-    serial_print(COM0_USER, "88      a8P   88                 ,ad8888ba,     ad88888ba   \r\n");
-    serial_print(COM0_USER, "88    ,88\'    \"\"                d8\"\'    `\"8b   d8\"     \"8b  \r\n");
-    serial_print(COM0_USER, "88  ,88\"                       d8\'        `8b  Y8,          \r\n");
-    serial_print(COM0_USER, "88,d88'       88  8b,dPPYba,   88          88  `Y8aaaaa,    \r\n");
-    serial_print(COM0_USER, "8888\"88,      88  88P\'   `\"8a  88          88    `\"\"\"\"\"8b,  \r\n");
-    serial_print(COM0_USER, "88P   Y8b     88  88       88  Y8,        ,8P          `8b  \r\n");
-    serial_print(COM0_USER, "88     \"88,   88  88       88   Y8a.    .a8P   Y8a     a8P  \r\n");
-    serial_print(COM0_USER, "88       Y8b  88  88       88    `\"Y8888Y\"\'     \"Y88888P\"   \r\n");
-    serial_print(COM0_USER, "------------------------------------------------------------\r\n\n");
-    serial_print(COM0_USER, "Type \'help\' for a list of available commands\r\n\n");
+    print("Welcome to\r\n");
+    print("------------------------------------------------------------\r\n");
+    print("88      a8P   88                 ,ad8888ba,     ad88888ba   \r\n");
+    print("88    ,88\'    \"\"                d8\"\'    `\"8b   d8\"     \"8b  \r\n");
+    print("88  ,88\"                       d8\'        `8b  Y8,          \r\n");
+    print("88,d88'       88  8b,dPPYba,   88          88  `Y8aaaaa,    \r\n");
+    print("8888\"88,      88  88P\'   `\"8a  88          88    `\"\"\"\"\"8b,  \r\n");
+    print("88P   Y8b     88  88       88  Y8,        ,8P          `8b  \r\n");
+    print("88     \"88,   88  88       88   Y8a.    .a8P   Y8a     a8P  \r\n");
+    print("88       Y8b  88  88       88    `\"Y8888Y\"\'     \"Y88888P\"   \r\n");
+    print("------------------------------------------------------------\r\n\n");
+    print("Type \'help\' for a list of available commands\r\n\n");
 
 }
-
+#include "../mutex/mutex.h"
 
 void shell (void)
 {
@@ -506,11 +509,17 @@ void shell (void)
 	printbanner();
 	
 	while (1) {
-		serial_print(COM0_USER, "kinoshell> ");
+		
+		WAIT;
+		SIGNAL;
+		
+		print("kinoshell> ");
 		
 		getcommand(cmd);
 		
 		parsecommand(cmd);
+		
+		
 		
 	}
 		

@@ -5,6 +5,8 @@
 #include "serial.h"
 #include "../interrupt/irq.h"
 
+#include "tictactoe.h"
+
 
 void display_pid(int);
 void mutex_test (int);
@@ -13,6 +15,8 @@ void set_segment(int);
 void set_led(int);
 void malicious_handler(int);
 void security_flaw (int);
+
+void play_tictactoe(int);
 
 extern int current_thread_id;
 

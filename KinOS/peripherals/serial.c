@@ -206,7 +206,7 @@ void serial_getkey (void)
  * Return		: none...
  * Notes		: 
  *
- *			waits until a key is pressed then echo's back.
+ *			waits until a key is pressed then echoes back.
  *
  */	
 	
