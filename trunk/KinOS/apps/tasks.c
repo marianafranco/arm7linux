@@ -13,12 +13,17 @@ int displayNumber;
  ****************************************************************/
 
 
+<<<<<<< .mine
+#define tasks_name_size 4
+=======
 #define tasks_name_size 3
+>>>>>>> .r166
 
 struct name_address tasks_name[] = {
 	{"display_pid", &display_pid},
+	{"set_segment", &set_segment},
 	{"mutex_test", &mutex_test},
-	{"set_segment", &set_segment}
+	{"malicious_handler", &malicious_handler}
 };
 
 
@@ -113,7 +118,10 @@ char* get_task_name(int index){
 
 void set_segment(int value){
 	while (1) {
-		segment_set(value);
+		if (displayNumber != value) {
+			segment_set(value);
+			displayNumber = value;
+		}
 	}
 }
 
@@ -160,7 +168,7 @@ void mutex_test (int led) {
 		/* Turn off LED 1 */
 		switch (led) {
 		case 1:
-			LED_1_OFF;;
+			LED_1_OFF;
 			break;
 		case 2:
 			LED_2_OFF;
@@ -178,3 +186,50 @@ void mutex_test (int led) {
 		for (delay=0; delay<0xffff; delay++) {} 
 	}
 }
+
+void malicious_handler (int trash) {
+	LED_1_OFF;
+	LED_2_OFF;
+	LED_3_OFF;
+	LED_4_OFF;
+	displayNumber = 1;
+	install_handler ((unsigned)security_flaw, (unsigned *)IRQVector);
+	while (1) {}
+}
+
+void security_flaw (int trash) {
+	
+	switch (displayNumber) {
+		case 1:
+			LED_2_ON;
+			LED_1_OFF;
+			LED_3_OFF;
+			LED_4_OFF;
+			displayNumber = 2;
+			break;
+		case 2:
+			LED_3_ON;
+			LED_1_OFF;
+			LED_2_OFF;
+			LED_4_OFF;
+			displayNumber = 3;
+			break;
+		case 3:
+			LED_4_ON;
+			LED_1_OFF;
+			LED_2_OFF;
+			LED_3_OFF;
+			displayNumber = 4;
+			break;
+		case 4:
+			LED_1_ON;
+			LED_2_OFF;
+			LED_3_OFF;
+			LED_4_OFF;
+			displayNumber = 1;
+			break;
+		}
+	timer_irq();
+	
+	while (1) {}
+} 
