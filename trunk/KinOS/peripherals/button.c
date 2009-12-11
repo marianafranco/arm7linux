@@ -19,5 +19,6 @@ void  button_irq (void) {
 	*(unsigned *) IRQStatus |= 1;
 
 	/* Do something */
+	run_end("all");		// Kill all tasks
 
 }
