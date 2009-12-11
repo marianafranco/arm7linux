@@ -10,7 +10,7 @@
 ; From the call of the function: r1 = task id, r2 = task address
 routine_exec
 ; Store variables
-	STMFD 	sp!,{r0-r12,lr}		; Push r0-12 in the stack
+	STMFD 	sp!,{r0-r12,lr}				; Push r0-12 in the stack
 	
 	MOV		r6, r3						; r6 = value of the first argument
 
@@ -35,7 +35,7 @@ loop
 	SUB		r4, r4, #4048				; r0 = r4 - 4048 (next stack)
 	B		loop						; Go to next stack
 end_loop
-	STR		r0,[r3]						; MEM[r3] = r4 (the process stack pointer)
+	STR		r4,[r3]						; MEM[r3] = r4 (the process stack pointer)
 
 ; Set up the r0
 	SUB		r3,r3,#52					; r3 = r3 - 52
