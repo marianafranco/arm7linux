@@ -3,21 +3,24 @@
  ****************************************************************/
 
 #include "tasks.h"
+#include "terminal.h"
 
 extern int thread_array[];
 
 int displayNumber;
+
 
 /****************************************************************
  * ROUTINES
  ****************************************************************/
 
 
-#define tasks_name_size 5
+#define tasks_name_size 6
 
 
 struct name_address tasks_name[] = {
 	{"display_pid", &display_pid},
+	{"set_led", &set_led},
 	{"set_segment", &set_segment},
 	{"mutex_test", &mutex_test},
 	{"fork_test", &fork_test},
@@ -70,6 +73,112 @@ char* get_task_name(int index){
 /****************************************************************
  * TASKS
  ****************************************************************/
+
+
+void set_led(int value){
+	switch (value) {
+		case 0:
+			LED_1_OFF;
+			LED_2_OFF;
+			LED_3_OFF;
+			LED_4_OFF;
+			break;
+		case 1:
+			LED_1_OFF;
+			LED_2_OFF;
+			LED_3_OFF;
+			LED_4_ON;
+			break;
+		case 2:
+			LED_1_OFF;
+			LED_2_OFF;
+			LED_3_ON;
+			LED_4_OFF;
+			break;
+		case 3:
+			LED_1_OFF;
+			LED_2_OFF;
+			LED_3_ON;
+			LED_4_ON;
+			break;
+		case 4:
+			LED_1_OFF;
+			LED_2_ON;
+			LED_3_OFF;
+			LED_4_OFF;
+			break;
+		case 5:
+			LED_1_OFF;
+			LED_2_ON;
+			LED_3_OFF;
+			LED_4_ON;
+			break;
+		case 6:
+			LED_1_OFF;
+			LED_2_ON;
+			LED_3_ON;
+			LED_4_OFF;
+			break;
+		case 7:
+			LED_1_OFF;
+			LED_2_ON;
+			LED_3_ON;
+			LED_4_ON;
+			break;
+		case 8:
+			LED_1_ON;
+			LED_2_OFF;
+			LED_3_OFF;
+			LED_4_OFF;
+			break;
+		case 9:
+			LED_1_ON;
+			LED_2_OFF;
+			LED_3_OFF;
+			LED_4_ON;
+			break;
+		case 10:
+			LED_1_ON;
+			LED_2_OFF;
+			LED_3_ON;
+			LED_4_OFF;
+			break;
+		case 11:
+			LED_1_ON;
+			LED_2_OFF;
+			LED_3_ON;
+			LED_4_ON;
+			break;
+		case 12:
+			LED_1_ON;
+			LED_2_ON;
+			LED_3_OFF;
+			LED_4_OFF;
+			break;
+		case 13:
+			LED_1_ON;
+			LED_2_ON;
+			LED_3_OFF;
+			LED_4_ON;
+			break;
+		case 14:
+			LED_1_ON;
+			LED_2_ON;
+			LED_3_ON;
+			LED_4_OFF;
+			break;
+		case 15:
+			LED_1_ON;
+			LED_2_ON;
+			LED_3_ON;
+			LED_4_ON;
+			break;		
+		}
+		set_state(current_thread_id, 0);
+		exit(current_thread_id);
+		while(1){
+		}
+}
 
 
 

@@ -142,15 +142,30 @@ void clearstring(char *str, int length) {
 	
 }
 
+void set_state(int pid, int state){
+	tasks[pid-1].state = state;
+
+}
 
 void run_start(char *arg, int num) {
 	int a = 0;
+	int count = 0;
+	int i;
 	
 	if (get_task_addr(arg) == 0){
 		serial_print(COM0_USER, "\nProgram not found.\r\n\n");
 	
 	}else{
-	
+		
+		for(i=0; i< 9; i++){
+			count = count + tasks[i].state;
+		}
+		
+		if(count==9){
+			serial_print(COM0_USER, "\nImpossible to run more than 9 programs.\r\n\n");
+			return;
+		}
+		
 		a = fork();
 		if(a != -1 && a != 0){
 			exec(a ,get_task_addr(arg), num);
