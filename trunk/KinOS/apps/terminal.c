@@ -143,8 +143,6 @@ void clearstring(char *str, int length) {
 }
 
 
-
-
 void run_start(char *arg, int num) {
 	int a = 0;
 	
@@ -166,26 +164,59 @@ void run_start(char *arg, int num) {
 
 
 
-
 void run_end(char *arg) {
 	int i;
-	for(i=0; i < 9; i++){
-		if(tasks[i].state == 1){
-			if(strcmper(tasks[i].name, arg) == 0){
-					exit(i+1);
-					tasks[i].state = 0;
-					serial_print(COM0_USER, "\nProgram finished.\r\n\n");
-					return;				
+	
+	// arg = all
+	if(strcmper(arg, "all")==0){
+		for(i=1; i < 9; i++){
+			exit(i+1);
+			tasks[i].state = 0;
+		}
+		serial_print(COM0_USER, "\nFinished all programs.\r\n\n");
+		
+	// arg = task name
+	}else{
+		for(i=1; i < 9; i++){
+			if(tasks[i].state == 1){
+				if(strcmper(tasks[i].name, arg) == 0){
+						exit(i+1);
+						tasks[i].state = 0;
+						serial_print(COM0_USER, "\nProgram finished.\r\n\n");
+						return;				
+				}
 			}
 		}
+		serial_print(COM0_USER, "\nProgram not started.\r\n\n");
 	}
-	serial_print(COM0_USER, "\nProgram not started.\r\n\n");
+
+}
+
+
+
+void run_end_pid(int pid) {
+	
+	if(pid == 1){
+		serial_print(COM0_USER, "\nNot possible to kill the shell program.\r\n\n");
+	}else if(pid<2 || pid > 9){
+		serial_print(COM0_USER, "\nIncorrect PID.\r\n\n");
+	}else{
+		exit(pid);
+		tasks[pid - 1].state = 0;
+		serial_print(COM0_USER, "\nProgram finished.\r\n\n");
+	}
 
 }
 
 
 void run_listtasks() {
-	serial_print(COM0_USER, "\nList Tasks command\r\n\n");
+	int i;
+	serial_print(COM0_USER, "\nTasks Name: \r\n\n");
+	for(i=0; i<get_task_name_size(); i++){
+		serial_print(COM0_USER, get_task_name(i));
+		serial_print(COM0_USER, "\r\n");
+	}
+	serial_print(COM0_USER, "\r\n\n");
 }
 
 
@@ -269,7 +300,7 @@ void parsecommand(char *cmd) {
 
 	int i, state, iw1, iw2, error;
 	char c;
-	char *reservedwords[] = { "ps", "start", "end", "help", "about", "listtasks" };
+	char *reservedwords[] = { "ps", "start", "end", "help", "about", "listtasks", "pid" };
 	char word1[MAX_CMD_LENGTH], word2[MAX_CMD_LENGTH], word3[2];
 	
 	error = 0;
@@ -384,9 +415,15 @@ void parsecommand(char *cmd) {
 			
 		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] != 0)
 			run_start(word2, word3[0] - 48);
+		
+		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] == 0)
+			run_start(word2, 0);
 			
 		else if(strcmp(reservedwords[2], word1) == 0 && iw2 != 0 && word3[0] == 0)
 			run_end(word2);
+			
+		else if(strcmp(reservedwords[2], word1) == 0 && strcmp(reservedwords[6], word2) == 0 && word3[0] != 0)
+			run_end_pid(word3[0] - 48);
 			
 		else if(strcmp(reservedwords[3], word1) == 0 && iw2 == 0 && word3[0] == 0)
 			run_help();
