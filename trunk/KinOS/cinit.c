@@ -45,7 +45,7 @@ int C_Entry (void) {
 		MOV		r1,	#0x40|0x10
 		MSR 	CPSR_c, r1
 	}
-	/* Start with process 1 */
+	/* Start with shell */
 	shell();
 	 /* The return below should not be reachable */
 	return 0;
