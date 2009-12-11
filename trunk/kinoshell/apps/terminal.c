@@ -154,6 +154,43 @@ void clearstring(char *str) {
 	
 }
 
+void run_ps() {
+	serial_print(COM0_USER, "\nCurrently active threads:\r\n");
+	// implementacao do ps vai aqui
+	serial_print(COM0_USER, "\n");
+}
+
+void run_start(char *arg) {
+
+}
+
+void run_end(char *arg) {
+
+}
+
+void run_help() {
+	serial_print(COM0_USER, "\nOther available commands for kinoshell:\r\n\n");
+	serial_print(COM0_USER, "          ps : Lists all currently active threads in KinOS\r\n");
+	serial_print(COM0_USER, "start <name> : Starts a new thread with the program specified in <name>\r\n");
+	serial_print(COM0_USER, "  end <name> : Kills all threads named <name>\r\n");
+	serial_print(COM0_USER, "       about : Displays additional information about the KinOS project\r\n");
+	serial_print(COM0_USER, "\n");
+}
+
+void run_about() {
+	serial_print(COM0_USER, "\nAbout KinOS v1.0 (December 2009)\r\n\n");
+	serial_print(COM0_USER, "Authors: Felipe Giunte Yoshida\r\n");
+	serial_print(COM0_USER, "         Mariana Ramos Franco\r\n");
+	serial_print(COM0_USER, "         Vinicius Tosta Ribeiro\r\n\n");
+	serial_print(COM0_USER, "Project advisor: Prof. Dr. Jorge Kinoshita\r\n\n");
+}
+
+
+/* -- getcommand -------------------------------------------------
+ *
+ * Reads a string from the COM0 port
+ *
+ */
 void getcommand(char *cmd) {
 	
 	int i, c;
@@ -166,8 +203,7 @@ void getcommand(char *cmd) {
 		c = serial_getchar();
 		if (c == 8) {	// backspace
 			if (i>0) {
-			    serial_print(COM0_USER, " ");
-			    i = i - 2;
+			    i--;
 			}
 		}
 		else {
@@ -176,24 +212,185 @@ void getcommand(char *cmd) {
 	}
 }
 
+/* -- getcommand -------------------------------------------------
+ *
+ * Runs a finite state machine in order to parse user input (char *cmd)
+ *
+ */
+int parsecommand(char *cmd) {
+
+	int i, estado;
+	char c;
+	
+	estado = 0;
+	
+	// sweeps the entire cmd string
+	for (i = 0; i < MAX_CMD_LENGTH; i++) {
+	
+		c = cmd[i];
+		
+		switch (estado) {
+		
+			case 0:
+				if(c == ' ' || c == '\t')
+					estado = 0;
+				else if(cmd[i] == 'p') // ps
+					estado = 10;
+				else if(cmd[i] == 's') // start
+					estado = 20;
+				else if(cmd[i] == 'e') // end
+					estado = 30;
+				else if(cmd[i] == 'h') // help
+					estado = 40;
+				else if(cmd[i] == 'a') // about
+					estado = 50;
+				else
+					estado = 666; // invalid command or empty input state
+				break;
+			
+			// ps command
+			case 10:
+				if(cmd[i] == 's')
+					estado = 11;
+				else
+					estado = 666;
+				break;
+			case 11:
+				if(c == ' ' || c == '\t')
+					estado = 11;
+				else if (c == '\r') {
+					run_ps();
+					return estado;
+				}
+				else
+					estado = 666;
+				break;
+			
+			// start command
+			case 20:
+				
+				break;
+			
+			// end command
+			case 30:
+				
+				break;
+			
+			// help command
+			case 40:
+				if(cmd[i] == 'e')
+					estado = 41;
+				else
+					estado = 666;
+				break;
+			case 41:
+				if(cmd[i] == 'l')
+					estado = 42;
+				else
+					estado = 666;
+				break;
+			case 42:
+				if(cmd[i] == 'p')
+					estado = 43;
+				else
+					estado = 666;
+				break;
+			case 43:
+				if(c == ' ' || c == '\t')
+					estado = 43;
+				else if (c == '\r') {
+					run_help();
+					return estado;
+				}
+				else
+					estado = 666;
+				break;
+			
+			// about command
+			case 50:
+				if(cmd[i] == 'b')
+					estado = 51;
+				else
+					estado = 666;
+				break;
+			case 51:
+				if(cmd[i] == 'o')
+					estado = 52;
+				else
+					estado = 666;
+				break;
+			case 52:
+				if(cmd[i] == 'u')
+					estado = 53;
+				else
+					estado = 666;
+				break;
+			case 53:
+				if(cmd[i] == 't')
+					estado = 54;
+				else
+					estado = 666;
+				break;
+			case 54:
+				if(c == ' ' || c == '\t')
+					estado = 54;
+				else if (c == '\r') {
+					run_about();
+					return estado;
+				}
+				else
+					estado = 666;
+				break;
+			
+			case 666:
+				return -1;
+				break;
+		
+		}
+	
+	}
+	
+	return -1;
+
+}
+
+void printbanner() {
+
+    serial_print(COM0_USER, "Welcome to\r\n");
+    serial_print(COM0_USER, "------------------------------------------------------------\r\n");
+    serial_print(COM0_USER, "88      a8P   88                 ,ad8888ba,     ad88888ba   \r\n");
+    serial_print(COM0_USER, "88    ,88\'    \"\"                d8\"\'    `\"8b   d8\"     \"8b  \r\n");
+    serial_print(COM0_USER, "88  ,88\"                       d8\'        `8b  Y8,          \r\n");
+    serial_print(COM0_USER, "88,d88'       88  8b,dPPYba,   88          88  `Y8aaaaa,    \r\n");
+    serial_print(COM0_USER, "8888\"88,      88  88P\'   `\"8a  88          88    `\"\"\"\"\"8b,  \r\n");
+    serial_print(COM0_USER, "88P   Y8b     88  88       88  Y8,        ,8P          `8b  \r\n");
+    serial_print(COM0_USER, "88     \"88,   88  88       88   Y8a.    .a8P   Y8a     a8P  \r\n");
+    serial_print(COM0_USER, "88       Y8b  88  88       88    `\"Y8888Y\"\'     \"Y88888P\"   \r\n");
+    serial_print(COM0_USER, "------------------------------------------------------------\r\n\n");
+    serial_print(COM0_USER, "Type \'help\' for a list of available commands\r\n\n");
+
+}
+
+
 void shell (void)
 {
 	char cmd[MAX_CMD_LENGTH];
 	
-	//int a = 0;
+	int cmdcode;
 	//char* newTask = "set_segment";
 	
 	comm_init();
+	printbanner();
 	
-	serial_print(COM0_USER, "Bem-vindo!\r\n");
 	while (1) {
-	serial_print(COM0_USER, "\nDigite algo: ");
-	
-	getcommand(cmd);
-	
-	serial_print(COM0_USER, "\r\nVc digitou: ");
-	serial_print(COM0_USER, cmd);
-	serial_print(COM0_USER, "\r\n");
+		serial_print(COM0_USER, "kinoshell> ");
+		
+		getcommand(cmd);
+		
+		cmdcode = parsecommand(cmd);
+		
+		if(cmdcode == -1)
+			serial_print(COM0_USER, "\nInvalid command.\r\n\n");
 	}
 		
 	Exit();
