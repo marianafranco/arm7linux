@@ -255,6 +255,8 @@ void run_help() {
 	serial_print(COM0_USER, "\n");
 }
 
+
+
 void run_about() {
 	serial_print(COM0_USER, "\nAbout KinOS v1.0 (December 2009)\r\n\n");
 	serial_print(COM0_USER, "Authors: Felipe Giunte Yoshida\r\n");
@@ -262,6 +264,7 @@ void run_about() {
 	serial_print(COM0_USER, "         Vinicius Tosta Ribeiro\r\n\n");
 	serial_print(COM0_USER, "Project advisor: Prof. Dr. Jorge Kinoshita\r\n\n");
 }
+
 
 
 /* -- getcommand -------------------------------------------------
