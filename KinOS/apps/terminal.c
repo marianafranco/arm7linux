@@ -291,7 +291,7 @@ void parsecommand(char *cmd) {
 			case 0:
 				if(c == ' ' || c == '\t')
 					state = 0;
-				else if (ISALPHA(c)) {
+				else if (ISALPHA(c) || c == '_') {
 					state = 1;
 					word1[iw1] = c;
 					iw1++;
@@ -305,7 +305,7 @@ void parsecommand(char *cmd) {
 					state = 2;
 				else if (c == '\r')
 					state = 5;
-				else if (ISALPHA(c) || ISDIGIT(c)) {
+				else if (ISALPHA(c) || ISDIGIT(c) || c == '_') {
 					state = 1;
 					word1[iw1] = c;
 					iw1++;
@@ -319,7 +319,7 @@ void parsecommand(char *cmd) {
 					state = 2;
 				else if (c == '\r')
 					state = 5;
-				else if (ISALPHA(c)) {
+				else if (ISALPHA(c) || c == '_') {
 					state = 3;
 					word2[iw2] = c;
 					iw2++;
@@ -329,7 +329,7 @@ void parsecommand(char *cmd) {
 				break;
 				
 			case 3:
-				if(ISALPHA(c) || ISDIGIT(c)) {
+				if(ISALPHA(c) || ISDIGIT(c) || c == '_') {
 					state = 3;
 					word2[iw2] = c;
 					iw2++;
