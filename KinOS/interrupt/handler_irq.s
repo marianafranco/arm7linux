@@ -43,7 +43,7 @@ handler_board_no_angel
 		TST		r0, #0x0001				; irq type = 0x0001?
 		BNE		handler_button			; If yes, go to handler_button
 		LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
-		B 		return					; and return
+		B 		end_handler				; and return
 
 ; handler routine for the button interruption
 handler_button
@@ -141,12 +141,12 @@ set_addresses
 ; Load the IRQ stack into r13_irq
 	LDR		r13, =irq_stack_pointer		; r13 = stack pointer address address
 	LDR		r13,[r13]					; Restore previous stack pointer
-	B		return						; Go to the end
+	B		end_handler						; Go to the end
 
 no_thread_switch
 	LDMFD		sp!,{r0-r3,lr}			; Restore the remaining registers
 
-return
+end_handler
 	SUBS 		pc, r14, #4				; Process counter = IRQ mode link register - 4
 										; (-4 is required for the pipeline)
 

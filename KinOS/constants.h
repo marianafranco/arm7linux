@@ -3,7 +3,7 @@
 /* 0 - Evaluator 7-T board with Angel */
 /* 1 - CodeWarrior ARMUlator */
 /* 2 - Evaluator 7-T board no Angel */
-#define emulator	0
+#define emulator	1
 /* The number of the operating system software interrupt */
 #define	OS_SWI		0
 /* Interrupt table SWI instruction position */
