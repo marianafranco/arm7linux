@@ -47,6 +47,7 @@ int C_Entry (void) {
 	}
 	/* Start with shell */
 	shell();
+	
 	 /* The return below should not be reachable */
 	return 0;
 }

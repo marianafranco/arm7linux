@@ -202,6 +202,11 @@ void display_pid(int trash){
 	}
 }
 
+void play_tictactoe(int trash) {
+	WAIT;
+	tictactoe();
+	SIGNAL;
+}
 
 
 void fork_test(int trash){
