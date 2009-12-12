@@ -214,16 +214,16 @@ void fork_test(int trash){
 	char pid[1];
 	
 	pid[0] = current_thread_id + 48;
-	serial_print(COM0_USER, "\r\nparent = ");
-	serial_print(COM0_USER, pid);
-	serial_print(COM0_USER, ".\r\n");
+	print("\r\nparent = ");
+	print(pid);
+	print(".\r\n");
 	
 	a = fork();
 	if(a != -1 && a != 0){
 		pid[0] = a + 48;
-		serial_print(COM0_USER, "child = ");
-		serial_print(COM0_USER, pid);
-		serial_print(COM0_USER, ".\r\n");
+		print("child = ");
+		print(pid);
+		print(".\r\n");
 		exit(a);
 	}
 	
