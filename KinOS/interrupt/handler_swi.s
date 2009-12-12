@@ -22,6 +22,7 @@
 	IMPORT	routine_exit
 	IMPORT  routine_print
 	IMPORT	handler_emulator
+	IMPORT 	force_next_thread
 
 	EXPORT 	Angel_SWI_Address
 	EXPORT 	handler_swi
@@ -100,7 +101,7 @@ pre_routine_print
 ; Switch caller
 pre_routine_switch
 	LDMFD	sp!,{r0-r12,lr}	; Restore r0-r12 registers and link registers
-	B	handler_emulator	; Branch to the switch routine
+	B	force_next_thread	; Branch to the switch routine
 
 	; Data area
 	AREA	swi_vars, DATA
