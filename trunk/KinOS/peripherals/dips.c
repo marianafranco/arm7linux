@@ -23,5 +23,5 @@
 unsigned dips_read (void) 
 {
 	/* 0xf = switch mask */
-	return 0XF & *IOData; 
+	return 0xF & *IOData; 
 }

@@ -179,8 +179,7 @@ void set_led(int value){
 		}
 		set_state(current_thread_id, 0);
 		exit(current_thread_id);
-		while(1){
-		}
+		while(1);
 }
 
 
@@ -327,5 +326,10 @@ void dips_to_leds (int trash) {
 }
 
 void dips_to_segments (int trash) {
-	segment_set(dips_read());
+	int setvalue = (int)(dips_read());
+	segment_set(setvalue);
+	
+	set_state(current_thread_id, 0);
+	exit(current_thread_id);
+	while(1);
 }
