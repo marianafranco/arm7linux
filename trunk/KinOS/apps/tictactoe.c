@@ -5,8 +5,18 @@
 #define	ISDIGIT(c) ((c >= 48 && c <= 57))
 #define MAX 3
 
+// global variable
 char grid[3][3];
 
+// prints the game grid
+// Example:
+//
+//  X |   |   
+// ---+---+---
+//  O | X |   
+// ---+---+---
+//  O | O | X 
+//
 void printgrid(void) {
     
     char str[MAX];
@@ -54,6 +64,7 @@ void printgrid(void) {
     
 }
 
+// Puts a game token in the grid at the position specified by the player
 int placetoken(char token, int i, int j) {
     
     if ((grid[i][j] == 0 || grid[i][j] == 32) && (i >= 0 || i < 3 || j >= 0 || j < 3)) {
@@ -67,6 +78,7 @@ int placetoken(char token, int i, int j) {
     
 }
 
+// Checks if one of the players has won
 int isgameover(void) {
     
     int i;
@@ -93,6 +105,7 @@ int isgameover(void) {
     
 }
 
+// Returns the game symbol for each player
 char getplayertoken(int player) {
     
     if (player == '0') return 'X';
@@ -100,6 +113,7 @@ char getplayertoken(int player) {
     
 }
 
+// Alternates between Player 1 and Player 2
 char changeplayer(char player) {
 	
 	if(player == '0')
@@ -109,6 +123,15 @@ char changeplayer(char player) {
 	
 }
 
+void banner() {
+	
+	print("Tic Tac Toe for KinOS v0.1 (December 2009)\r\n\n");
+	print("Type 'q' in both Row and Column fields anytime to quit\r\n\n");
+	
+}
+
+// Entry point of the game
+// (The commented-out sections regarding random numbers are for automatic playing)
 void tictactoe(void) {
     
     int i, j, victory, okmove = 0;
@@ -121,6 +144,8 @@ void tictactoe(void) {
         }
     }
     
+    banner();
+    
     //srand(time(NULL));
     
     printgrid();
@@ -129,6 +154,7 @@ void tictactoe(void) {
     victory = 0;
     player = '0';
     
+    // Gets moves from both players until a win condition or tied game is found
     while(victory == 0 && freespaces > 0) {
         
         playerstr[0] = player+1;
@@ -144,6 +170,7 @@ void tictactoe(void) {
             
             print("   Row: ");
             getcommand(rowstr, MAX);
+            
             i = (int)(rowstr[0] - 48);
             //i = rand()%3;
             
@@ -152,6 +179,10 @@ void tictactoe(void) {
             j = (int)(columnstr[0] - 48);
             //j = rand()%3;
             
+            if(rowstr[0] == 'q' && columnstr[0] == 'q') {
+            	print("\n\nQuitting Tic Tac Toe\r\n\n");
+            	return;
+            }
             
             okmove = placetoken(getplayertoken(player), i, j);
         }

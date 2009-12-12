@@ -131,7 +131,7 @@ void comm_getkey (void)
 	serial_getkey(); 
 }
 
-
+// Fills an entire string str of length 'length' with null characters
 void clearstring(char *str, int length) {
 	
 	int i;
@@ -142,16 +142,19 @@ void clearstring(char *str, int length) {
 	
 }
 
+// Sets the state (active or inactive) in the tasks struct
 void set_state(int pid, int state){
 	tasks[pid-1].state = state;
 
 }
 
+// Runs start command with arguments arg and num
 void run_start(char *arg, int num) {
 	int a = 0;
 	int count = 0;
 	int i;
 	
+	// Checks if the typed program name is in the tasks list
 	if (get_task_addr(arg) == 0){
 		print("\nProgram not found.\r\n\n");
 	
@@ -168,6 +171,7 @@ void run_start(char *arg, int num) {
 		
 	else{
 		
+		// Forks the shell process and executes the new process with the user-supplied arguments
 		a = fork();
 		if(a != -1 && a != 0){
 			print("\nProgram started.\r\n\n");
@@ -181,7 +185,7 @@ void run_start(char *arg, int num) {
 }
 
 
-
+// Kills a running process
 void run_end(char *arg) {
 	int i;
 	
@@ -205,13 +209,12 @@ void run_end(char *arg) {
 				}
 			}
 		}
-		print("\nProgram not started.\r\n\n");
+		print("\nThe selected program has not yet been started.\r\n\n");
 	}
 
 }
 
-
-
+// Kills a process using its PID as an argument
 void run_end_pid(int pid) {
 	
 	if(pid == 1){
@@ -226,7 +229,7 @@ void run_end_pid(int pid) {
 
 }
 
-
+// Lists all available programs in the tasks list
 void run_listtasks() {
 	int i;
 	print("\nTasks Name: \r\n\n");
@@ -238,16 +241,14 @@ void run_listtasks() {
 }
 
 
-
+// Lists all currently active threads in the system
+// This is done by consulting the tasks list (defined above)
 void run_ps() {
 
 	int i;
 	print("\nCurrently active threads:\r\n");
 	print("\n");
 	print("Name:\t\tPID:\r\n");
-	// implementacao do ps vai aqui
-	
-	//run_start("task5", 0);
 	
 	for(i=0; i < 9; i++){
 		if(tasks[i].state == 1){
@@ -262,23 +263,23 @@ void run_ps() {
 }
 
 
-
-
+// Lists all available commands for kinoshell
 void run_help() {
 	print("\nOther available commands for kinoshell:\r\n\n");
-	print("                ps : Lists all currently active threads in KinOS\r\n");
-	print("      start <name> : Starts a new thread with the program specified in <name>\r\n");
-	print("start <name> <arg> : Starts a new thread with the program specified in <name>\r\n");
-	print("                   : and the argument in <arg>\r\n");
-	print("        end <name> : Kills the first threads named <name>\r\n");
-	print("     end pid <num> : Kills the threads with the pid <num>\r\n");
-	print("           end all : Kills all threads\r\n");
-	print("             about : Displays additional information about the KinOS project\r\n");
+	print("                  ps : Lists all currently active threads in KinOS\r\n");
+	print("        start <name> : Starts a new thread with the program specified in <name>\r\n");
+	print("start <name> [<arg>] : Starts a new thread with the program specified in <name>\r\n");
+	print("                       and the argument in <arg>\r\n");
+	print("          end <name> : Kills the first threads named <name>\r\n");
+	print("       end pid <num> : Kills the threads with the pid <num>\r\n");
+	print("             end all : Kills all threads\r\n");
+	print("               about : Displays additional information about the KinOS project\r\n");
+	print("           listtasks : Displays a list of available programs for execution\r\n");
 	print("\n");
 }
 
 
-
+// Additional information about the project
 void run_about() {
 	print("\nAbout KinOS v1.0 (December 2009)\r\n\n");
 	print("Authors: Felipe Giunte Yoshida\r\n");
@@ -342,6 +343,8 @@ void parsecommand(char *cmd) {
 	
 		c = cmd[i];
 		
+		// this finite state mamchine is designed to find up to two words (letter{letter|digit}) and one hex number ([0-9][A-F][a-f])
+		// it ignores excessive blanks between each word
 		switch (state) {
 		
 			case 0:
@@ -403,7 +406,7 @@ void parsecommand(char *cmd) {
 					state = 4;
 				else if(c == '\r')
 					state = 5;
-				else if(ISDIGIT(c) || c=='a' || c=='b' || c=='c' || c=='d' || c=='e' || c=='f' ) {
+				else if(ISDIGIT(c) || (c >= 65 &&  c <= 70) || (c >= 97 &&  c <= 102)) {
 					state = 6;
 					word3[0] = c;
 				}
@@ -412,6 +415,7 @@ void parsecommand(char *cmd) {
 				break;
 			
 			case 5:
+				// accptance state
 				state = 5;
 				break;
 				
@@ -425,7 +429,7 @@ void parsecommand(char *cmd) {
 				break;
 			
 			case 666:
-				//error = 1;
+				// error state
 				break;
 		}
 		
@@ -440,11 +444,16 @@ void parsecommand(char *cmd) {
 			
 		else if(strcmp(reservedwords[1], word1) == 0 && iw2 != 0 && word3[0] != 0){
 			//numbers
-			if(word3[0]>47 && word3[0]<58){
+			if(word3[0] > 47 && word3[0] < 58){
 				run_start(word2, word3[0] - 48);
+			}
 			// a, b, c, d, e, f
-			}else if(word3[0]>96 && word3[0]<103){
+			else if(word3[0] > 96 && word3[0] < 103){
 				run_start(word2, word3[0] - 87);
+			}
+			// A B C D E F
+			else if(word3[0] >= 65 && word3[0] <= 70){
+				run_start(word2, word3[0] - 55);
 			}
 		}
 		
