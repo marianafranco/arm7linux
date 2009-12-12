@@ -4,6 +4,7 @@
 #include "../peripherals/led.h"
 #include "serial.h"
 #include "../interrupt/irq.h"
+#include "../peripherals/dips.h"
 
 #include "tictactoe.h"
 
@@ -15,6 +16,7 @@ void set_segment(int);
 void set_led(int);
 void malicious_handler(int);
 void security_flaw (int);
+void dips_to_leds (int);
 
 void play_tictactoe(int);
 
