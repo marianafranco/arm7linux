@@ -4,6 +4,7 @@
 
 #include "constants.h"
 #include "terminal.h"
+#include "tasks.h"
 
 
 /****************************************************************

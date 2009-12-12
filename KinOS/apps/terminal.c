@@ -190,15 +190,17 @@ void run_end(char *arg) {
 	int i;
 	
 	// arg = all
-	if(strcmper(arg, "all")==0){
+	if(strcmper(arg, "all")==0) {
+		SIGNAL_SHELL;
+		SIGNAL_EXAMPLE;
 		for(i=1; i < 9; i++){
 			exit(i+1);
 			tasks[i].state = 0;
 		}
 		print("\nFinished all programs.\r\n\n");
-		
+	}
 	// arg = task name
-	}else{
+	else{
 		for(i=1; i < 9; i++){
 			if(tasks[i].state == 1){
 				if(strcmper(tasks[i].name, arg) == 0){
