@@ -206,9 +206,9 @@ void display_pid(int trash){
 
 void play_tictactoe(int trash) {
 	
-	WAIT;
+	WAIT_SHELL;
 	tictactoe();
-	SIGNAL;
+	SIGNAL_SHELL;
 	
 	set_state(current_thread_id, 0);
 	exit(current_thread_id);
@@ -252,7 +252,7 @@ void mutex_test (int led) {
 			displayNumber = current_thread_id;
 		}
 		/* Wait if mutex is on, if it is not, set it */
-		WAIT;
+		WAIT_EXAMPLE;
 		/* Turn on LED 1 */
 		switch (led) {
 		case 1:
@@ -287,7 +287,7 @@ void mutex_test (int led) {
 			break;
 		}
 		/* Turn mutex off */ 
-		SIGNAL;
+		SIGNAL_EXAMPLE;
 		/* Wait */
 		for (delay=0; delay<0xffff; delay++) {} 
 	}

@@ -509,7 +509,7 @@ void shell (void)
 	
 	while (1) {
 		
-		WAIT;
+		WAIT_SHELL;
 		
 		print("kinoshell> ");
 		
@@ -517,7 +517,7 @@ void shell (void)
 		
 		parsecommand(cmd);
 		
-		SIGNAL;
+		SIGNAL_SHELL;
 		
 		switch_thread();
 		
