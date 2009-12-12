@@ -244,52 +244,58 @@ void fork_test(int trash){
 // Parte 1 do exemplo do mutex
 void mutex_test (int led) {
 
-	while (1) {
-		int delay;
-		/* Set display as 3 */
-		if (displayNumber != current_thread_id) {
-			segment_set(current_thread_id);
-			displayNumber = current_thread_id;
+	if (led >= 1 && led <= 4) {
+	
+		while (1) {
+			int delay;
+			/* Set display as 3 */
+			if (displayNumber != current_thread_id) {
+				segment_set(current_thread_id);
+				displayNumber = current_thread_id;
+			}
+			/* Wait if mutex is on, if it is not, set it */
+			WAIT_EXAMPLE;
+			/* Turn on LED 1 */
+			switch (led) {
+				case 1:
+					LED_1_ON;
+					break;
+				case 2:
+					LED_2_ON;
+					break;
+				case 3:
+					LED_3_ON;
+					break;
+				case 4:
+					LED_4_ON;
+					break;
+			}
+			
+			/* Wait 20ffff*/
+			for (delay=0; delay<0xffff; delay++) {}
+			/* Turn off LED 1 */
+			switch (led) {
+				case 1:
+					LED_1_OFF;
+					break;
+				case 2:
+					LED_2_OFF;
+					break;
+				case 3:
+					LED_3_OFF;
+					break;
+				case 4:
+					LED_4_OFF;
+					break;
+			}
+			/* Turn mutex off */ 
+			SIGNAL_EXAMPLE;
+			/* Wait */
+			for (delay=0; delay<0xffff; delay++) {} 
 		}
-		/* Wait if mutex is on, if it is not, set it */
-		WAIT_EXAMPLE;
-		/* Turn on LED 1 */
-		switch (led) {
-		case 1:
-			LED_1_ON;
-			break;
-		case 2:
-			LED_2_ON;
-			break;
-		case 3:
-			LED_3_ON;
-			break;
-		case 4:
-			LED_4_ON;
-			break;
-		}
-		
-		/* Wait 20ffff*/
-		for (delay=0; delay<0xffff; delay++) {}
-		/* Turn off LED 1 */
-		switch (led) {
-		case 1:
-			LED_1_OFF;
-			break;
-		case 2:
-			LED_2_OFF;
-			break;
-		case 3:
-			LED_3_OFF;
-			break;
-		case 4:
-			LED_4_OFF;
-			break;
-		}
-		/* Turn mutex off */ 
-		SIGNAL_EXAMPLE;
-		/* Wait */
-		for (delay=0; delay<0xffff; delay++) {} 
+	}
+	else {
+		print("Invalid parameter for mutex_test\r\n\n");
 	}
 }
 
