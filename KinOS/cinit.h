@@ -1,11 +1,15 @@
-#include "constants.h"
-#include "apps/terminal.h"
-#include "interrupt/irq.h"
-#include "peripherals/button.h"
-#include "peripherals/segment.h"
-#include "peripherals/timer.h"
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
 
-#include "apps/tictactoe.h"
+#include "constants.h"
+#include "terminal.h"
+#include "irq.h"
+#include "button.h"
+#include "segment.h"
+#include "timer.h"
+#include "tictactoe.h"
+
 
 extern void handler_board_angel(void);
 extern void handler_board_no_angel(void);

@@ -1,3 +1,20 @@
+/************************************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*************************************************************************************/
+
+
 /* This file contains routines to initialize and handle button interruptions */
 
 #include "button.h"
@@ -19,6 +36,8 @@ void  button_irq (void) {
 	*(unsigned *) IRQStatus |= 1;
 
 	/* Do something */
-	run_end("all");		// Kill all tasks
+	
+	/* Call the function to kill all tasks with pid > 1 */
+	run_end("all");
 
 }
