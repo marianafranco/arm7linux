@@ -9,5 +9,5 @@ __swi(OS_SWI) int syscall_print(int, int, char*, int);
 int fork (void);
 void exec (int, pt2Task, int);
 void exit (int);
-
 void print(char *str);
+void switch_thread (void);
