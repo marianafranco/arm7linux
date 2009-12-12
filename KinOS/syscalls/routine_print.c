@@ -1,3 +1,24 @@
+/************************************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*************************************************************************************/
+
+
+/**************************************************************
+ * MACROS
+ **************************************************************/
+
 #define SYSCFG		(0x03ff0000)
 #define UART0_BASE	(SYSCFG + 0xD000)
 #define UART1_BASE 	(SYSCFG + 0xE000)
@@ -60,6 +81,12 @@
 #define COM1_DEBUG	(1)
 #define COM0_USER	(0)
 
+
+/**************************************************************
+ * ROUTINES
+ **************************************************************/
+
+/*  print out a string through the user com port */
 void routine_print(char *str) {
 	
 	while ( *str != 0 || *str != '\0') {
