@@ -17,6 +17,7 @@ void set_led(int);
 void malicious_handler(int);
 void security_flaw (int);
 void dips_to_leds (int);
+void dips_to_segments (int);
 
 void play_tictactoe(int);
 
