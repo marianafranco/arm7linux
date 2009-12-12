@@ -224,12 +224,6 @@ char serial_getchar(void)
 	return c;
 }
 
-
-void serial_irq(void) {
-	
-	//serial_print(COM0_USER, "Tratei a interrupcao\r\n");
-	
-}	
 		
 		
 /*****************************************************************
