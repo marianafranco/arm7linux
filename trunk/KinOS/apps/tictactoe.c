@@ -1,9 +1,13 @@
 #include "tictactoe.h"
+//#include <stdlib.h>
+//#include <time.h>
 
 #define	ISDIGIT(c) ((c >= 48 && c <= 57))
-#define MAX 2
+#define MAX 3
 
-void printgrid(char grid[3][3]) {
+char grid[3][3];
+
+void printgrid(void) {
     
     char str[MAX];
     
@@ -50,37 +54,37 @@ void printgrid(char grid[3][3]) {
     
 }
 
-int placetoken(char grid[3][3], char token, int i, int j) {
+int placetoken(char token, int i, int j) {
     
-    if (grid[i][j] != ' ' || i < 0 || i > 2 || j < 0 || j > 2) {
-        print("Invalid move!\r\n\n");
-        return 0;
-    }
-    else {
+    if ((grid[i][j] == 0 || grid[i][j] == 32) && (i >= 0 || i < 3 || j >= 0 || j < 3)) {
         grid[i][j] = token;
         return 1;
+    }
+    else {
+        print("\r\nInvalid move!\r\n\n");
+        return 0;
     }
     
 }
 
-int isgameover(char grid[3][3]) {
+int isgameover(void) {
     
     int i;
     
     for (i = 0; i < 3; i++) {
         
         if (
-           (grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && grid[i][0] != ' ') || // lines
-           (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i] && grid[0][i] != ' ')    // columns
+           (grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && (grid[i][0] != 32 && grid[i][0] != 0)) || // lines
+           (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i] && (grid[0][i] != 32 && grid[0][i] != 0))    // columns
            ) {
             return 1;
         }
     }
     
     // diagonals
-    if ((grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2]) ||
-        (grid[0][2] == grid[1][1] && grid[1][1] == grid[0][2]) &&
-        (grid[1][1] != ' ')) {
+    if (((grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2]) ||
+         (grid[0][2] == grid[1][1] && grid[1][1] == grid[2][0])) &&
+        (grid[1][1] != 32 && grid[1][1] != 0)) {
         return 1;
     }
     else {
@@ -89,72 +93,91 @@ int isgameover(char grid[3][3]) {
     
 }
 
-char getplayerchar(int player) {
+char getplayertoken(int player) {
     
-    if (player == 0) return 'X';
+    if (player == '0') return 'X';
     else return 'O';
     
 }
 
-void tictactoe() {
+char changeplayer(char player) {
+	
+	if(player == '0')
+		return '1';
+	else
+		return '0';
+	
+}
+
+void tictactoe(void) {
     
-    int i, j, player = 0, victory, okmove = 0;
+    int i, j, victory, okmove = 0;
     int freespaces;
-    char grid[3][3], playerstr[2], rowstr[MAX], columnstr[MAX];
+    char playerstr[2], rowstr[MAX], columnstr[MAX], player;
     
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
-            grid[i][j] = ' ';
+            grid[i][j] = 32;
         }
     }
     
-    printgrid(grid);
+    //srand(time(NULL));
+    
+    printgrid();
     
     freespaces = 9;
     victory = 0;
+    player = '0';
     
-    while(!victory && freespaces > 0) {
+    while(victory == 0 && freespaces > 0) {
         
-        playerstr[0] = (char)(player + 48);
+        playerstr[0] = player+1;
         playerstr[1] = 0;
         okmove = 0;
         
-        while (!okmove) {
+        
+        while (okmove != 1) {
             print("Player ");
         	print(playerstr);
         	print("\'s move:\r\n\n");
             
+            
             print("   Row: ");
-            getcommand(rowstr);
+            getcommand(rowstr, MAX);
             i = (int)(rowstr[0] - 48);
+            //i = rand()%3;
             
             print("\n   Column: ");
-            getcommand(columnstr);
+            getcommand(columnstr, MAX);
             j = (int)(columnstr[0] - 48);
+            //j = rand()%3;
             
-            okmove = placetoken(grid, getplayerchar(player), i, j);
+            
+            okmove = placetoken(getplayertoken(player), i, j);
         }
+        
         
         print("\r\n");
         
         freespaces--;
         
-        victory = isgameover(grid);
+        victory = isgameover();
         
-        printgrid(grid);
+        printgrid();
         
-        player = !player;
+        player = changeplayer(player);
         
     }
     
-    if (victory) {
-    	playerstr[0] = (char)(player+1);
-        print("A winner is ");
+    
+    if (victory == 1) {
+    	playerstr[0] = changeplayer(player)+1;
+        print("A winner is Player ");
         print(playerstr);
         print(" !\r\n\n");
     }
     else {
-        print("Tied game!\n\n");
+        print("Tied game!\r\n\n");
     }
     
 }
