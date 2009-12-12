@@ -18,3 +18,7 @@ void exit(int process_id){
 void print(char *str) {
 	syscall_print(3, 0, str, 0);
 }
+
+void switch_thread (void) {
+	syscall(4, 0, 0, 0);
+}
