@@ -14,33 +14,14 @@
 	source/examples/mutex/ 
 *************************************************************************************/
 
+unsigned volatile int semaphore_shell	= 2; // this is a start value
+unsigned volatile int semaphore_example	= 2; // this is a start value
 
-/******************************************************************
- * STATICS
- ******************************************************************/
- 
-unsigned volatile int semaphore	= 2; // this is a start value
+void mutex_lock_shell (void) {
 
-
-/******************************************************************
- * ROUTINES
- ******************************************************************/
- 
- 
-/* -- mutex_gatelock ----------------------------------------------
- *
- * Description 	: Locks the semaphore... 
- * 
- * Parameters	: none...
- * Return		: none...
- * Notes		:
- *
- */
- 
-void mutex_gatelock (void) {
 	__asm {
 		spin:
-		mov		r1, &semaphore
+		mov		r1, &semaphore_shell
 		mov		r2, #1
 		swp		r3,r2,[r1]
 		cmp		r3,#1
@@ -48,20 +29,29 @@ void mutex_gatelock (void) {
 	}
 }
 
-
-/* -- mutex_gateunlock -------------------------------------------
- *
- * Description 	: Unlocks the semaphore ...
- * 
- * Parameters	: none...
- * Return		: none...
- * Notes		:
- *
- */
-
-void mutex_gateunlock (void)  {
+void mutex_unlock_shell (void)  {
 	__asm  {
-		mov		r1, &semaphore
+		mov		r1, &semaphore_shell
+		mov		r2, #0
+		swp		r0,r2,[r1]
+	}
+}
+
+void mutex_lock_example (void) {
+
+	__asm {
+		spin:
+		mov		r1, &semaphore_example
+		mov		r2, #1
+		swp		r3,r2,[r1]
+		cmp		r3,#1
+		beq		spin
+	}
+}
+
+void mutex_unlock_example (void)  {
+	__asm  {
+		mov		r1, &semaphore_example
 		mov		r2, #0
 		swp		r0,r2,[r1]
 	}

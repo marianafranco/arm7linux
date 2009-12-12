@@ -1,42 +1,13 @@
-/**************************************************************
- * EXTERNAL
- **************************************************************/
- 
-extern unsigned volatile int semaphore; // do not access directly
+extern unsigned volatile int semaphore_shell; // do not access directly
+extern unsigned volatile int semaphore_example; // do not access directly
 
+#define WAIT_SHELL 	  while (semaphore_shell==1) {} mutex_lock_shell(); 
+#define SIGNAL_SHELL  mutex_unlock_shell(); 	
 
-/**************************************************************
- * MACROS
- **************************************************************/
+#define WAIT_EXAMPLE 	while (semaphore_example==1) {} mutex_lock_example(); 
+#define SIGNAL_EXAMPLE  mutex_unlock_example(); 
 
-#define WAIT 		while (semaphore==1) {} mutex_gatelock(); 
-#define SIGNAL 		mutex_gateunlock(); 	
-
-
-/****************************************************************
- * ROUTINES
- ****************************************************************/
-
-
-/* -- mutex_gatelock ----------------------------------------------
- *
- * Description 	: Locks the semaphore... 
- * 
- * Parameters	: none...
- * Return	: none...
- * Notes	:
- *
- */
-void mutex_gatelock (void);
-
-
-/* -- mutex_gateunlock --------------------------------------------
- *
- * Description 	: Unlocks the semaphore ...
- * 
- * Parameters	: none...
- * Return	: none...
- * Notes	:
- *
- */
-void mutex_gateunlock (void);
+void mutex_lock_shell (void);
+void mutex_unlock_shell (void);
+void mutex_lock_example (void);
+void mutex_unlock_example (void);
