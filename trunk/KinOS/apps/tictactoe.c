@@ -22,7 +22,7 @@ void printgrid(char grid[3][3]) {
     print(str);
     print("\r\n");
     
-    print("  ---+---+---\n");
+    print("  ---+---+---\r\n");
     
     print("1  ");
     str[0] = grid[1][0];
@@ -35,7 +35,7 @@ void printgrid(char grid[3][3]) {
     print(str);
     print("\r\n");
     
-    print("  ---+---+---\n");
+    print("  ---+---+---\r\n");
     
     print("2  ");
     str[0] = grid[2][0];
@@ -53,7 +53,7 @@ void printgrid(char grid[3][3]) {
 int placetoken(char grid[3][3], char token, int i, int j) {
     
     if (grid[i][j] != ' ' || i < 0 || i > 2 || j < 0 || j > 2) {
-        print("Invalid move!\n\n");
+        print("Invalid move!\r\n\n");
         return 0;
     }
     else {
@@ -102,11 +102,9 @@ void tictactoe() {
     int freespaces;
     char grid[3][3], playerstr[2], rowstr[MAX], columnstr[MAX];
     
-    //serial_initcom0user (BAUD_9600);
-    
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
-            grid[i][j] = 'A';
+            grid[i][j] = ' ';
         }
     }
     
@@ -117,7 +115,7 @@ void tictactoe() {
     
     while(!victory && freespaces > 0) {
         
-        playerstr[0] = (char)(player) + 48;
+        playerstr[0] = (char)(player + 48);
         playerstr[1] = 0;
         okmove = 0;
         
@@ -126,19 +124,18 @@ void tictactoe() {
         	print(playerstr);
         	print("\'s move:\r\n\n");
             
-            print("   Row: ");
+            print("   Row: \r");
             getcommand(rowstr);
-            i = (int)(rowstr[0] + 48);
+            i = (int)(rowstr[0] - 48);
             
-            print("Column: ");
+            print("\n   Column: ");
             getcommand(columnstr);
-            j = (int)(columnstr[0] + 48);
-            //scanf("%d %d", &i, &j);
+            j = (int)(columnstr[0] - 48);
             
             okmove = placetoken(grid, getplayerchar(player), i, j);
         }
         
-        print("\n");
+        print("\r\n");
         
         freespaces--;
         
@@ -152,9 +149,9 @@ void tictactoe() {
     
     if (victory) {
     	playerstr[0] = (char)(player+1);
-        print("Player ");
+        print("A winner is ");
         print(playerstr);
-        print(" wins!\r\n\n");
+        print(" !\r\n\n");
     }
     else {
         print("Tied game!\n\n");
