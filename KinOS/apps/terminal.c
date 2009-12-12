@@ -33,7 +33,7 @@
 
 #define		angel_SWI	0x123456
 #define	 	MAX_CMD_LENGTH	80
-#define 	MAX_TASK_NAME	30
+#define 	MAX_TASK_NAME	20
 
 #define		ISALPHA(c) ((c >= 65 && c <= 90) || (c >= 97 && c <= 192))
 #define		ISDIGIT(c) ((c >= 48 && c <= 57))
@@ -245,15 +245,27 @@ void run_listtasks() {
 // This is done by consulting the tasks list (defined above)
 void run_ps() {
 
-	int i;
+	int i, j, k;
+	char blankstr[MAX_TASK_NAME];
+	
 	print("\nCurrently active threads:\r\n");
 	print("\n");
-	print("Name:\t\tPID:\r\n");
+	print("Name:               PID:\r\n");
 	
-	for(i=0; i < 9; i++){
+	for(i=0; i < 9; i++) {
 		if(tasks[i].state == 1){
+			
+			j = 0;
+			while (tasks[i].name[j] != 0 && j < MAX_TASK_NAME)
+				j++;
+			
+			clearstring(blankstr, MAX_TASK_NAME);
+			
+			for(k = 0; k < MAX_TASK_NAME - j; k++)
+				blankstr[k] = 32;  // blank
+			
 			print(tasks[i].name);
-			print("\t\t");
+			print(blankstr);
 			print( tasks[i].pid);
 			print("\r\n");		
 		}
