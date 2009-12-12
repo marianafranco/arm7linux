@@ -499,7 +499,6 @@ void printbanner() {
     print("Type \'help\' for a list of available commands\r\n\n");
 
 }
-#include "../mutex/mutex.h"
 
 void shell (void)
 {
@@ -510,7 +509,7 @@ void shell (void)
 	
 	while (1) {
 		
-		WAIT;
+		//WAIT;
 		
 		print("kinoshell> ");
 		
@@ -518,9 +517,9 @@ void shell (void)
 		
 		parsecommand(cmd);
 		
-		SIGNAL;
+		//SIGNAL;
 		
-		switch_thread();
+		//switch_thread();
 		
 	}
 		
