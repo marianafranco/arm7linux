@@ -1,3 +1,20 @@
+/************************************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*************************************************************************************/
+
+
 /****************************************************************
  * IMPORT
  ****************************************************************/
@@ -5,19 +22,22 @@
 #include "tasks.h"
 #include "terminal.h"
 
-extern int thread_array[];
 
-int displayNumber;
+/****************************************************************
+ * EXTERN
+ ****************************************************************/
+
+extern int thread_array[];
 
 
 /****************************************************************
- * ROUTINES
+ * GLOBAL VARIABLES
  ****************************************************************/
 
+// The number which is showed in the display
+int displayNumber;
 
-#define tasks_name_size 9
-
-
+// Struct which saves the task name and task address
 struct name_address tasks_name[] = {
 	{"display_pid", &display_pid},
 	{"set_led", &set_led},
@@ -30,7 +50,19 @@ struct name_address tasks_name[] = {
 	{"tictactoe", &play_tictactoe}
 };
 
+/****************************************************************
+ * MACRO
+ ****************************************************************/
 
+// The number of tasks in the struct tasks_name
+#define tasks_name_size 9
+
+
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
+
+// Compare two strings
 int strcmper (char* str1, char* str2){
 	int i;
 	for (i = 0; str1[i] == str2[i]; i++){
@@ -41,7 +73,7 @@ int strcmper (char* str1, char* str2){
 	return str1[i] - str2[i];
 }
 
-
+// Get the task address
 pt2Task  get_task_addr(char* name){
 	int i;
 	for(i=0; i < tasks_name_size; i++){
@@ -52,8 +84,7 @@ pt2Task  get_task_addr(char* name){
 	return 0;
 }
 
-
-
+// Get the thread state (active/inactive) 
 int get_state(int pid){
 	if (pid > 9 || pid < 0){
 		return 0;
@@ -62,11 +93,12 @@ int get_state(int pid){
 	}
 }
 
-
+// Get the size of the struct task_name
 int get_task_name_size(){
 	return tasks_name_size;
 }
 
+// Get the task name from the struct task_name
 char* get_task_name(int index){
 	return tasks_name[index].name;
 }
@@ -78,6 +110,7 @@ char* get_task_name(int index){
  ****************************************************************/
 
 
+// Show in the LEDs the value passed as argument
 void set_led(int value){
 	switch (value) {
 		case 0:
@@ -183,7 +216,7 @@ void set_led(int value){
 }
 
 
-
+// Set in the display the value passed as argument
 void set_segment(int value){
 	while (1) {
 		if (displayNumber != value) {
@@ -194,7 +227,7 @@ void set_segment(int value){
 }
 
 
-
+// Set in the display the thread's pid
 void display_pid(int trash){
 	while (1) {
 		if (displayNumber != current_thread_id) {
@@ -204,6 +237,7 @@ void display_pid(int trash){
 	}
 }
 
+// The tictactoe program
 void play_tictactoe(int trash) {
 	
 	WAIT_SHELL;
@@ -215,7 +249,7 @@ void play_tictactoe(int trash) {
 	while(1){}
 }
 
-
+// Exemple of fork/exec
 void fork_test(int trash){
 	int a = 0;
 	char pid[1];
@@ -241,7 +275,7 @@ void fork_test(int trash){
 
 
 
-// Parte 1 do exemplo do mutex
+// Example of mutex
 void mutex_test (int led) {
 
 	if (led >= 1 && led <= 4) {
@@ -304,6 +338,8 @@ void mutex_test (int led) {
 	}
 }
 
+// Malicious program wich install a handler 
+// Atention!! This program will lock the system
 void malicious_handler (int trash) {
 	LED_1_OFF;
 	LED_2_OFF;
@@ -314,6 +350,7 @@ void malicious_handler (int trash) {
 	while (1) {}
 }
 
+// Routine used in the malicious_handler
 void security_flaw (int trash) {
 	int delay;
 	while (1) {
@@ -337,10 +374,13 @@ void security_flaw (int trash) {
 	}	
 } 
 
+// Set in the LEDs the value give in the switches
 void dips_to_leds (int trash) {
 	set_led(dips_read());
 }
 
+
+// Set in the display the value give in the switches
 void dips_to_segments (int trash) {
 	
 	int setvalue;
