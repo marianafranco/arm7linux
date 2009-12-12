@@ -11,6 +11,10 @@
 #include "tictactoe.h"
 
 
+/****************************************************************
+ * EXTERN
+ ****************************************************************/
+
 extern void handler_board_angel(void);
 extern void handler_board_no_angel(void);
 extern void handler_swi(void);
