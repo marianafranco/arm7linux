@@ -15,7 +15,7 @@ int displayNumber;
  ****************************************************************/
 
 
-#define tasks_name_size 7
+#define tasks_name_size 8
 
 
 struct name_address tasks_name[] = {
@@ -26,7 +26,8 @@ struct name_address tasks_name[] = {
 	{"fork_test", &fork_test},
 	{"dips_to_leds", &dips_to_leds},
 	{"dips_to_segments", &dips_to_segments},
-	{"malicious_handler", &malicious_handler}
+	{"malicious_handler", &malicious_handler},
+	{"tictactoe", &play_tictactoe}
 };
 
 
