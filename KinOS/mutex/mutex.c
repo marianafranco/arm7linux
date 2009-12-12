@@ -14,9 +14,19 @@
 	source/examples/mutex/ 
 *************************************************************************************/
 
+/******************************************************************
+ * STATICS
+ ******************************************************************/
+ 
 unsigned volatile int semaphore_shell	= 2; // this is a start value
 unsigned volatile int semaphore_example	= 2; // this is a start value
 
+
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
+
+/* Locks the shell semaphore */
 void mutex_lock_shell (void) {
 
 	__asm {
@@ -29,6 +39,7 @@ void mutex_lock_shell (void) {
 	}
 }
 
+/* Unlocks the shell semaphore */
 void mutex_unlock_shell (void)  {
 	__asm  {
 		mov		r1, &semaphore_shell
@@ -37,6 +48,7 @@ void mutex_unlock_shell (void)  {
 	}
 }
 
+/* Locks the example semaphore */
 void mutex_lock_example (void) {
 
 	__asm {
@@ -49,6 +61,7 @@ void mutex_lock_example (void) {
 	}
 }
 
+/* Unlocks the example semaphore */
 void mutex_unlock_example (void)  {
 	__asm  {
 		mov		r1, &semaphore_example

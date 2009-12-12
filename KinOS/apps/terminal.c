@@ -505,7 +505,7 @@ void parsecommand(char *cmd) {
 }
 
 
-
+/* Print the KiOS banner */
 void printbanner() {
 
     print("Welcome to\r\n");
@@ -523,6 +523,7 @@ void printbanner() {
 
 }
 
+/* The shell routine */
 void shell (void)
 {
 	char cmd[MAX_CMD_LENGTH];

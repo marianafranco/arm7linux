@@ -1,12 +1,45 @@
-#include "tictactoe.h"
-//#include <stdlib.h>
-//#include <time.h>
+/************************************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
 
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*************************************************************************************/
+
+
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+
+#include "tictactoe.h"
+
+
+/****************************************************************
+ * MACROS
+ ****************************************************************/
+ 
 #define	ISDIGIT(c) ((c >= 48 && c <= 57))
 #define MAX 3
 
+/****************************************************************
+ * GLOBAL VARIABLES
+ ****************************************************************/
+ 
 // global variable
 char grid[3][3];
+
+
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
 
 // prints the game grid
 // Example:
