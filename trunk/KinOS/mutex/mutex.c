@@ -1,5 +1,42 @@
-unsigned volatile int semaphore	= 2; // this is a start value
+/************************************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
 	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*************************************************************************************/
+
+
+/******************************************************************
+ * STATICS
+ ******************************************************************/
+ 
+unsigned volatile int semaphore	= 2; // this is a start value
+
+
+/******************************************************************
+ * ROUTINES
+ ******************************************************************/
+ 
+ 
+/* -- mutex_gatelock ----------------------------------------------
+ *
+ * Description 	: Locks the semaphore... 
+ * 
+ * Parameters	: none...
+ * Return		: none...
+ * Notes		:
+ *
+ */
+ 
 void mutex_gatelock (void) {
 	__asm {
 		spin:
@@ -10,6 +47,17 @@ void mutex_gatelock (void) {
 		beq		spin
 	}
 }
+
+
+/* -- mutex_gateunlock -------------------------------------------
+ *
+ * Description 	: Unlocks the semaphore ...
+ * 
+ * Parameters	: none...
+ * Return		: none...
+ * Notes		:
+ *
+ */
 
 void mutex_gateunlock (void)  {
 	__asm  {

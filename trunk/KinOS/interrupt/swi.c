@@ -1,6 +1,31 @@
+/************************************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*************************************************************************************/
+
+
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+ 
 #include "swi.h"
 
 
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
+ 
 int fork(){
 	int pid = 0;
 	pid = syscall(0, 0, 0, 0);
