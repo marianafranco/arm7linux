@@ -24,6 +24,7 @@ struct name_address tasks_name[] = {
 	{"set_segment", &set_segment},
 	{"mutex_test", &mutex_test},
 	{"fork_test", &fork_test},
+	{"dips_to_leds", &dips_to_leds},
 	{"malicious_handler", &malicious_handler}
 };
 
@@ -318,3 +319,7 @@ void security_flaw (int trash) {
 		for (delay = 0; delay <= 0x001ffff0; delay++) {};
 	}	
 } 
+
+void dips_to_leds (int trash) {
+	set_led(dips_read());
+}
