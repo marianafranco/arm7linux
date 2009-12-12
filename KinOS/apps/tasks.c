@@ -205,9 +205,14 @@ void display_pid(int trash){
 }
 
 void play_tictactoe(int trash) {
+	
 	WAIT;
 	tictactoe();
 	SIGNAL;
+	
+	set_state(current_thread_id, 0);
+	exit(current_thread_id);
+	while(1){}
 }
 
 
@@ -326,10 +331,14 @@ void dips_to_leds (int trash) {
 }
 
 void dips_to_segments (int trash) {
-	int setvalue = (int)(dips_read());
+	
+	int setvalue;
+	
+	setvalue = (int)(dips_read());
 	segment_set(setvalue);
+	print("DIP value succesfully setted on the display!\r\n\n");
 	
 	set_state(current_thread_id, 0);
 	exit(current_thread_id);
-	while(1);
+	while(1){}
 }

@@ -1,4 +1,4 @@
-void getcommand(char *cmd);
+void getcommand(char *cmd, int length);
 
 void shell (void);
 

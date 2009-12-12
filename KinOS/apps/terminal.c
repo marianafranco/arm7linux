@@ -294,15 +294,15 @@ void run_about() {
  * Reads a string from the COM0 port
  *
  */
-void getcommand(char *cmd) {
+void getcommand(char *cmd, int length) {
 	
 	int i, c;
 	
 	c=0; i=0;
 	
-	clearstring(cmd, MAX_CMD_LENGTH);
+	clearstring(cmd, length);
 	
-	while (c != '\r' && i < MAX_CMD_LENGTH) {
+	while (c != '\r' && i < length) {
 		c = serial_getchar();
 		if (c == 8) {	// backspace
 			if (i>0) {
@@ -509,17 +509,17 @@ void shell (void)
 	
 	while (1) {
 		
-		//WAIT;
+		WAIT;
 		
 		print("kinoshell> ");
 		
-		getcommand(cmd);
+		getcommand(cmd, MAX_CMD_LENGTH);
 		
 		parsecommand(cmd);
 		
-		//SIGNAL;
+		SIGNAL;
 		
-		//switch_thread();
+		switch_thread();
 		
 	}
 		
