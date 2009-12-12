@@ -28,10 +28,14 @@
 	EXPORT 	handler_emulator
 	EXPORT 	process_control_block
 	EXPORT 	thread_array
+	EXPORT	force_next_thread
 
 	; Beginning handler code
 	AREA	handler_irq, CODE
 
+force_next_thread
+	ADD	r14, r14, #4	; Add 4 to the returning address in case it was not
+						; called from a interruption (forced switching)
 ; Routine designed to the emulator, all the hardware IRQ is caused by the timer
 handler_emulator
 	STMFD	sp!, {r0 - r3, lr}	; Stacking r0 to r3 and the link register
