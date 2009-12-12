@@ -15,7 +15,7 @@ int displayNumber;
  ****************************************************************/
 
 
-#define tasks_name_size 8
+#define tasks_name_size 9
 
 
 struct name_address tasks_name[] = {

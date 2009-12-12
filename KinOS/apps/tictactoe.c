@@ -124,7 +124,7 @@ void tictactoe() {
         	print(playerstr);
         	print("\'s move:\r\n\n");
             
-            print("   Row: \r");
+            print("   Row: ");
             getcommand(rowstr);
             i = (int)(rowstr[0] - 48);
             
