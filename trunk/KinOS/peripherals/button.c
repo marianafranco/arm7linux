@@ -47,6 +47,7 @@ void  button_irq (void) {
 	/* Do something */
 	
 	/* Call the function to kill all tasks with pid > 1 */
+	print("\r\n");
 	run_end("all");
 
 }

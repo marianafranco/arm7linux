@@ -295,7 +295,12 @@ void mutex_test (int led) {
 		}
 	}
 	else {
+		// kills the process if it received invalid parameters
 		print("Invalid parameter for mutex_test\r\n\n");
+		
+		set_state(current_thread_id, 0);
+		exit(current_thread_id);
+		while(1){}
 	}
 }
 
