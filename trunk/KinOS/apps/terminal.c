@@ -112,8 +112,8 @@ void comm_init (void)
 
 void comm_banner (void) 
 { 
-	serial_print (COM0_USER, "\n** Welcome to KinOS!!");
-  	serial_print (COM0_USER, " - Version 0.1 **\n\r");
+	print ("\n** Welcome to KinOS!!");
+  	print (" - Version 0.1 **\n\r");
 }
 
 /* -- comm_getkey -----------------------------------------------
@@ -162,7 +162,7 @@ void run_start(char *arg, int num) {
 		}
 		
 		if(count==9){
-			serial_print(COM0_USER, "\nImpossible to run more than 9 programs.\r\n\n");
+			print("\nImpossible to run more than 9 programs.\r\n\n");
 			return;
 		}
 		
@@ -265,16 +265,16 @@ void run_ps() {
 
 
 void run_help() {
-	serial_print(COM0_USER, "\nOther available commands for kinoshell:\r\n\n");
-	serial_print(COM0_USER, "                ps : Lists all currently active threads in KinOS\r\n");
-	serial_print(COM0_USER, "      start <name> : Starts a new thread with the program specified in <name>\r\n");
-	serial_print(COM0_USER, "start <name> <arg> : Starts a new thread with the program specified in <name>\r\n");
-	serial_print(COM0_USER, "                   : and the argument in <arg>\r\n");
-	serial_print(COM0_USER, "        end <name> : Kills the first threads named <name>\r\n");
-	serial_print(COM0_USER, "     end pid <num> : Kills the threads with the pid <num>\r\n");
-	serial_print(COM0_USER, "           end all : Kills all threads\r\n");
-	serial_print(COM0_USER, "             about : Displays additional information about the KinOS project\r\n");
-	serial_print(COM0_USER, "\n");
+	print("\nOther available commands for kinoshell:\r\n\n");
+	print("                ps : Lists all currently active threads in KinOS\r\n");
+	print("      start <name> : Starts a new thread with the program specified in <name>\r\n");
+	print("start <name> <arg> : Starts a new thread with the program specified in <name>\r\n");
+	print("                   : and the argument in <arg>\r\n");
+	print("        end <name> : Kills the first threads named <name>\r\n");
+	print("     end pid <num> : Kills the threads with the pid <num>\r\n");
+	print("           end all : Kills all threads\r\n");
+	print("             about : Displays additional information about the KinOS project\r\n");
+	print("\n");
 }
 
 
@@ -459,7 +459,7 @@ void parsecommand(char *cmd) {
 			if(word3[0]>49 && word3[0]<58){
 				run_end_pid(word3[0] - 48);
 			}else{
-				serial_print(COM0_USER, "\nThe pid must be a number between 2 and 9.\r\n\n");
+				print("\nThe pid must be a number between 2 and 9.\r\n\n");
 			}
 		}
 			
