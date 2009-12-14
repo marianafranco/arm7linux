@@ -157,6 +157,7 @@ void run_start(char *arg, int num) {
 	// Checks if the typed program name is in the tasks list
 	if (get_task_addr(arg) == 0){
 		print("\nProgram not found.\r\n\n");
+		return;
 	
 	}
 		
