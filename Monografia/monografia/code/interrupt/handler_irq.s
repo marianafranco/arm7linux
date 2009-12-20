@@ -1,3 +1,21 @@
+;************************************************************
+;	KinOS - Microkernel for ARM Evaluator 7-T
+;	Seniors project - Computer Engineering
+;	Escola Politecnica da USP, 2009
+;	
+;	Felipe Giunte Yoshida
+;	Mariana Ramos Franco
+;	Vinicius Tosta Ribeiro
+;
+;
+; 
+;	The program was based on the mutex program by ARM - Strategic Support Group,
+;	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+;	source/examples/mutex/ 
+;************************************************************
+
+
+
 ; Hardware interrupt handling code
 
 	IMPORT 	button_irq
@@ -10,10 +28,14 @@
 	EXPORT 	handler_emulator
 	EXPORT 	process_control_block
 	EXPORT 	thread_array
+	EXPORT	force_next_thread
 
 	; Beginning handler code
 	AREA	handler_irq, CODE
 
+force_next_thread
+	ADD	r14, r14, #4	; Add 4 to the returning address in case it was not
+						; called from a interruption (forced switching)
 ; Routine designed to the emulator, all the hardware IRQ is caused by the timer
 handler_emulator
 	STMFD	sp!, {r0 - r3, lr}	; Stacking r0 to r3 and the link register
@@ -43,7 +65,7 @@ handler_board_no_angel
 		TST		r0, #0x0001				; irq type = 0x0001?
 		BNE		handler_button			; If yes, go to handler_button
 		LDMFD	sp!, {r0 - r3, lr}		; If it is not any of them, restore r0-r3 and lr
-		B 		return					; and return
+		B 		end_handler				; and return
 
 ; handler routine for the button interruption
 handler_button
@@ -141,12 +163,12 @@ set_addresses
 ; Load the IRQ stack into r13_irq
 	LDR		r13, =irq_stack_pointer		; r13 = stack pointer address address
 	LDR		r13,[r13]					; Restore previous stack pointer
-	B		return						; Go to the end
+	B		end_handler						; Go to the end
 
 no_thread_switch
 	LDMFD		sp!,{r0-r3,lr}			; Restore the remaining registers
 
-return
+end_handler
 	SUBS 		pc, r14, #4				; Process counter = IRQ mode link register - 4
 										; (-4 is required for the pipeline)
 

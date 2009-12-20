@@ -1,7 +1,31 @@
+/****************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*****************************************************************/
+
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+
 /* This file contains routines to initialize and handle the 7 segment display */
 
 #include "segment.h"
 
+/******************************************************************
+ * STATICS
+ ******************************************************************/
+ 
 /* Calculates the proper display addresses value according to the number */
 static unsigned int numeric_display [16] =  {
 	DISP_0,
@@ -22,6 +46,11 @@ static unsigned int numeric_display [16] =  {
 	DISP_F
 };
 
+
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
+ 
 /* Set number on the display */
 void segment_set (int seg) {
 	if ( seg >= 0 & seg <= 0xf ) {

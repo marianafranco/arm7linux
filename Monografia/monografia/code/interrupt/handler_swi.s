@@ -1,8 +1,28 @@
+;***************************************************************
+;	KinOS - Microkernel for ARM Evaluator 7-T
+;	Seniors project - Computer Engineering
+;	Escola Politecnica da USP, 2009
+;	
+;	Felipe Giunte Yoshida
+;	Mariana Ramos Franco
+;	Vinicius Tosta Ribeiro
+;
+;
+; 
+;	The program was based on the mutex program by ARM - Strategic Support Group,
+;	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+;	source/examples/mutex/ 
+;***************************************************************
+
+
 ; Software interrupt handling code
 
 	IMPORT	routine_fork
 	IMPORT	routine_exec
 	IMPORT	routine_exit
+	IMPORT  routine_print
+	IMPORT	handler_emulator
+	IMPORT 	force_next_thread
 
 	EXPORT 	Angel_SWI_Address
 	EXPORT 	handler_swi
@@ -41,6 +61,13 @@ os_swi
 	MOV		r1,	#2				; r1 = 2
 	CMP		r0, r1				; Compare the first parameter to 2
 	BEQ		pre_routine_exit	; If it is equal, branch to the exit
+	MOV		r1,	#3				; r1 = 3
+	CMP		r0, r1				; Compare the first parameter to 3
+	BEQ		pre_routine_print	; If it is equal, branch to the print
+	MOV		r1,	#4				; r1 = 4
+	CMP		r0, r1				; Compare the first parameter to 4
+	BEQ		pre_routine_switch	; If it is equal, branch to the switch
+	
 	LDMFD	sp!,{r0-r12,pc}^	; If it is an unidentified syscall, go back to the program,
 								; restoring the registers and putting the return address in
 								; the process counter
@@ -62,6 +89,19 @@ pre_routine_exit
 	LDMFD	sp!,{r0-r12,lr}	; Restore r0-r12 registers and link registers
 	STMFD 	sp!,{r0-r12,lr}	; and stores them again (in order to clean the registers)
 	B	routine_exit		; Branch to the exit C routine
+
+; Print caller
+pre_routine_print
+	LDMFD	sp!,{r0-r12,lr}	; Restore r0-r12 registers and link registers
+	STMFD 	sp!,{r0-r12,lr}	; and stores them again (in order to clean the registers)
+	MOV 	r0, r2			; r0 = r2
+	BL	routine_print		; Branch to the print C routine
+	LDMFD	sp!,{r0-r12,pc}^; Return to the original function
+
+; Switch caller
+pre_routine_switch
+	LDMFD	sp!,{r0-r12,lr}	; Restore r0-r12 registers and link registers
+	B	force_next_thread	; Branch to the switch routine
 
 	; Data area
 	AREA	swi_vars, DATA

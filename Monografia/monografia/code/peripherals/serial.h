@@ -1,4 +1,3 @@
-
 /*************************************************************
  *
  *	ARM Strategic Support Group
@@ -62,6 +61,7 @@
 
 void serial_initcom0user (unsigned baudrate);
 
+
 /* -- serial_initcom1debug -------------------------------------
  *
  * Description	: initializes the DEBUG/COM1 serial port.
@@ -73,6 +73,7 @@ void serial_initcom0user (unsigned baudrate);
  */
  
 void serial_initcom1debug (unsigned baudrate);
+
 
 /* -- serial_print ---------------------------------------------
  *
@@ -87,6 +88,7 @@ void serial_initcom1debug (unsigned baudrate);
 
 void serial_print (unsigned port, char *s);		
 	
+
 /* -- serial_getkey --------------------------------------------
  *
  * Description	: standard implementation of getkey.
@@ -102,7 +104,20 @@ void serial_print (unsigned port, char *s);
 void serial_getkey (void);	
 
 
-char serial_getcmd (void);	
+/* -- serial_getkey --------------------------------------------
+ *
+ * Description	: standard implementation of getkey.
+ *
+ * Parameters	: none...
+ * Return		: none...
+ * Notes		: 
+ *
+ *			waits until a key is pressed then echoes back.
+ *
+ */	
+char serial_getchar(void);
+
+
 		
 /*****************************************************************
  * END OF serial.h 
