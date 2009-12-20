@@ -1,0 +1,86 @@
+\section{Avanços Finais} \label{sec:avancos}
+\index{sistema!avancos} 
+
+Após a primeira revisão da monografia, algumas modificações foram realizadas para o término do sistema.
+
+
+%-------------------------------------------
+% Shell
+%-------------------------------------------
+\subsection{Shell} \label{sub:shell}
+\index{sistema!avancos!shell}
+
+Novos comandos foram adicionados:
+
+\begin{itemize}
+
+\item start <name> [<arg>] : inicializa a \emph{thread} com o parâmetro passado em <arg>. O parâmetro deve ser um número em hexadecimal de 0 à F.
+\item end pid <num> : finaliza a \emph{thread} pelo número de seu pid (de 2 à 9). Não é possível finalizar o \emph{shell}.
+\item end all : finaliza todas as \emph{threads} ativas, menos o \emph{shell}.
+
+\end{itemize}
+
+Além disso, uma estrutura, \textbf{pid\_name}, foi criada no arquivo \textbf{terminal.c} para que fosse possível relacionar o nome de uma \emph{thread} com o seu pid.
+
+E no arquivo \textbf{tasks.c}, criou-se a estrutura \textbf{name\_address} para relacionar o nome de todas as \emph{threads} disponíveis do sistema e seus respectivos ponteiros de função. Assim, para adicionar uma nova \emph{thread} é necessário criar uma nova entrada nessa estrutura para que o nome da \emph{thread} passe à figurar na lista apresentada pelo comando \emph{listtasks}, podendo-se então inicializá-la normalmente pelo comando \emph{start}.
+
+
+%-------------------------------------------
+% Threads
+%-------------------------------------------
+\subsection{Threads} \label{sub:threads}
+\index{sistema!avancos!threads}
+
+Para guardar o ponteiro de função de uma \emph{thread} na estrutura \textbf{name\_address}, citada do item anterior, esta deve possuir a seguinte assinatura:
+
+\begin{lstlisting}
+void <nome_da_thread>(int <value>);
+\end{lstlisting}
+
+Ou seja, toda \emph{thread} do sistema consiste de uma função do tipo \emph{void} que tem como argumento um valor do tipo inteiro.
+
+Deste modo, foram criadas 8 \emph{threads} para exemplificar o funcionamento do \emph{microkernel}:
+
+\begin{itemize}
+\item \textbf{display\_pid}: Apresenta no display de 7 segmentos o pid da \emph{thread}.
+\item \textbf{set\_led}: Acende os leds conforme o valor em hexadecimal passado em argumento.
+\item \textbf{set\_segment}: Coloca o valor passado em argumento no display.
+\item \textbf{mutex\_test}: Exemplo de mutex. Acende o led passado em argumento (1 à 4) e coloca no display o pid da \emph{thread}.
+\item \textbf{fork\_test}: Imprime na tela o valor do pid da \emph{thread} filha retornado pelo \emph{fork} para a \emph{thread} mãe. 
+\item \textbf{dips\_to\_leds}: Acende os leds conforme o valor apresentados nos \emph{switches} da placa.
+\item \textbf{dips\_to\_segments}: Coloca no display o valor apresentados nos \emph{switches} da placa.
+\item \textbf{malicious\_handler}: Altera o vetor de interrupção para apontar para um rotina maliciosa. Ao executar essa \emph{thread} o sistema é bloqueado, devendo-se então reinicializar o mesmo.
+\item \textbf{tictactoe}: Jogo da velha que utiliza o terminal para a entrada dos comandos.
+\end{itemize}
+
+
+
+%-------------------------------------------
+% Mutex
+%-------------------------------------------
+\subsection{Mutex} \label{sub:mutex}
+\index{sistema!avancos!mutex}
+
+Foi necessário implementar o esquema de mutex no terminal para que ao inicializar o programa \textbf{tictactoe} este funcionasse corretamente, bloqueando o funcionamento do terminal. Assim, temos sempre apenas uma aplicação acessando a porta serial.
+
+Para implementar a exclusão mútua no terminal, criou-se os sinais WAIT\_SHELL e SIGNAL\_SHELL.
+
+
+%-------------------------------------------
+% System Calls
+%-------------------------------------------
+\subsection{System Calls} \label{sub:syscalls}
+\index{sistema!avancos!syscalls}
+
+Para o correto funcionamento do terminal, duas novas system calls foram criadas.
+
+\subsubsection{print}
+
+Chamada quando se deseja imprimir uma sequência de caracteres no terminal. Dessa maneira toda a sequência é impressa no terminal, sem o risco de ocorrer uma interrupção de \emph{timer} fazendo com que o \emph{microkernel} chaveie para uma outra \emph{thread} que vá imprimir uma outra sequência, o que poderia provocar o embaralhamento de mensagens na tela.
+
+
+\subsubsection{switch\_thread}
+
+System call criada para forçar o chaveamento de processos. É utilizada no terminal para forçar o chaveamento para uma outra \emph{thread} após liberar o uso da porta serial pelo sinal SIGNAL\_SHELL. 
+
+Isso permite que outras \emph{threads}, como a \textbf{tictactoe}, possam utilizar a porta serial.

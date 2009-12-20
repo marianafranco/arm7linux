@@ -61,7 +61,7 @@ A recepção de caracteres é feita de forma similar: dessa vez, a verificação é fe
 
 \subsection{Funcionalidades do Shell}
 
-O editor de linha de comando do KinOS possui três funcionalidades básicas: listar \emph{threads} ativas (\emph{ps}), inicializar novas \emph{threads} (\emph{start}) e encerrar \emph{threads} ativas (\emph{end}). As sintaxes de cada comando são, respectivamente:
+O editor de linha de comando do KinOS possui cinco funcionalidades básicas: listar \emph{threads} ativas (\emph{ps}), inicializar novas \emph{threads} (\emph{start}), encerrar \emph{threads} ativas (\emph{end}), listar as threads disponíveis. As sintaxes de cada comando são, respectivamente:
 
 \begin{lstlisting}
 ps
@@ -69,6 +69,8 @@ ps
 start <nome da thread>
 
 end <nome da thread>
+
+listtasks
 \end{lstlisting}
 
 O comando \emph{ps} utiliza o vetor de threads do sistema operacional para saber quais \emph{threads} estão ativas. A partir daí, buscam-se as informações sobre cada \emph{thread} ativa em seu respectivo PCB. Essas informações são, então, listadas ao usuário.
@@ -76,3 +78,9 @@ O comando \emph{ps} utiliza o vetor de threads do sistema operacional para saber
 O comando \emph{start} utiliza as system calls \emph{fork} e \emph{exec} para iniciar novas \emph{threads} no sistema. O usuário deve fornecer o nome da \emph{thread} como parâmetro do comando. Cada \emph{thread} que pode ser disparada dentro do KinOS já está definida dentro do código-fonte, e cada um de seus nomes também já está definido.
 
 O comando \emph{end} é similar ao \emph{start}. Dessa vez, o comando recebe o nome de uma \emph{thread} ativa no sistema e utiliza a system call \emph{exit} para encerrá-la.
+
+O comando \emph{listtasks} apresenta uma lista com o nome das \emph{threads} disponíveis no sistema.
+
+Além desses comandos, foi implementado o comando help que lista a sintaxe de todos os possíveis comandos da \emph{shell}.
+
+\paragraph{}
