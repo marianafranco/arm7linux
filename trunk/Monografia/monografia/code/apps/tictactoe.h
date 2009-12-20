@@ -2,17 +2,16 @@
  * IMPORT
  ****************************************************************/
 
-#include "constants.h"
+#include "serial.h"
 #include "terminal.h"
-#include "tasks.h"
+
+#include "../mutex/mutex.h"
+#include "../interrupt/swi.h"
 
 
 /****************************************************************
  * ROUTINES
  ****************************************************************/
-
-/* Initializes the button */
-void button_init (void);
-
-/* Handles a button interruption */
-void button_irq (void);
+ 
+/* Entry point of the game */
+void tictactoe(void);

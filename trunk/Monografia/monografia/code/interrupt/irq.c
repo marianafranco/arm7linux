@@ -1,10 +1,39 @@
+/***************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*****************************************************************/
+
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+
 /* C functions for hardware interruptions */
 
 #include "irq.h"
 
+/****************************************************************
+ * EXTERN
+ ****************************************************************/
+
 /* Reserved spaces where the Angel IRQ/SWI addressess will be stored */
 extern int  Angel_IRQ_Address;
 extern int  Angel_SWI_Address;
+
+
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
 
 /* 	Installs a handler branch on the interrupt vector */
 void install_handler (unsigned handler_routine_address, unsigned *vector_address) {

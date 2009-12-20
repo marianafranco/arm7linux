@@ -1,7 +1,31 @@
+/****************************************************************
+	KinOS - Microkernel for ARM Evaluator 7-T
+	Seniors project - Computer Engineering
+	Escola Politecnica da USP, 2009
+	
+	Felipe Giunte Yoshida
+	Mariana Ramos Franco
+	Vinicius Tosta Ribeiro
+*/
+
+/* 
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+*****************************************************************/
+
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+ 
 /* This file contains routines to initialize and handle timer interruptions */
 
 #include "timer.h"
 
+/****************************************************************
+ * ROUTINES
+ ****************************************************************/
+ 
 /* Initiate timer settings */
 void timer_init (void) {
 	/* Case it's from the emulator */
