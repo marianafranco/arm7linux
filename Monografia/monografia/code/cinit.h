@@ -1,13 +1,21 @@
+/****************************************************************
+ * IMPORT
+ ****************************************************************/
+
 #include "constants.h"
-#include "apps/tasks.h"
-#include "apps/terminal.h"
-#include "interrupt/irq.h"
-#include "peripherals/button.h"
-#include "peripherals/segment.h"
-#include "peripherals/timer.h"
+#include "terminal.h"
+#include "irq.h"
+#include "button.h"
+#include "segment.h"
+#include "timer.h"
+#include "tictactoe.h"
+
+
+/****************************************************************
+ * EXTERN
+ ****************************************************************/
 
 extern void handler_board_angel(void);
 extern void handler_board_no_angel(void);
 extern void handler_swi(void);
 extern void handler_emulator(void);
-extern void task1(void);
