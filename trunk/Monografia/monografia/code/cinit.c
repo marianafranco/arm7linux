@@ -1,4 +1,4 @@
-/*
+/**************************************************************
 	KinOS - Microkernel for ARM Evaluator 7-T
 	Seniors project - Computer Engineering
 	Escola Politecnica da USP, 2009
@@ -9,10 +9,10 @@
 */
 
 /* 
-The program was based on the mutex program by ARM - Strategic Support Group,
-contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
-source/examples/mutex/ 
-*/
+	The program was based on the mutex program by ARM - Strategic Support Group,
+	contained on the ARM Evaluator 7-T example CD, under the folder /Evaluator7-T/
+	source/examples/mutex/ 
+***************************************************************/
 
 /* Initialization code in C */
 
@@ -45,9 +45,9 @@ int C_Entry (void) {
 		MOV		r1,	#0x40|0x10
 		MSR 	CPSR_c, r1
 	}
-	/* Start with process 1 */
-	task1();
-	//shell();
+	/* Start with shell */
+	shell();
+	
 	 /* The return below should not be reachable */
 	return 0;
 }
