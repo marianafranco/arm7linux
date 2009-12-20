@@ -203,7 +203,7 @@ Por exemplo, quando o processador esta no modo IRQ, as instruções executadas con
 \subsection{Registradores de Estado} \label{sub:reg_estado}
 \index{conceitos!processador!reg_estado}
 
-O \emph{Current Program Status Register} (CPRS) é acessível em todos os modos do processador. Ele contém as \emph{flags} de condição, os bits para desabilitar as interrupções, o modo atual do processador, e outras informações de estado e controle. Cada modo de interrupção possui também um \emph{Saved Program Register} (SPRS), que é usado para preservar o valor do CPSR quando a interrupção associada acontece \cite{ArchManual}.
+O \emph{Current Program Status Register} (CPSR) é acessível em todos os modos do processador. Ele contém as \emph{flags} de condição, os bits para desabilitar as interrupções, o modo atual do processador, e outras informações de estado e controle. Cada modo de interrupção possui também um \emph{Saved Program Register} (SPSR), que é usado para preservar o valor do CPSR quando a interrupção associada acontece \cite{ArchManual}.
 
 Assim, os registradores de estado \cite{TechManual}:
 

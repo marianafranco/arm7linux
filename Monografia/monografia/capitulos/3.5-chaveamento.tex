@@ -139,3 +139,5 @@ Depois disso, muda-se o endereço do ponteiro de pilha para o PCB da \emph{thread
 \subsection{Retorno à execução da nova rotina}
 
 Como os registradores, o ponteiro de pilha, o endereço de retorno e o registrador de estados já estão com os dados do próxima \emph{thread}, deve-se apenas fazer com que o a instrução imediatamente posterior à aquela executada antes da interrupção seja executada. Porém, o pipeline do processador fez com que o endereço da instrução duas vezes à frente tivesse sido armazenado. Para compensar isso, deve-se subtrair o tamanho de uma instrução (4 bytes) do endereço que vai ser colocado no \emph{process counter}. Todo este processo é feito com apenas uma instrução: \verb|SUBS 		pc, r14, #4|, que simultaneamente decrementa do endereço de retorno 4 e coloca o resultado no \emph{process counter}.
+
+\paragraph{}
