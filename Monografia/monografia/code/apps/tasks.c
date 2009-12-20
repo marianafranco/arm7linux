@@ -14,7 +14,6 @@
 	source/examples/mutex/ 
 *****************************************************************/
 
-
 /****************************************************************
  * IMPORT
  ****************************************************************/
@@ -102,7 +101,6 @@ int get_task_name_size(){
 char* get_task_name(int index){
 	return tasks_name[index].name;
 }
-
 
 
 /****************************************************************
@@ -237,6 +235,7 @@ void display_pid(int trash){
 	}
 }
 
+
 // The tictactoe program
 void play_tictactoe(int trash) {
 	
@@ -248,6 +247,7 @@ void play_tictactoe(int trash) {
 	exit(current_thread_id);
 	while(1){}
 }
+
 
 // Exemple of fork/exec
 void fork_test(int trash){
@@ -272,7 +272,6 @@ void fork_test(int trash){
 		
 	}
 }
-
 
 
 // Example of mutex
@@ -338,6 +337,7 @@ void mutex_test (int led) {
 	}
 }
 
+
 // Malicious program wich install a handler 
 // Atention!! This program will lock the system
 void malicious_handler (int trash) {
@@ -349,6 +349,7 @@ void malicious_handler (int trash) {
 	install_handler ((unsigned)security_flaw, (unsigned *)IRQVector);
 	while (1) {}
 }
+
 
 // Routine used in the malicious_handler
 void security_flaw (int trash) {
@@ -373,6 +374,7 @@ void security_flaw (int trash) {
 		for (delay = 0; delay <= 0x001ffff0; delay++) {};
 	}	
 } 
+
 
 // Set in the LEDs the value give in the switches
 void dips_to_leds (int trash) {

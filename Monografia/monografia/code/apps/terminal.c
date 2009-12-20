@@ -63,8 +63,6 @@ __swi (angel_SWI) void _WriteC(unsigned op, const char *c);
  * ROUTINES
  ****************************************************************/
 
-
-
 /* -- comm_print ------------------------------------------------
  *
  * Description	: write a string via the Angel SWI call WriteC
