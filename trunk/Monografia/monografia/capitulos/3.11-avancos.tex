@@ -3,7 +3,6 @@
 
 Após a primeira revisão da monografia, algumas modificações foram realizadas para o término do sistema.
 
-
 %-------------------------------------------
 % Shell
 %-------------------------------------------
@@ -61,26 +60,22 @@ Deste modo, foram criadas 8 \emph{threads} para exemplificar o funcionamento do 
 \subsection{Mutex} \label{sub:mutex}
 \index{sistema!avancos!mutex}
 
-Foi necessário implementar o esquema de mutex no terminal para que ao inicializar o programa \textbf{tictactoe} este funcionasse corretamente, bloqueando o funcionamento do terminal. Assim, temos sempre apenas uma aplicação acessando a porta serial.
+A rotina descrita no item \ref{cap:mutex} foi utilizada em duas rotinas. A primeira, chamada de mutex\_test, acende e apaga um led. Caso o led esteja aceso, o mutex está habilitado. Ao se iniciar uma outra thread com o mesmo código, percebe-se que os dois leds não acendem ao mesmo tempo.
 
-Para implementar a exclusão mútua no terminal, criou-se os sinais WAIT\_SHELL e SIGNAL\_SHELL.
-
+Outro uso do mutex é no programa tictactoe, que concorre com o shell no uso da porta serial e da tela. Para tal, força-se uma troca de threads com a chamada de sistema switch\_thread (descrita abaixo) e habilita-se a exclusão mútua de código entre o shell e o tictactoe.
 
 %-------------------------------------------
 % System Calls
 %-------------------------------------------
-\subsection{System Calls} \label{sub:syscalls}
+\subsection{Chamadas de sistema} \label{sub:syscalls}
 \index{sistema!avancos!syscalls}
 
-Para o correto funcionamento do terminal, duas novas system calls foram criadas.
+Para o melhor funcionamento do terminal, duas novas chamadas de sistema foram criadas.
 
 \subsubsection{print}
 
-Chamada quando se deseja imprimir uma sequência de caracteres no terminal. Dessa maneira toda a sequência é impressa no terminal, sem o risco de ocorrer uma interrupção de \emph{timer} fazendo com que o \emph{microkernel} chaveie para uma outra \emph{thread} que vá imprimir uma outra sequência, o que poderia provocar o embaralhamento de mensagens na tela.
-
+Chamada quando se deseja imprimir uma seqüência de caracteres completa (linha) no terminal. Como as chamadas de sistema são executadas em modo privilegiado, outras interrupções são desabilitadas, permitindo com que nada interrompa a rotina até sua finalização.
 
 \subsubsection{switch\_thread}
 
-System call criada para forçar o chaveamento de processos. É utilizada no terminal para forçar o chaveamento para uma outra \emph{thread} após liberar o uso da porta serial pelo sinal SIGNAL\_SHELL. 
-
-Isso permite que outras \emph{threads}, como a \textbf{tictactoe}, possam utilizar a porta serial.
+Chamada de sistema criada para forçar o chaveamento de threads. Ao ser chamada, simula uma interrupção de timer, fazendo com que se chaveie para a próxima thread e com que o timer seja reinicializado. É um artifício utilizado para que se force que o mutex da próxima thread seja inicializado antes do mutex da thread atual.
